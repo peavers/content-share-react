@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import type {
   ApiServiceType,

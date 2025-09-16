@@ -13,6 +13,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Dashboard Component
 import Dashboard from './components/Dashboard';
+import VideoUpload from './components/VideoUpload';
 
 // Configure Amplify
 Amplify.configure(awsConfig);
@@ -32,6 +33,11 @@ const App: React.FC<AppProps> = () => {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/upload" element={
+              <ProtectedRoute>
+                <VideoUpload />
               </ProtectedRoute>
             } />
 

@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, MouseEvent } from 'react';
+import React, { useState, type FormEvent, type MouseEvent } from 'react';
 import { signUp, confirmSignUp, resendSignUpCode } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import type { RegisterComponentProps, AmplifySignUpResult } from '../../types';

@@ -131,3 +131,54 @@ export interface HealthCheckResponse {
   status: string;
   version: string;
 }
+
+// Video Upload Types
+export interface PresignedUrlInfo {
+  partNumber: number;
+  url: string;
+  expiresAt: string;
+}
+
+export interface UploadInitiateRequest {
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  metadata?: Record<string, string>;
+  title?: string;
+  description?: string;
+}
+
+export interface UploadInitiateResponse {
+  uploadId: string;
+  uploadType: 'single' | 'multipart';
+  fileKey: string;
+  chunkSize?: number;
+  totalChunks?: number;
+  presignedUrls: PresignedUrlInfo[];
+  completeUrl: string;
+}
+
+export interface CompletedPart {
+  partNumber: number;
+  etag: string;
+}
+
+export interface UploadCompleteRequest {
+  parts: CompletedPart[];
+}
+
+export interface UploadProgress {
+  uploadId: string;
+  fileName: string;
+  fileSize: number;
+  uploadedBytes: number;
+  totalBytes: number;
+  percentage: number;
+  status: 'preparing' | 'uploading' | 'completing' | 'completed' | 'error' | 'cancelled';
+  error?: string;
+  startTime: Date;
+  estimatedTimeRemaining?: number;
+  uploadSpeed?: number;
+}
+
+export interface VideoUploadProps {}

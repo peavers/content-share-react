@@ -1,15 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/apiService';
 import type { UserProfile, ContentDto, ApiCall, DashboardProps } from '../types';
 
 const Dashboard: React.FC<DashboardProps> = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [content, setContent] = useState<ContentDto[]>([]);
   const [healthStatus, setHealthStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
   const [apiCalls, setApiCalls] = useState<ApiCall[]>([]);
 
   useEffect(() => {
@@ -63,7 +64,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
       }
 
     } catch (err: any) {
-      setError('Failed to load dashboard data');
       console.error('Dashboard load error:', err);
     } finally {
       setLoading(false);
@@ -98,6 +98,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 <span className="text-gray-500">Welcome,</span>
                 <span className="ml-1 font-medium text-gray-900">{user?.username || 'User'}</span>
               </div>
+              <button
+                onClick={() => navigate('/upload')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span>Upload Video</span>
+              </button>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"

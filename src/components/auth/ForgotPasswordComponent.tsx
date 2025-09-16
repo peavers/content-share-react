@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, type FormEvent } from 'react';
 import { resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
 import type { ForgotPasswordComponentProps } from '../../types';
