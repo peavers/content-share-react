@@ -1,47 +1,22 @@
-// User and Authentication Types
-export interface User {
-  username: string;
-  userId: string;
-  signInDetails?: any;
-}
+// Re-export generated types directly - no backward compatibility
+export type {
+  User,
+  UserProfileDto,
+  Organization,
+  OrganizationMembership,
+  OrganizationInvitation,
+  CreateOrganizationRequest,
+  InviteMemberRequest,
+  UploadRequest,
+  UploadResult,
+  UploadCompletionRequest,
+  PartInfo,
+  PresignedUrlInfo
+} from '../generated';
 
-export interface UserProfile {
-  username: string;
-  email: string;
-  groups?: string[];
-  scopes?: string[];
-  attributes?: Record<string, any>;
-}
+import type { User } from '../generated';
 
-// Content Types
-export interface ContentDto {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  owner: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  shared: boolean;
-  status: string;
-  sharedWith?: string[];
-}
-
-export interface ShareRequestDto {
-  usernames: string[];
-}
-
-// API Call Tracking
-export interface ApiCall {
-  id: string;
-  timestamp: string;
-  method: string;
-  endpoint: string;
-  status: 'success' | 'error';
-  data: string;
-}
-
-// Auth Context Types
+// Auth Context Types - use generated User type
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -51,51 +26,6 @@ export interface AuthContextType {
   getAccessToken: () => Promise<string | null>;
   getIdToken: () => Promise<string | null>;
   refreshSession: () => Promise<any>;
-}
-
-// API Service Types
-export interface ApiServiceType {
-  getUserProfile: () => Promise<UserProfile>;
-  updateUserProfile: (profileData: UserProfile) => Promise<UserProfile>;
-  getSharedContent: () => Promise<ContentDto[]>;
-  createContent: (contentData: Partial<ContentDto>) => Promise<ContentDto>;
-  updateContent: (contentId: string, contentData: Partial<ContentDto>) => Promise<ContentDto>;
-  deleteContent: (contentId: string) => Promise<void>;
-  shareContent: (contentId: string, shareData: ShareRequestDto) => Promise<any>;
-  healthCheck: () => Promise<{ timestamp: string; service: string; status: string; version: string }>;
-}
-
-// Component Props Types
-export interface DashboardProps {}
-
-export interface LoginComponentProps {}
-
-export interface RegisterComponentProps {}
-
-export interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-export interface ForgotPasswordComponentProps {}
-
-export interface AppProps {}
-
-// Form State Types
-export interface LoginFormState {
-  email: string;
-  password: string;
-  error: string;
-  loading: boolean;
-}
-
-export interface RegisterFormState {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  error: string;
-  loading: boolean;
-  step: 'register' | 'verify';
-  verificationCode: string;
 }
 
 // AWS Amplify Types
@@ -124,49 +54,7 @@ export interface AmplifyAuthSession {
   };
 }
 
-// Health Check Response
-export interface HealthCheckResponse {
-  timestamp: string;
-  service: string;
-  status: string;
-  version: string;
-}
-
 // Video Upload Types
-export interface PresignedUrlInfo {
-  partNumber: number;
-  url: string;
-  expiresAt: string;
-}
-
-export interface UploadInitiateRequest {
-  fileName: string;
-  fileSize: number;
-  contentType: string;
-  metadata?: Record<string, string>;
-  title?: string;
-  description?: string;
-}
-
-export interface UploadInitiateResponse {
-  uploadId: string;
-  uploadType: 'single' | 'multipart';
-  fileKey: string;
-  chunkSize?: number;
-  totalChunks?: number;
-  presignedUrls: PresignedUrlInfo[];
-  completeUrl: string;
-}
-
-export interface CompletedPart {
-  partNumber: number;
-  etag: string;
-}
-
-export interface UploadCompleteRequest {
-  parts: CompletedPart[];
-}
-
 export interface UploadProgress {
   uploadId: string;
   fileName: string;
@@ -181,4 +69,40 @@ export interface UploadProgress {
   uploadSpeed?: number;
 }
 
+export interface CompletedPart {
+  partNumber: number;
+  etag: string;
+}
+
+// Simple component props
 export interface VideoUploadProps {}
+export interface AppProps {}
+export interface DashboardProps {}
+export interface LoginComponentProps {}
+export interface RegisterComponentProps {}
+export interface ForgotPasswordComponentProps {}
+export interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+// Form State Types
+export interface LoginFormState {
+  email: string;
+  password: string;
+  error: string;
+  loading: boolean;
+}
+
+export interface RegisterFormState {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  error: string;
+  loading: boolean;
+  step: 'register' | 'verify';
+  verificationCode: string;
+}
+
+// Re-export organization utilities
+export type { WorkspaceContext } from './organization';
+export { hasPermission } from './organization';

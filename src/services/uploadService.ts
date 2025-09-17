@@ -1,6 +1,5 @@
 import axios, { type AxiosProgressEvent } from 'axios';
 import type {
-  UploadInitiateRequest,
   CompletedPart,
   UploadProgress
 } from '../types';
@@ -12,7 +11,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080
 export class UploadService {
   private activeUploads = new Map<string, AbortController>();
 
-  async initiateUpload(request: UploadInitiateRequest): Promise<UploadResult> {
+  async initiateUpload(request: UploadRequest): Promise<UploadResult> {
     // Convert to generated API request format
     const uploadRequest: UploadRequest = {
       fileName: request.fileName,
@@ -125,7 +124,7 @@ export class UploadService {
     try {
       updateProgress('preparing');
 
-      const initiateRequest: UploadInitiateRequest = {
+      const initiateRequest: UploadRequest = {
         fileName: file.name,
         fileSize: file.size,
         contentType: file.type,

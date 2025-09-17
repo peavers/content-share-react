@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { getCurrentUser, fetchAuthSession, signOut } from 'aws-amplify/auth';
-import type { AuthContextType, AuthUser, AmplifyAuthSession } from '../types';
+import type { AuthContextType, User, AmplifyAuthSession } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -17,7 +17,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
@@ -34,11 +34,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const session: AmplifyAuthSession = await fetchAuthSession();
 
       if (currentUser && session?.tokens) {
+        // Map AWS Amplify user to generated User type
         setUser({
-          id: currentUser.userId, // Set id to userId for compatibility
+          id: currentUser.userId,
+          email: currentUser.signInDetails?.loginId || '', // Use loginId as email
           username: currentUser.username,
-          userId: currentUser.userId,
-          signInDetails: currentUser.signInDetails
+          firstName: '',
+          lastName: '',
+          avatarUrl: '',
+          personalOrganizationId: '', // Will be set from API
+          emailVerified: true,
+          active: true,
+          lastLoginAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          personalOrganization: null // Required by generated User type
         });
         setIsAuthenticated(true);
       } else {

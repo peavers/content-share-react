@@ -1,7 +1,11 @@
-import {
-    type CreateOrganizationRequest, type InviteMemberRequest, MemberRole, type Organization,
-    type OrganizationInvitation, type OrganizationMembership
+import type {
+    CreateOrganizationRequest,
+    InviteMemberRequest,
+    Organization,
+    OrganizationInvitation,
+    OrganizationMembership
 } from "../types";
+import { OrganizationMembershipRoleEnum } from "../generated";
 import { generatedApiService } from './generatedApiService';
 
 
@@ -46,7 +50,7 @@ class OrganizationService {
     return response.data;
   }
 
-  async updateMemberRole(organizationId: string, targetUserId: string, role: MemberRole): Promise<OrganizationMembership> {
+  async updateMemberRole(organizationId: string, targetUserId: string, role: OrganizationMembershipRoleEnum): Promise<OrganizationMembership> {
     const response = await generatedApiService.organization.updateMemberRole(
       organizationId,
       targetUserId,
@@ -105,26 +109,26 @@ class OrganizationService {
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 
-  getRoleDisplayName(role: MemberRole): string {
+  getRoleDisplayName(role: OrganizationMembershipRoleEnum): string {
     switch (role) {
-      case MemberRole.OWNER:
+      case OrganizationMembershipRoleEnum.Owner:
         return 'Owner';
-      case MemberRole.ADMIN:
+      case OrganizationMembershipRoleEnum.Admin:
         return 'Admin';
-      case MemberRole.MEMBER:
+      case OrganizationMembershipRoleEnum.Member:
         return 'Member';
       default:
         return 'Unknown';
     }
   }
 
-  getRoleBadgeColor(role: MemberRole): string {
+  getRoleBadgeColor(role: OrganizationMembershipRoleEnum): string {
     switch (role) {
-      case MemberRole.OWNER:
+      case OrganizationMembershipRoleEnum.Owner:
         return 'bg-purple-100 text-purple-800';
-      case MemberRole.ADMIN:
+      case OrganizationMembershipRoleEnum.Admin:
         return 'bg-blue-100 text-blue-800';
-      case MemberRole.MEMBER:
+      case OrganizationMembershipRoleEnum.Member:
         return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';

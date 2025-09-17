@@ -1,6 +1,7 @@
 import {useOrganization} from '../../contexts';
 import {useEffect, useRef, useState} from "react";
-import {type Organization, OrganizationType, type WorkspaceContext} from "../../types";
+import type {Organization, WorkspaceContext} from "../../types";
+import {OrganizationOrganizationTypeEnum} from "../../generated";
 
 
 interface WorkspaceSelectorProps {
@@ -32,7 +33,7 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
 
     const handleWorkspaceChange = (organization: Organization) => {
         const workspace: WorkspaceContext = {
-            type: organization.organizationType === OrganizationType.PERSONAL ? 'personal' : 'organization',
+            type: organization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,
             currentUserRole: undefined, // Will be set by context
             permissions: []
@@ -49,8 +50,8 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
         );
     }
 
-    const personalOrgs = organizations.filter(org => org.organizationType === OrganizationType.PERSONAL);
-    const teamOrgs = organizations.filter(org => org.organizationType === OrganizationType.ORGANIZATION);
+    const personalOrgs = organizations.filter(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
+    const teamOrgs = organizations.filter(org => org.organizationType === OrganizationOrganizationTypeEnum.Organization);
 
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
@@ -158,7 +159,7 @@ function WorkspaceOption({organization, isSelected, onClick}: WorkspaceOptionPro
             <OrganizationAvatar organization={organization} size="sm"/>
             <div className="flex-1 min-w-0">
                 <div className="truncate font-medium">{organization.name}</div>
-                {organization.organizationType === OrganizationType.ORGANIZATION && (
+                {organization.organizationType === OrganizationOrganizationTypeEnum.Organization && (
                     <div className="text-xs text-gray-500">
                         {organization.memberCount || 0} member{(organization.memberCount || 0) !== 1 ? 's' : ''}
                     </div>
@@ -197,7 +198,7 @@ export function OrganizationAvatar({organization, size, className = ''}: Organiz
     }
 
     // Generate avatar based on organization type and name
-    const isPersonal = organization.organizationType === OrganizationType.PERSONAL;
+    const isPersonal = organization.organizationType === OrganizationOrganizationTypeEnum.Personal;
     const initial = organization.name.charAt(0).toUpperCase();
     const bgColor = isPersonal ? 'bg-blue-500' : 'bg-purple-500';
 

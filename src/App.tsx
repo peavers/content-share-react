@@ -16,8 +16,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import MainLayout from './components/layout/MainLayout';
 
 // Page Components
-import { DashboardOverview } from './components/dashboard/DashboardOverview';
-import { VideosPage } from './components/videos/VideosPage';
+import DashboardOverview from './components/dashboard/DashboardOverview';
+import VideosPage from './components/videos/VideosPage';
 import VideoUpload from './components/VideoUpload';
 import { OrganizationPage } from './components/organization/OrganizationPage';
 import { SettingsPage } from './components/settings/SettingsPage';

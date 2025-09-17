@@ -33,7 +33,7 @@ export const OrganizationPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (currentWorkspace && currentWorkspace.organizationType === 'organization') {
+    if (currentWorkspace && currentWorkspace.type === 'organization') {
       loadOrganizationData();
     }
   }, [currentWorkspace]);

@@ -1,47 +1,18 @@
-// Organization-related utility types and enums
-// Note: Main types (User, Organization, etc.) are now imported from generated API types
+// Minimal organization utility types - use generated types where possible
 import type { Organization } from '../generated';
+import { OrganizationMembershipRoleEnum } from '../generated';
 
+// Simple workspace context - just wraps the generated Organization
 export interface WorkspaceContext {
   type: 'personal' | 'organization';
   organization: Organization;
-  currentUserRole?: MemberRole;
+  currentUserRole?: OrganizationMembershipRoleEnum;
   permissions: string[];
 }
 
-// Enums
-export enum OrganizationType {
-  PERSONAL = 'PERSONAL',
-  ORGANIZATION = 'ORGANIZATION'
-}
-
-export enum Visibility {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE'
-}
-
-export enum MemberRole {
-  OWNER = 'OWNER',
-  ADMIN = 'ADMIN',
-  MEMBER = 'MEMBER'
-}
-
-export enum MemberStatus {
-  ACTIVE = 'ACTIVE',
-  PENDING = 'PENDING',
-  SUSPENDED = 'SUSPENDED'
-}
-
-export enum InvitationStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  DECLINED = 'DECLINED',
-  EXPIRED = 'EXPIRED'
-}
-
-// Permission system
+// Permission system using generated role enum
 export const PERMISSIONS = {
-  [MemberRole.OWNER]: [
+  [OrganizationMembershipRoleEnum.Owner]: [
     'manage_org',
     'delete_org',
     'invite_members',
@@ -50,19 +21,19 @@ export const PERMISSIONS = {
     'view_analytics',
     'manage_billing'
   ],
-  [MemberRole.ADMIN]: [
+  [OrganizationMembershipRoleEnum.Admin]: [
     'invite_members',
     'remove_members',
     'manage_uploads',
     'view_analytics'
   ],
-  [MemberRole.MEMBER]: [
+  [OrganizationMembershipRoleEnum.Member]: [
     'view_uploads',
     'upload_files'
   ]
 };
 
-export function hasPermission(role: MemberRole | undefined, permission: string): boolean {
+export function hasPermission(role: OrganizationMembershipRoleEnum | undefined, permission: string): boolean {
   if (!role) return false;
   return PERMISSIONS[role]?.includes(permission) || false;
 }

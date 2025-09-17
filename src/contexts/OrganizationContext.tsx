@@ -1,8 +1,10 @@
-import {
-    MemberRole,
-    OrganizationType,
-    hasPermission, type Organization, type WorkspaceContext, type OrganizationInvitation
+import type {
+    Organization,
+    OrganizationInvitation,
+    WorkspaceContext
 } from '../types';
+import { OrganizationMembershipRoleEnum, OrganizationOrganizationTypeEnum } from '../generated';
+import { hasPermission } from '../types';
 import {organizationService} from '../services/organizationService';
 import {useAuth} from './AuthContext';
 import {createContext, type ReactNode, useEffect, useState} from "react";
@@ -26,7 +28,7 @@ interface OrganizationContextType {
 
     // Utilities
     hasPermissionInCurrentWorkspace: (permission: string) => boolean;
-    getUserRoleInOrganization: (organizationId: string) => MemberRole | undefined;
+    getUserRoleInOrganization: (organizationId: string) => OrganizationMembershipRoleEnum | undefined;
     getPersonalWorkspace: () => WorkspaceContext | null;
 }
 
@@ -59,7 +61,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
             // Set default workspace to personal workspace if none selected
             if (!currentWorkspace && orgs.length > 0) {
-                const personalOrg = orgs.find(org => org.organizationType === OrganizationType.PERSONAL);
+                const personalOrg = orgs.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
                 if (personalOrg) {
                     setCurrentWorkspace(createWorkspaceContext(personalOrg));
                 }
@@ -125,17 +127,17 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
     };
 
     // Get user's role in specific organization
-    const getUserRoleInOrganization = (organizationId: string): MemberRole | undefined => {
+    const getUserRoleInOrganization = (organizationId: string): OrganizationMembershipRoleEnum | undefined => {
         const org = organizations.find(o => o.id === organizationId);
         if (!org?.memberships || !user?.id) return undefined;
 
         const membership = org.memberships.find(m => m.userId === user.id);
-        return membership?.role as MemberRole | undefined;
+        return membership?.role;
     };
 
     // Get personal workspace
     const getPersonalWorkspace = (): WorkspaceContext | null => {
-        const personalOrg = organizations.find(org => org.organizationType === OrganizationType.PERSONAL);
+        const personalOrg = organizations.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
         return personalOrg ? createWorkspaceContext(personalOrg) : null;
     };
 
@@ -143,7 +145,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
     const createWorkspaceContext = (organization: Organization): WorkspaceContext => {
         const userRole = getUserRoleInOrganization(organization.id);
         return {
-            type: organization.organizationType === OrganizationType.PERSONAL ? 'personal' : 'organization',
+            type: organization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,
             currentUserRole: userRole,
             permissions: userRole ? (hasPermission as any)(userRole, '') || [] : []
@@ -180,7 +182,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
             }
 
             // Fallback to personal workspace
-            const personalOrg = organizations.find(org => org.organizationType === OrganizationType.PERSONAL);
+            const personalOrg = organizations.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
             if (personalOrg) {
                 setCurrentWorkspaceState(createWorkspaceContext(personalOrg));
             }
