@@ -66,8 +66,29 @@ apiClient.interceptors.response.use(
   }
 );
 
-// API service methods
+// API service methods with generic HTTP methods
 const apiService: ApiServiceType = {
+  // Generic HTTP methods
+  get: async <T = any>(url: string): Promise<{ data: T }> => {
+    const response = await apiClient.get<T>(url);
+    return { data: response.data };
+  },
+
+  post: async <T = any>(url: string, data?: any): Promise<{ data: T }> => {
+    const response = await apiClient.post<T>(url, data);
+    return { data: response.data };
+  },
+
+  put: async <T = any>(url: string, data?: any): Promise<{ data: T }> => {
+    const response = await apiClient.put<T>(url, data);
+    return { data: response.data };
+  },
+
+  delete: async <T = any>(url: string): Promise<{ data: T }> => {
+    const response = await apiClient.delete<T>(url);
+    return { data: response.data };
+  },
+
   // User profile endpoints
   getUserProfile: async (): Promise<UserProfile> => {
     const response: AxiosResponse<UserProfile> = await apiClient.get('/api/user/profile');
@@ -105,9 +126,10 @@ const apiService: ApiServiceType = {
     return response.data;
   },
 
-  // Health check
+  // Health check - use generated API service
   healthCheck: async (): Promise<HealthCheckResponse> => {
-    const response: AxiosResponse<HealthCheckResponse> = await apiClient.get('/health');
+    const { generatedApiService } = await import('./generatedApiService');
+    const response = await generatedApiService.healthCheck();
     return response.data;
   }
 };

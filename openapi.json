@@ -1,0 +1,1045 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/user/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateUserProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "updateOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "deleteOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/members/{targetUserId}": {
+      "put": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "updateMemberRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMembership"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "removeMember",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/s3/upload/initiate": {
+      "post": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "initiateUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/upload/complete/{uploadId}": {
+      "post": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "completeMultipartUpload",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getUserOrganizations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organization"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "createOrganization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/invitations": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "inviteMember",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationInvitation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations/{token}/decline": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "declineInvitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations/{token}/accept": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "acceptInvitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMembership"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/validate": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "validateToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/buckets": {
+      "get": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "listBuckets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/members": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getOrganizationMembers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationMembership"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getUserInvitations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationInvitation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "adminOnly",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/upload/{uploadId}": {
+      "delete": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "abortUpload",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "CreateOrganizationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          },
+          "plan": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "inviteEmails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inviteRoles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "OWNER",
+                "ADMIN",
+                "MEMBER"
+              ]
+            }
+          }
+        }
+      },
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string"
+          },
+          "organizationType": {
+            "type": "string",
+            "enum": [
+              "PERSONAL",
+              "ORGANIZATION"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          },
+          "plan": {
+            "type": "string"
+          },
+          "maxStorageGb": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usedStorageBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxMembers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVideos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "customDomain": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationMembership"
+            }
+          },
+          "memberCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "videoCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "OrganizationMembership": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PENDING",
+              "SUSPENDED"
+            ]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization": {},
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "personalOrganizationId": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "lastLoginAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "personalOrganization": {}
+        }
+      },
+      "UploadRequest": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "PresignedUrlInfo": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UploadResult": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string"
+          },
+          "uploadType": {
+            "type": "string"
+          },
+          "fileKey": {
+            "type": "string"
+          },
+          "chunkSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalChunks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "presignedUrls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PresignedUrlInfo"
+            }
+          },
+          "completeUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "PartInfo": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "etag": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadCompletionRequest": {
+        "type": "object",
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartInfo"
+            }
+          }
+        }
+      },
+      "InviteMemberRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganizationInvitation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "invitedBy": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "token": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "DECLINED",
+              "EXPIRED"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "inviter": {
+            "$ref": "#/components/schemas/User"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "expired": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

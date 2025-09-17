@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { getCurrentUser, fetchAuthSession, signOut } from 'aws-amplify/auth';
-import type { AuthContextType, User, AmplifyAuthSession } from '../types';
+import type { AuthContextType, AuthUser, AmplifyAuthSession } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -17,7 +17,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (currentUser && session?.tokens) {
         setUser({
+          id: currentUser.userId, // Set id to userId for compatibility
           username: currentUser.username,
           userId: currentUser.userId,
           signInDetails: currentUser.signInDetails

@@ -1,11 +1,9 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { uploadService } from '../services/uploadService';
 import type { VideoUploadProps, UploadProgress } from '../types';
 
 const VideoUpload: React.FC<VideoUploadProps> = () => {
-  const { getAccessToken } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,15 +72,9 @@ const VideoUpload: React.FC<VideoUploadProps> = () => {
       setIsUploading(true);
       setError(null);
 
-      const token = await getAccessToken();
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
       await uploadService.uploadFile(
         selectedFile,
         { title: title.trim(), description: description.trim() },
-        token,
         (progress) => {
           setUploadProgress(progress);
         }

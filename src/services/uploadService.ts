@@ -1,28 +1,29 @@
 import axios, { type AxiosProgressEvent } from 'axios';
 import type {
   UploadInitiateRequest,
-  UploadInitiateResponse,
-  UploadCompleteRequest,
   CompletedPart,
   UploadProgress
 } from '../types';
+import type { UploadRequest, UploadResult, UploadCompletionRequest } from '../generated';
+import { generatedApiService } from './generatedApiService';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export class UploadService {
   private activeUploads = new Map<string, AbortController>();
 
-  async initiateUpload(request: UploadInitiateRequest, token: string): Promise<UploadInitiateResponse> {
-    const response = await axios.post(
-      `${API_BASE_URL}/api/s3/upload/initiate`,
-      request,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+  async initiateUpload(request: UploadInitiateRequest): Promise<UploadResult> {
+    // Convert to generated API request format
+    const uploadRequest: UploadRequest = {
+      fileName: request.fileName,
+      fileSize: request.fileSize,
+      contentType: request.contentType,
+      metadata: request.metadata || {},
+      title: request.title || '',
+      description: request.description || ''
+    };
+
+    const response = await generatedApiService.s3.initiateUpload(uploadRequest);
     return response.data;
   }
 
@@ -56,38 +57,27 @@ export class UploadService {
 
   async completeUpload(
     uploadId: string,
-    completedParts: CompletedPart[],
-    token: string
+    completedParts: CompletedPart[]
   ): Promise<void> {
-    const request: UploadCompleteRequest = { parts: completedParts };
+    // Convert to generated API request format
+    const request: UploadCompletionRequest = {
+      parts: completedParts.map(part => ({
+        partNumber: part.partNumber,
+        etag: part.etag
+      }))
+    };
 
-    await axios.post(
-      `${API_BASE_URL}/api/s3/upload/complete/${uploadId}`,
-      request,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    await generatedApiService.s3.completeMultipartUpload(uploadId, request);
   }
 
-  async abortUpload(uploadId: string, token: string): Promise<void> {
+  async abortUpload(uploadId: string): Promise<void> {
     const controller = this.activeUploads.get(uploadId);
     if (controller) {
       controller.abort();
       this.activeUploads.delete(uploadId);
     }
 
-    await axios.delete(
-      `${API_BASE_URL}/api/s3/upload/${uploadId}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    );
+    await generatedApiService.s3.abortUpload(uploadId);
   }
 
   cancelUpload(uploadId: string): void {
@@ -101,7 +91,6 @@ export class UploadService {
   async uploadFile(
     file: File,
     metadata: { title?: string; description?: string },
-    token: string,
     onProgress: (progress: UploadProgress) => void
   ): Promise<void> {
     const startTime = new Date();
@@ -144,13 +133,13 @@ export class UploadService {
         description: metadata.description
       };
 
-      const uploadResponse = await this.initiateUpload(initiateRequest, token);
+      const uploadResponse = await this.initiateUpload(initiateRequest);
       updateProgress('uploading');
 
       if (uploadResponse.uploadType === 'single') {
         await this.handleSingleUpload(file, uploadResponse, updateProgress, uploadId);
       } else {
-        await this.handleMultipartUpload(file, uploadResponse, updateProgress, uploadId, token);
+        await this.handleMultipartUpload(file, uploadResponse, updateProgress, uploadId);
       }
 
       updateProgress('completed', 100);
@@ -163,7 +152,7 @@ export class UploadService {
 
   private async handleSingleUpload(
     file: File,
-    uploadResponse: UploadInitiateResponse,
+    uploadResponse: UploadResult,
     updateProgress: (status: UploadProgress['status'], percentage?: number, error?: string, uploadedBytes?: number) => void,
     uploadId: string
   ): Promise<void> {
@@ -182,10 +171,9 @@ export class UploadService {
 
   private async handleMultipartUpload(
     file: File,
-    uploadResponse: UploadInitiateResponse,
+    uploadResponse: UploadResult,
     updateProgress: (status: UploadProgress['status'], percentage?: number, error?: string, uploadedBytes?: number) => void,
-    uploadId: string,
-    token: string
+    uploadId: string
   ): Promise<void> {
     const chunkSize = uploadResponse.chunkSize || 104857600; // 100MB default
     const completedParts: CompletedPart[] = [];
@@ -220,7 +208,7 @@ export class UploadService {
     }
 
     updateProgress('completing');
-    await this.completeUpload(uploadResponse.uploadId, completedParts, token);
+    await this.completeUpload(uploadResponse.uploadId, completedParts);
   }
 
   validateVideoFile(file: File): { isValid: boolean; error?: string } {
