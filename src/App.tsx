@@ -7,6 +7,7 @@ import awsConfig from './config/awsConfig';
 
 // Components
 import LoginComponent from './components/auth/LoginComponent';
+import RegisterComponent from './components/auth/RegisterComponent';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 import UploadPage from './components/UploadPage';
@@ -24,6 +25,7 @@ const App: React.FC = () => {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginComponent />} />
+              <Route path="/register" element={<RegisterComponent />} />
 
               {/* Protected Routes */}
               <Route path="/dashboard" element={
