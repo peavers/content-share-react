@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useOrganization } from '../../contexts';
 import { tagService } from '../../services/tagService';
 import Navigation from '../shared/Navigation';
+import TagInput from '../shared/TagInput';
 import type { Tag } from '../../generated';
 
 const TagManagement: React.FC = () => {
@@ -14,8 +15,7 @@ const TagManagement: React.FC = () => {
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newTagPath, setNewTagPath] = useState('');
-  const [newTagDescription, setNewTagDescription] = useState('');
+  const [newTags, setNewTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -54,20 +54,22 @@ const TagManagement: React.FC = () => {
   };
 
   const handleCreateTag = async () => {
-    if (!newTagPath.trim()) {
-      setError('Tag path is required');
+    if (newTags.length === 0) {
+      setError('Please add at least one tag');
       return;
     }
 
     try {
-      await tagService.createTag({
-        path: newTagPath.startsWith('/') ? newTagPath : '/' + newTagPath,
-        description: newTagDescription.trim() || undefined
-      });
+      // Create all selected tags
+      for (const tagPath of newTags) {
+        await tagService.createTag({
+          path: tagPath.startsWith('/') ? tagPath : '/' + tagPath,
+          description: undefined
+        });
+      }
 
       setShowCreateModal(false);
-      setNewTagPath('');
-      setNewTagDescription('');
+      setNewTags([]);
       await fetchTags();
     } catch (err: any) {
       console.error('Error creating tag:', err);
@@ -243,7 +245,7 @@ const TagManagement: React.FC = () => {
     <div className="min-h-screen bg-base-200">
       <Navigation />
 
-      <main className="container mx-auto px-4 py-8 max-w-6xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Tag Management</h1>
@@ -298,47 +300,28 @@ const TagManagement: React.FC = () => {
       {showCreateModal && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg mb-4">Create New Tag</h3>
-
-            <div className="form-control mb-4">
-              <label className="label">
-                <span className="label-text">Tag Path</span>
-              </label>
-              <input
-                type="text"
-                placeholder="/news/americas or /technology"
-                className="input input-bordered"
-                value={newTagPath}
-                onChange={(e) => setNewTagPath(e.target.value)}
-              />
-              <label className="label">
-                <span className="label-text-alt opacity-70">
-                  Use / for hierarchical tags. Parent tags will be created automatically.
-                </span>
-              </label>
-            </div>
+            <h3 className="font-bold text-lg mb-4">Create New Tags</h3>
 
             <div className="form-control mb-6">
               <label className="label">
-                <span className="label-text">Description (Optional)</span>
+                <span className="label-text">Add Tags</span>
               </label>
-              <textarea
-                className="textarea textarea-bordered"
-                placeholder="Brief description of this tag"
-                value={newTagDescription}
-                onChange={(e) => setNewTagDescription(e.target.value)}
+              <TagInput
+                allTags={tags}
+                selectedTags={newTags}
+                onTagsChange={setNewTags}
+                placeholder="Type to search or create tags (e.g., /news or /news/americas)"
               />
             </div>
 
             <div className="modal-action">
               <button onClick={handleCreateTag} className="btn btn-primary">
-                Create
+                Create {newTags.length > 0 && `(${newTags.length})`}
               </button>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
-                  setNewTagPath('');
-                  setNewTagDescription('');
+                  setNewTags([]);
                 }}
                 className="btn btn-ghost"
               >

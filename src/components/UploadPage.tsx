@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrganization } from '../contexts';
 import { uploadService } from '../services/uploadService';
 import { tagService } from '../services/tagService';
 import Navigation from './shared/Navigation';
-import Avatar from './shared/Avatar';
+import TagInput from './shared/TagInput';
 import type { Tag } from '../generated';
 
 const UploadPage: React.FC = () => {
@@ -13,77 +13,16 @@ const UploadPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
   const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<Tag[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const tagInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (currentWorkspace) {
       fetchTags();
     }
   }, [currentWorkspace]);
-
-  useEffect(() => {
-    // Filter suggestions based on input
-    if (!tagInput.trim()) {
-      setFilteredSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    const input = tagInput.toLowerCase();
-    const parts = input.split('/').filter(p => p);
-
-    // Build a combined list of existing tags + locally selected tags
-    const localTags = selectedTags.map(path => {
-      const pathParts = path.split('/').filter(p => p);
-      const name = pathParts[pathParts.length - 1];
-      const depth = pathParts.length - 1;
-      const parentPath = depth === 0 ? null : '/' + pathParts.slice(0, depth).join('/');
-
-      return {
-        id: undefined,
-        path,
-        name,
-        depth,
-        parentPath
-      } as Tag;
-    });
-
-    // Combine and deduplicate (prefer existing tags)
-    const existingPaths = new Set(allTags.map(t => t.path));
-    const combinedTags = [
-      ...allTags,
-      ...localTags.filter(t => !existingPaths.has(t.path))
-    ];
-
-    if (parts.length === 0) {
-      // Show root tags
-      const suggestions = combinedTags.filter(t => t.depth === 0);
-      setFilteredSuggestions(suggestions);
-      setShowSuggestions(suggestions.length > 0);
-    } else {
-      // Build the parent path
-      const currentDepth = parts.length - 1;
-      const parentPath = currentDepth === 0 ? null : '/' + parts.slice(0, currentDepth).join('/');
-      const searchTerm = parts[parts.length - 1];
-
-      // Filter tags at the appropriate level
-      const suggestions = combinedTags.filter(t => {
-        if (t.parentPath !== parentPath) return false;
-        if (!t.name) return false;
-        return t.name.toLowerCase().includes(searchTerm);
-      });
-
-      setFilteredSuggestions(suggestions);
-      setShowSuggestions(suggestions.length > 0);
-    }
-  }, [tagInput, allTags, selectedTags]);
 
   const fetchTags = async () => {
     try {
@@ -104,47 +43,6 @@ const UploadPage: React.FC = () => {
       } else {
         setError('Please select a video file');
         setSelectedFile(null);
-      }
-    }
-  };
-
-  const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Ensure it starts with /
-    if (value && !value.startsWith('/')) {
-      setTagInput('/' + value);
-    } else {
-      setTagInput(value);
-    }
-  };
-
-  const selectTag = (tag: Tag) => {
-    if (tag.path && !selectedTags.includes(tag.path)) {
-      setSelectedTags([...selectedTags, tag.path]);
-    }
-    setTagInput('');
-    setShowSuggestions(false);
-    tagInputRef.current?.focus();
-  };
-
-  const removeTag = (tagPath: string) => {
-    setSelectedTags(selectedTags.filter(t => t !== tagPath));
-  };
-
-  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && tagInput.trim()) {
-      e.preventDefault();
-      // If there's exactly one suggestion, use it
-      if (filteredSuggestions.length === 1) {
-        selectTag(filteredSuggestions[0]);
-      } else {
-        // Create new tag with the input
-        const newTagPath = tagInput.trim();
-        if (!selectedTags.includes(newTagPath)) {
-          setSelectedTags([...selectedTags, newTagPath]);
-        }
-        setTagInput('');
-        setShowSuggestions(false);
       }
     }
   };
@@ -209,7 +107,17 @@ const UploadPage: React.FC = () => {
     <div className="min-h-screen bg-base-200">
       <Navigation showUploadButton={false} />
 
-      <main className="container mx-auto px-4 py-12 max-w-3xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Upload Video</h1>
+            <p className="text-sm opacity-60 mt-1">
+              Upload to {currentWorkspace.organization.name}
+            </p>
+          </div>
+        </div>
+
         {/* Success Alert */}
         {success && (
           <div className="alert alert-success shadow-lg mb-6">
@@ -237,19 +145,8 @@ const UploadPage: React.FC = () => {
         )}
 
         {/* Upload Form */}
-        <div className="card bg-base-100 shadow-2xl">
+        <div className="card bg-base-100 shadow-lg">
           <div className="card-body p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Avatar name={currentWorkspace.organization.name} size="md" />
-              <div>
-                <h2 className="text-2xl font-bold">Upload Video</h2>
-                <p className="text-sm opacity-60">
-                  to {currentWorkspace.organization.name}
-                </p>
-              </div>
-            </div>
-
-            <div className="divider"></div>
 
             {/* File Upload */}
             <div className="form-control mb-4">
@@ -310,66 +207,11 @@ const UploadPage: React.FC = () => {
                 <span className="label-text text-base font-medium">Tags</span>
                 <span className="label-text-alt opacity-70">Optional</span>
               </label>
-
-              {/* Selected Tags */}
-              {selectedTags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {selectedTags.map((tag) => (
-                    <div key={tag} className="badge badge-primary gap-2 p-3">
-                      <span>{tag}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="hover:text-error"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Tag Input with Autocomplete */}
-              <div className="relative">
-                <input
-                  ref={tagInputRef}
-                  type="text"
-                  placeholder="Type to search tags (e.g., /news or /news/americas)"
-                  className="input input-bordered w-full"
-                  value={tagInput}
-                  onChange={handleTagInputChange}
-                  onKeyDown={handleTagInputKeyDown}
-                  onFocus={() => tagInput && setShowSuggestions(filteredSuggestions.length > 0)}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                />
-
-                {/* Suggestions Dropdown */}
-                {showSuggestions && filteredSuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {filteredSuggestions.map((tag) => (
-                      <button
-                        key={tag.id}
-                        type="button"
-                        onClick={() => selectTag(tag)}
-                        className="w-full text-left px-4 py-2 hover:bg-base-200 flex items-center justify-between"
-                      >
-                        <span className="font-medium">{tag.path}</span>
-                        {tag.description && (
-                          <span className="text-xs opacity-60 ml-2">{tag.description}</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <label className="label">
-                <span className="label-text-alt opacity-70">
-                  Start typing to search existing tags or create new ones. Press Enter to add.
-                </span>
-              </label>
+              <TagInput
+                allTags={allTags}
+                selectedTags={selectedTags}
+                onTagsChange={setSelectedTags}
+              />
             </div>
 
             <div className="divider"></div>
