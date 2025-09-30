@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth, useOrganization } from '../../contexts';
 import { CreateOrganizationModal } from '../organization/CreateOrganizationModal';
 import Avatar from './Avatar';
+import ThemeSwitcher from './ThemeSwitcher';
 
 interface NavigationProps {
   showUploadButton?: boolean;
@@ -101,6 +102,9 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
               Create Organization
             </button>
           ) : null}
+
+          {/* Theme Switcher */}
+          <ThemeSwitcher />
 
           {/* User Dropdown */}
           <div className="dropdown dropdown-end">

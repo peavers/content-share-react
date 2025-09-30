@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { AuthProvider } from './contexts/AuthContext';
-import { OrganizationProvider } from './contexts/OrganizationContext';
+import { OrganizationProvider } from './contexts';
+import { ThemeProvider } from './contexts';
 import awsConfig from './config/awsConfig';
 
 // Components
@@ -21,9 +22,10 @@ Amplify.configure(awsConfig);
 const App: React.FC = () => {
   return (
     <Router>
-      <AuthProvider>
-        <OrganizationProvider>
-          <div className="App">
+      <ThemeProvider>
+        <AuthProvider>
+          <OrganizationProvider>
+            <div className="App">
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginComponent />} />
@@ -60,9 +62,10 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
             </Routes>
-          </div>
-        </OrganizationProvider>
-      </AuthProvider>
+            </div>
+          </OrganizationProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </Router>
   );
 }
