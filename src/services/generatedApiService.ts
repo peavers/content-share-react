@@ -4,7 +4,9 @@ import {
   AwsS3ControllerApi,
   OrganizationControllerApi,
   SecurityControllerApi,
+  TagControllerApi,
   UserControllerApi,
+  VideoControllerApi,
   Configuration
 } from '../generated';
 
@@ -60,14 +62,18 @@ const configuration = new Configuration({
 export const awsS3Api = new AwsS3ControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const organizationApi = new OrganizationControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const securityApi = new SecurityControllerApi(configuration, API_BASE_URL, axiosInstance);
+export const tagApi = new TagControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const userApi = new UserControllerApi(configuration, API_BASE_URL, axiosInstance);
+export const videoApi = new VideoControllerApi(configuration, API_BASE_URL, axiosInstance);
 
 // Export as default for backward compatibility
 export const generatedApiService = {
   s3: awsS3Api,
   organization: organizationApi,
   security: securityApi,
-  user: userApi
+  tag: tagApi,
+  user: userApi,
+  video: videoApi
 };
 
 export default generatedApiService;

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useOrganization } from '../../contexts';
 import type { Organization, WorkspaceContext } from '../../types';
-import { OrganizationOrganizationTypeEnum } from '../../generated';
+import { OrganizationResponseOrganizationTypeEnum } from '../../generated';
 import { CreateOrganizationModal } from './CreateOrganizationModal';
 
 interface GitHubStyleOrgSwitcherProps {
@@ -43,7 +43,7 @@ export function GitHubStyleOrgSwitcher({ className = '' }: GitHubStyleOrgSwitche
 
   const handleOrgSwitch = (organization: Organization) => {
     const workspace: WorkspaceContext = {
-      type: organization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
+      type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
       organization,
       currentUserRole: undefined,
       permissions: []
@@ -58,10 +58,10 @@ export function GitHubStyleOrgSwitcher({ className = '' }: GitHubStyleOrgSwitche
   );
 
   const personalOrgs = filteredOrganizations.filter(
-    org => org.organizationType === OrganizationOrganizationTypeEnum.Personal
+    org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal
   );
   const teamOrgs = filteredOrganizations.filter(
-    org => org.organizationType === OrganizationOrganizationTypeEnum.Organization
+    org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Organization
   );
 
   if (loading || !currentWorkspace) {
@@ -200,7 +200,7 @@ interface OrganizationOptionProps {
 }
 
 function OrganizationOption({ organization, isSelected, onClick }: OrganizationOptionProps) {
-  const isPersonal = organization.organizationType === OrganizationOrganizationTypeEnum.Personal;
+  const isPersonal = organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal;
 
   return (
     <button

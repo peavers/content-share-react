@@ -1,41 +1,44 @@
-# OrganizationControllerApi
+# TagControllerApi
 
 All URIs are relative to *http://localhost:8080*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**acceptInvitation**](#acceptinvitation) | **POST** /api/organizations/invitations/{token}/accept | |
-|[**createOrganization**](#createorganization) | **POST** /api/organizations | |
-|[**declineInvitation**](#declineinvitation) | **POST** /api/organizations/invitations/{token}/decline | |
-|[**deleteOrganization**](#deleteorganization) | **DELETE** /api/organizations/{organizationId} | |
-|[**getOrganization**](#getorganization) | **GET** /api/organizations/{organizationId} | |
-|[**getOrganizationMembers**](#getorganizationmembers) | **GET** /api/organizations/{organizationId}/members | |
-|[**getUserInvitations**](#getuserinvitations) | **GET** /api/organizations/invitations | |
-|[**getUserOrganizations**](#getuserorganizations) | **GET** /api/organizations | |
-|[**inviteMember**](#invitemember) | **POST** /api/organizations/{organizationId}/invitations | |
-|[**removeMember**](#removemember) | **DELETE** /api/organizations/{organizationId}/members/{targetUserId} | |
-|[**updateMemberRole**](#updatememberrole) | **PUT** /api/organizations/{organizationId}/members/{targetUserId} | |
-|[**updateOrganization**](#updateorganization) | **PUT** /api/organizations/{organizationId} | |
+|[**addTagsToVideo**](#addtagstovideo) | **POST** /api/tags/video/{videoId} | |
+|[**createTag**](#createtag) | **POST** /api/tags | |
+|[**deleteTag**](#deletetag) | **DELETE** /api/tags | |
+|[**deleteTagById**](#deletetagbyid) | **DELETE** /api/tags/{tagId} | |
+|[**getAllTags**](#getalltags) | **GET** /api/tags | |
+|[**getChildTags**](#getchildtags) | **GET** /api/tags/children | |
+|[**getRootTags**](#getroottags) | **GET** /api/tags/root | |
+|[**getTagTree**](#gettagtree) | **GET** /api/tags/tree | |
+|[**getVideoTags**](#getvideotags) | **GET** /api/tags/video/{videoId} | |
+|[**removeTagFromVideo**](#removetagfromvideo) | **DELETE** /api/tags/video/{videoId} | |
+|[**replaceVideoTags**](#replacevideotags) | **PUT** /api/tags/video/{videoId} | |
+|[**updateTag**](#updatetag) | **PUT** /api/tags/{tagId} | |
 
-# **acceptInvitation**
-> OrganizationMembership acceptInvitation()
+# **addTagsToVideo**
+> addTagsToVideo(addTagsRequest)
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
-    Configuration
+    TagControllerApi,
+    Configuration,
+    AddTagsRequest
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let token: string; // (default to undefined)
+let videoId: number; // (default to undefined)
+let addTagsRequest: AddTagsRequest; //
 
-const { status, data } = await apiInstance.acceptInvitation(
-    token
+const { status, data } = await apiInstance.addTagsToVideo(
+    videoId,
+    addTagsRequest
 );
 ```
 
@@ -43,12 +46,13 @@ const { status, data } = await apiInstance.acceptInvitation(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **token** | [**string**] |  | defaults to undefined|
+| **addTagsRequest** | **AddTagsRequest**|  | |
+| **videoId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
 
-**OrganizationMembership**
+void (empty response body)
 
 ### Authorization
 
@@ -56,8 +60,8 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: */*
+ - **Content-Type**: application/json
+ - **Accept**: Not defined
 
 
 ### HTTP response details
@@ -67,26 +71,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **createOrganization**
-> OrganizationResponse createOrganization(createOrganizationRequest)
+# **createTag**
+> Tag createTag(createTagRequest)
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration,
-    CreateOrganizationRequest
+    CreateTagRequest
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let createOrganizationRequest: CreateOrganizationRequest; //
+let createTagRequest: CreateTagRequest; //
 
-const { status, data } = await apiInstance.createOrganization(
-    createOrganizationRequest
+const { status, data } = await apiInstance.createTag(
+    createTagRequest
 );
 ```
 
@@ -94,12 +98,12 @@ const { status, data } = await apiInstance.createOrganization(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createOrganizationRequest** | **CreateOrganizationRequest**|  | |
+| **createTagRequest** | **CreateTagRequest**|  | |
 
 
 ### Return type
 
-**OrganizationResponse**
+**Tag**
 
 ### Authorization
 
@@ -118,25 +122,27 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **declineInvitation**
-> declineInvitation()
+# **deleteTag**
+> deleteTag()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let token: string; // (default to undefined)
+let path: string; // (default to undefined)
+let deleteChildren: boolean; // (optional) (default to false)
 
-const { status, data } = await apiInstance.declineInvitation(
-    token
+const { status, data } = await apiInstance.deleteTag(
+    path,
+    deleteChildren
 );
 ```
 
@@ -144,7 +150,8 @@ const { status, data } = await apiInstance.declineInvitation(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **token** | [**string**] |  | defaults to undefined|
+| **path** | [**string**] |  | defaults to undefined|
+| **deleteChildren** | [**boolean**] |  | (optional) defaults to false|
 
 
 ### Return type
@@ -168,25 +175,25 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **deleteOrganization**
-> deleteOrganization()
+# **deleteTagById**
+> deleteTagById()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
+let tagId: number; // (default to undefined)
 
-const { status, data } = await apiInstance.deleteOrganization(
-    organizationId
+const { status, data } = await apiInstance.deleteTagById(
+    tagId
 );
 ```
 
@@ -194,7 +201,7 @@ const { status, data } = await apiInstance.deleteOrganization(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **organizationId** | [**string**] |  | defaults to undefined|
+| **tagId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
@@ -218,122 +225,22 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getOrganization**
-> OrganizationResponse getOrganization()
+# **getAllTags**
+> Array<Tag> getAllTags()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
-
-const { status, data } = await apiInstance.getOrganization(
-    organizationId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **organizationId** | [**string**] |  | defaults to undefined|
-
-
-### Return type
-
-**OrganizationResponse**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: */*
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **getOrganizationMembers**
-> Array<GetOrganizationMembers200ResponseInner> getOrganizationMembers()
-
-
-### Example
-
-```typescript
-import {
-    OrganizationControllerApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
-
-let organizationId: string; // (default to undefined)
-
-const { status, data } = await apiInstance.getOrganizationMembers(
-    organizationId
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **organizationId** | [**string**] |  | defaults to undefined|
-
-
-### Return type
-
-**Array<GetOrganizationMembers200ResponseInner>**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: */*
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **getUserInvitations**
-> Array<OrganizationInvitation> getUserInvitations()
-
-
-### Example
-
-```typescript
-import {
-    OrganizationControllerApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
-
-const { status, data } = await apiInstance.getUserInvitations();
+const { status, data } = await apiInstance.getAllTags();
 ```
 
 ### Parameters
@@ -342,7 +249,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**Array<OrganizationInvitation>**
+**Array<Tag>**
 
 ### Authorization
 
@@ -361,22 +268,72 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getUserOrganizations**
-> Array<OrganizationResponse> getUserOrganizations()
+# **getChildTags**
+> Array<Tag> getChildTags()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-const { status, data } = await apiInstance.getUserOrganizations();
+let parentPath: string; // (default to undefined)
+
+const { status, data } = await apiInstance.getChildTags(
+    parentPath
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **parentPath** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**Array<Tag>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getRootTags**
+> Array<Tag> getRootTags()
+
+
+### Example
+
+```typescript
+import {
+    TagControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new TagControllerApi(configuration);
+
+const { status, data } = await apiInstance.getRootTags();
 ```
 
 ### Parameters
@@ -385,7 +342,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**Array<OrganizationResponse>**
+**Array<Tag>**
 
 ### Authorization
 
@@ -404,42 +361,31 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **inviteMember**
-> OrganizationInvitation inviteMember(inviteMemberRequest)
+# **getTagTree**
+> Array<TagNode> getTagTree()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
-    Configuration,
-    InviteMemberRequest
+    TagControllerApi,
+    Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
-let inviteMemberRequest: InviteMemberRequest; //
-
-const { status, data } = await apiInstance.inviteMember(
-    organizationId,
-    inviteMemberRequest
-);
+const { status, data } = await apiInstance.getTagTree();
 ```
 
 ### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **inviteMemberRequest** | **InviteMemberRequest**|  | |
-| **organizationId** | [**string**] |  | defaults to undefined|
+This endpoint does not have any parameters.
 
 
 ### Return type
 
-**OrganizationInvitation**
+**Array<TagNode>**
 
 ### Authorization
 
@@ -447,7 +393,7 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
+ - **Content-Type**: Not defined
  - **Accept**: */*
 
 
@@ -458,27 +404,25 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **removeMember**
-> removeMember()
+# **getVideoTags**
+> Array<Tag> getVideoTags()
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
-let targetUserId: string; // (default to undefined)
+let videoId: number; // (default to undefined)
 
-const { status, data } = await apiInstance.removeMember(
-    organizationId,
-    targetUserId
+const { status, data } = await apiInstance.getVideoTags(
+    videoId
 );
 ```
 
@@ -486,8 +430,60 @@ const { status, data } = await apiInstance.removeMember(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **organizationId** | [**string**] |  | defaults to undefined|
-| **targetUserId** | [**string**] |  | defaults to undefined|
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**Array<Tag>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removeTagFromVideo**
+> removeTagFromVideo()
+
+
+### Example
+
+```typescript
+import {
+    TagControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new TagControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+let path: string; // (default to undefined)
+
+const { status, data } = await apiInstance.removeTagFromVideo(
+    videoId,
+    path
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **videoId** | [**number**] |  | defaults to undefined|
+| **path** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -511,29 +507,28 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **updateMemberRole**
-> OrganizationMembership updateMemberRole(requestBody)
+# **replaceVideoTags**
+> replaceVideoTags(addTagsRequest)
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
-    Configuration
+    TagControllerApi,
+    Configuration,
+    AddTagsRequest
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
-let targetUserId: string; // (default to undefined)
-let requestBody: { [key: string]: string; }; //
+let videoId: number; // (default to undefined)
+let addTagsRequest: AddTagsRequest; //
 
-const { status, data } = await apiInstance.updateMemberRole(
-    organizationId,
-    targetUserId,
-    requestBody
+const { status, data } = await apiInstance.replaceVideoTags(
+    videoId,
+    addTagsRequest
 );
 ```
 
@@ -541,14 +536,13 @@ const { status, data } = await apiInstance.updateMemberRole(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **requestBody** | **{ [key: string]: string; }**|  | |
-| **organizationId** | [**string**] |  | defaults to undefined|
-| **targetUserId** | [**string**] |  | defaults to undefined|
+| **addTagsRequest** | **AddTagsRequest**|  | |
+| **videoId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
 
-**OrganizationMembership**
+void (empty response body)
 
 ### Authorization
 
@@ -557,7 +551,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: */*
+ - **Accept**: Not defined
 
 
 ### HTTP response details
@@ -567,28 +561,28 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **updateOrganization**
-> Organization updateOrganization(createOrganizationRequest)
+# **updateTag**
+> Tag updateTag(updateTagRequest)
 
 
 ### Example
 
 ```typescript
 import {
-    OrganizationControllerApi,
+    TagControllerApi,
     Configuration,
-    CreateOrganizationRequest
+    UpdateTagRequest
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
+const apiInstance = new TagControllerApi(configuration);
 
-let organizationId: string; // (default to undefined)
-let createOrganizationRequest: CreateOrganizationRequest; //
+let tagId: number; // (default to undefined)
+let updateTagRequest: UpdateTagRequest; //
 
-const { status, data } = await apiInstance.updateOrganization(
-    organizationId,
-    createOrganizationRequest
+const { status, data } = await apiInstance.updateTag(
+    tagId,
+    updateTagRequest
 );
 ```
 
@@ -596,13 +590,13 @@ const { status, data } = await apiInstance.updateOrganization(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createOrganizationRequest** | **CreateOrganizationRequest**|  | |
-| **organizationId** | [**string**] |  | defaults to undefined|
+| **updateTagRequest** | **UpdateTagRequest**|  | |
+| **tagId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
 
-**Organization**
+**Tag**
 
 ### Authorization
 

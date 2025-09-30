@@ -1,4 +1,4 @@
-# Organization
+# OrganizationResponse
 
 
 ## Properties
@@ -28,9 +28,9 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { Organization } from './api';
+import { OrganizationResponse } from './api';
 
-const instance: Organization = {
+const instance: OrganizationResponse = {
     id,
     name,
     slug,

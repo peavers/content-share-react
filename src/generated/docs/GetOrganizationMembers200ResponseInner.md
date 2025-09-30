@@ -1,4 +1,4 @@
-# OrganizationInvitation
+# GetOrganizationMembers200ResponseInner
 
 
 ## Properties
@@ -7,39 +7,31 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **number** |  | [optional] [default to undefined]
 **organizationId** | **string** |  | [optional] [default to undefined]
-**invitedBy** | **string** |  | [optional] [default to undefined]
-**email** | **string** |  | [optional] [default to undefined]
+**userId** | **string** |  | [optional] [default to undefined]
 **role** | **string** |  | [optional] [default to undefined]
-**token** | **string** |  | [optional] [default to undefined]
 **status** | **string** |  | [optional] [default to undefined]
-**expiresAt** | **string** |  | [optional] [default to undefined]
-**acceptedAt** | **string** |  | [optional] [default to undefined]
+**joinedAt** | **string** |  | [optional] [default to undefined]
 **createdAt** | **string** |  | [optional] [default to undefined]
+**updatedAt** | **string** |  | [optional] [default to undefined]
 **organization** | [**Organization**](Organization.md) |  | [optional] [default to undefined]
-**inviter** | [**User**](User.md) |  | [optional] [default to undefined]
-**expired** | **boolean** |  | [optional] [default to undefined]
-**active** | **boolean** |  | [optional] [default to undefined]
+**user** | [**User**](User.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { OrganizationInvitation } from './api';
+import { GetOrganizationMembers200ResponseInner } from './api';
 
-const instance: OrganizationInvitation = {
+const instance: GetOrganizationMembers200ResponseInner = {
     id,
     organizationId,
-    invitedBy,
-    email,
+    userId,
     role,
-    token,
     status,
-    expiresAt,
-    acceptedAt,
+    joinedAt,
     createdAt,
+    updatedAt,
     organization,
-    inviter,
-    expired,
-    active,
+    user,
 };
 ```
 

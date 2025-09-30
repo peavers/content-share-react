@@ -1,7 +1,7 @@
 import {useOrganization} from '../../contexts';
 import {useEffect, useRef, useState} from "react";
 import type {Organization, WorkspaceContext} from "../../types";
-import {OrganizationOrganizationTypeEnum} from "../../generated";
+import {OrganizationResponseOrganizationTypeEnum} from "../../generated";
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 
 
@@ -35,7 +35,7 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
 
     const handleWorkspaceChange = (organization: Organization) => {
         const workspace: WorkspaceContext = {
-            type: organization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
+            type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,
             currentUserRole: undefined, // Will be set by context
             permissions: []
@@ -52,8 +52,8 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
         );
     }
 
-    const personalOrgs = organizations.filter(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
-    const teamOrgs = organizations.filter(org => org.organizationType === OrganizationOrganizationTypeEnum.Organization);
+    const personalOrgs = organizations.filter(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal);
+    const teamOrgs = organizations.filter(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Organization);
 
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
@@ -146,7 +146,7 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
                 onSuccess={(newOrganization) => {
                     // Switch to the newly created organization
                     const workspace: WorkspaceContext = {
-                        type: newOrganization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
+                        type: newOrganization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
                         organization: newOrganization,
                         currentUserRole: undefined, // Will be set by context
                         permissions: []
@@ -176,7 +176,7 @@ function WorkspaceOption({organization, isSelected, onClick}: WorkspaceOptionPro
             <OrganizationAvatar organization={organization} size="sm"/>
             <div className="flex-1 min-w-0">
                 <div className="truncate font-medium">{organization.name}</div>
-                {organization.organizationType === OrganizationOrganizationTypeEnum.Organization && (
+                {organization.organizationType === OrganizationResponseOrganizationTypeEnum.Organization && (
                     <div className="text-xs text-gray-500">
                         {organization.memberCount || 0} member{(organization.memberCount || 0) !== 1 ? 's' : ''}
                     </div>
@@ -215,7 +215,7 @@ export function OrganizationAvatar({organization, size, className = ''}: Organiz
     }
 
     // Generate avatar based on organization type and name
-    const isPersonal = organization.organizationType === OrganizationOrganizationTypeEnum.Personal;
+    const isPersonal = organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal;
     const initial = organization.name.charAt(0).toUpperCase();
     const bgColor = isPersonal ? 'bg-blue-500' : 'bg-purple-500';
 

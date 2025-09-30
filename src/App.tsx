@@ -9,9 +9,11 @@ import awsConfig from './config/awsConfig';
 import LoginComponent from './components/auth/LoginComponent';
 import RegisterComponent from './components/auth/RegisterComponent';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import Dashboard from './components/Dashboard';
+import VideosPage from './components/VideosPage';
 import UploadPage from './components/UploadPage';
 import VideoDetailPage from './components/VideoDetailPage';
+import TagManagement from './components/admin/TagManagement';
+import AdminVideoManagement from './components/admin/AdminVideoManagement';
 
 // Configure Amplify
 Amplify.configure(awsConfig);
@@ -28,9 +30,9 @@ const App: React.FC = () => {
               <Route path="/register" element={<RegisterComponent />} />
 
               {/* Protected Routes */}
-              <Route path="/dashboard" element={
+              <Route path="/" element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <VideosPage />
                 </ProtectedRoute>
               } />
 
@@ -46,8 +48,17 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
 
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/admin/tag-management" element={
+                <ProtectedRoute>
+                  <TagManagement />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/admin/videos" element={
+                <ProtectedRoute>
+                  <AdminVideoManagement />
+                </ProtectedRoute>
+              } />
             </Routes>
           </div>
         </OrganizationProvider>

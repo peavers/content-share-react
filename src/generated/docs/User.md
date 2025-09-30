@@ -17,7 +17,8 @@ Name | Type | Description | Notes
 **lastLoginAt** | **string** |  | [optional] [default to undefined]
 **createdAt** | **string** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
-**personalOrganization** | **any** |  | [optional] [default to undefined]
+**organizationMemberships** | **Array&lt;any&gt;** |  | [optional] [default to undefined]
+**personalOrganization** | [**Organization**](Organization.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -37,6 +38,7 @@ const instance: User = {
     lastLoginAt,
     createdAt,
     updatedAt,
+    organizationMemberships,
     personalOrganization,
 };
 ```

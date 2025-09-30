@@ -108,66 +108,54 @@ const RegisterComponent: React.FC = () => {
 
   if (step === 'confirm') {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          <div className="border border-black p-12 space-y-12">
-            {/* Header */}
-            <div className="text-center">
-              <h2 className="text-3xl font-light text-black mb-4">Confirm Your Email</h2>
-              <p className="text-gray-600 font-light">
-                We've sent a confirmation code to <strong>{email}</strong>
-              </p>
-            </div>
+      <div className="hero bg-base-200 min-h-screen">
+        <div className="hero-content flex-col w-full max-w-md">
+          <div className="text-center mb-4">
+            <h1 className="text-4xl font-bold">Confirm Your Email</h1>
+            <p className="py-6">We've sent a confirmation code to <strong>{email}</strong></p>
+          </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="border border-red-300 p-4 bg-red-50">
-                <p className="text-red-600 text-sm">{error}</p>
-              </div>
-            )}
+          <div className="card bg-base-100 w-full shadow-2xl">
+            <form onSubmit={handleConfirmation} className="card-body">
+              {/* Error Alert */}
+              {error && (
+                <div className="alert alert-error">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
 
-            {/* Confirmation Form */}
-            <form onSubmit={handleConfirmation} className="space-y-8">
-              <div>
-                <label htmlFor="confirmationCode" className="block text-sm font-light text-black mb-3">
-                  Confirmation Code
+              {/* Confirmation Code Input */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Confirmation Code</span>
                 </label>
                 <input
-                  id="confirmationCode"
-                  name="confirmationCode"
                   type="text"
-                  required
+                  placeholder="Enter confirmation code"
+                  className="input input-bordered"
                   value={confirmationCode}
                   onChange={(e) => setConfirmationCode(e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-                  placeholder="Enter confirmation code"
+                  required
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-black text-white py-4 px-4 hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Confirming...
-                  </div>
-                ) : (
-                  'Confirm Email'
-                )}
-              </button>
+              {/* Submit Button */}
+              <div className="form-control mt-6">
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading && <span className="loading loading-spinner"></span>}
+                  {loading ? 'Confirming...' : 'Confirm Email'}
+                </button>
+              </div>
 
-              {/* Link back */}
-              <div className="text-center">
+              {/* Back Link */}
+              <div className="text-center mt-4">
                 <button
                   type="button"
                   onClick={() => setStep('register')}
-                  className="text-sm text-black border-b border-black hover:border-gray-600 transition-colors duration-200"
+                  className="link link-hover"
                 >
                   Back to registration
                 </button>
@@ -180,125 +168,105 @@ const RegisterComponent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8">
-      <div className="w-full max-w-md">
-        <div className="border border-black p-12 space-y-12">
-          {/* Header */}
-          <div className="text-center">
-            <h2 className="text-3xl font-light text-black mb-4">ContentShare</h2>
-            <p className="text-gray-600 font-light">Create your account</p>
-          </div>
+    <div className="hero bg-base-200 min-h-screen">
+      <div className="hero-content flex-col w-full max-w-md">
+        <div className="text-center mb-4">
+          <h1 className="text-5xl font-bold">ContentShare</h1>
+          <p className="py-6">Create your account</p>
+        </div>
 
-          {/* Error Message */}
-          {error && (
-            <div className="border border-red-300 p-4 bg-red-50">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-
-          {/* Registration Form */}
-          <form onSubmit={handleRegister} className="space-y-8">
-            <div className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-light text-black mb-3">
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-                  placeholder="Enter your full name"
-                />
+        <div className="card bg-base-100 w-full shadow-2xl">
+          <form onSubmit={handleRegister} className="card-body">
+            {/* Error Alert */}
+            {error && (
+              <div className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
               </div>
+            )}
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-light text-black mb-3">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-                  placeholder="Enter your email"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-light text-black mb-3">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-                  placeholder="Create a password"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Must be at least 8 characters long
-                </p>
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-light text-black mb-3">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-                  placeholder="Confirm your password"
-                />
-              </div>
+            {/* Name Input */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Full Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                className="input input-bordered"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-black text-white py-4 px-4 hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating account...
-                </div>
-              ) : (
-                'Create Account'
-              )}
-            </button>
+            {/* Email Input */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Email Address</span>
+              </label>
+              <input
+                type="email"
+                placeholder="email@example.com"
+                className="input input-bordered"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-            {/* Links */}
+            {/* Password Input */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="password"
+                className="input input-bordered"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <label className="label">
+                <span className="label-text-alt">Must be at least 8 characters</span>
+              </label>
+            </div>
+
+            {/* Confirm Password Input */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Confirm Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="confirm password"
+                className="input input-bordered"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="form-control mt-6">
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading && <span className="loading loading-spinner"></span>}
+                {loading ? 'Creating account...' : 'Create Account'}
+              </button>
+            </div>
+
+            {/* Login Link */}
+            <div className="divider">OR</div>
             <div className="text-center">
-              <div className="text-sm text-gray-600">
+              <p className="text-sm">
                 Already have an account?{' '}
-                <a
-                  href="/login"
-                  className="text-black border-b border-black hover:border-gray-600 transition-colors duration-200"
-                >
+                <a href="/login" className="link link-primary">
                   Sign in
                 </a>
-              </div>
+              </p>
             </div>
           </form>
         </div>

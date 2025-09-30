@@ -19,7 +19,8 @@ export class UploadService {
       contentType: request.contentType,
       metadata: request.metadata || {},
       title: request.title || '',
-      description: request.description || ''
+      description: request.description || '',
+      tags: request.tags || undefined
     };
 
     const response = await generatedApiService.s3.initiateUpload(uploadRequest);
@@ -89,7 +90,7 @@ export class UploadService {
 
   async uploadFile(
     file: File,
-    metadata: { title?: string; description?: string },
+    metadata: { title?: string; description?: string; tags?: string[] },
     onProgress: (progress: UploadProgress) => void
   ): Promise<void> {
     const startTime = new Date();
@@ -129,7 +130,8 @@ export class UploadService {
         fileSize: file.size,
         contentType: file.type,
         title: metadata.title,
-        description: metadata.description
+        description: metadata.description,
+        tags: metadata.tags
       };
 
       const uploadResponse = await this.initiateUpload(initiateRequest);

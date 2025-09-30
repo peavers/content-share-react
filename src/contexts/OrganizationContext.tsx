@@ -3,7 +3,7 @@ import type {
     OrganizationInvitation,
     WorkspaceContext
 } from '../types';
-import { OrganizationMembershipRoleEnum, OrganizationOrganizationTypeEnum } from '../generated';
+import { OrganizationMembershipRoleEnum, OrganizationResponseOrganizationTypeEnum } from '../generated';
 import { hasPermission } from '../types';
 import {organizationService} from '../services/organizationService';
 import {useAuth} from './AuthContext';
@@ -61,7 +61,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
             // Set default workspace to personal workspace if none selected
             if (!currentWorkspace && orgs.length > 0) {
-                const personalOrg = orgs.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
+                const personalOrg = orgs.find(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal);
                 if (personalOrg) {
                     const workspace = createWorkspaceContext(personalOrg);
                     setCurrentWorkspace(workspace);
@@ -142,7 +142,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
     // Get personal workspace
     const getPersonalWorkspace = (): WorkspaceContext | null => {
-        const personalOrg = organizations.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
+        const personalOrg = organizations.find(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal);
         return personalOrg ? createWorkspaceContext(personalOrg) : null;
     };
 
@@ -150,7 +150,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
     const createWorkspaceContext = (organization: Organization): WorkspaceContext => {
         const userRole = getUserRoleInOrganization(organization.id);
         return {
-            type: organization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
+            type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,
             currentUserRole: userRole,
             permissions: userRole ? (hasPermission as any)(userRole, '') || [] : []
@@ -187,7 +187,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
             }
 
             // Fallback to personal workspace
-            const personalOrg = organizations.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
+            const personalOrg = organizations.find(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal);
             if (personalOrg) {
                 setCurrentWorkspaceState(createWorkspaceContext(personalOrg));
             }

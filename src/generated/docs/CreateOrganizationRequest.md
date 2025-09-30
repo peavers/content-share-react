@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **description** | **string** |  | [optional] [default to undefined]
 **avatarUrl** | **string** |  | [optional] [default to undefined]
 **websiteUrl** | **string** |  | [optional] [default to undefined]
+**organizationType** | **string** |  | [optional] [default to undefined]
 **visibility** | **string** |  | [optional] [default to undefined]
 **plan** | **string** |  | [optional] [default to undefined]
 **settings** | **{ [key: string]: any; }** |  | [optional] [default to undefined]
@@ -27,6 +28,7 @@ const instance: CreateOrganizationRequest = {
     description,
     avatarUrl,
     websiteUrl,
+    organizationType,
     visibility,
     plan,
     settings,

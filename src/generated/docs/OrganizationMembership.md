@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **joinedAt** | **string** |  | [optional] [default to undefined]
 **createdAt** | **string** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
-**organization** | **any** |  | [optional] [default to undefined]
+**organization** | [**Organization**](Organization.md) |  | [optional] [default to undefined]
 **user** | [**User**](User.md) |  | [optional] [default to undefined]
 
 ## Example

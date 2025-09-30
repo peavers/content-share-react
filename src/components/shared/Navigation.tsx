@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth, useOrganization } from '../../contexts';
 import { CreateOrganizationModal } from '../organization/CreateOrganizationModal';
+import Avatar from './Avatar';
 
 interface NavigationProps {
   showUploadButton?: boolean;
@@ -11,20 +12,7 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
   const { user, logout } = useAuth();
   const { organizations, currentWorkspace, setCurrentWorkspace } = useOrganization();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowOrgSwitcher(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -42,135 +30,93 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
       permissions: []
     };
     setCurrentWorkspace(workspace);
-    setShowOrgSwitcher(false);
   };
 
   return (
     <>
-      <header className="border-b border-black">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="flex justify-between items-center h-20">
-            <Link to="/dashboard" className="text-2xl font-light text-black hover:text-gray-600 transition-colors">
-              ContentShare
+      <div className="navbar bg-base-100 shadow-lg">
+        <div className="flex-1">
+          <Link to="/dashboard" className="btn btn-ghost text-xl">
+            ContentShare
+          </Link>
+        </div>
+
+        <div className="flex-none">
+          {/* Upload Button */}
+          {currentWorkspace && showUploadButton && location.pathname !== '/upload' && (
+            <Link to="/upload" className="btn btn-primary mr-2">
+              Upload Video
             </Link>
+          )}
 
-            {/* Navigation */}
-            <div className="flex items-center space-x-8">
-              {/* Upload Button */}
-              {currentWorkspace && showUploadButton && location.pathname !== '/upload' && (
-                <Link
-                  to="/upload"
-                  className="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-colors duration-200"
-                >
-                  Upload Video
-                </Link>
-              )}
+          {/* Back to Dashboard when on upload page */}
+          {location.pathname === '/upload' && (
+            <Link to="/dashboard" className="btn btn-outline mr-2">
+              Dashboard
+            </Link>
+          )}
 
-              {/* Back to Dashboard when on upload page */}
-              {location.pathname === '/upload' && (
-                <Link
-                  to="/dashboard"
-                  className="text-black border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-200"
-                >
-                  ← Dashboard
-                </Link>
-              )}
-
-              {/* Organization Dropdown or Create Button */}
-              {currentWorkspace ? (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setShowOrgSwitcher(!showOrgSwitcher)}
-                    className="flex items-center space-x-3 text-black hover:text-gray-600 transition-colors duration-200"
-                  >
-                    <div className="w-8 h-8 bg-gray-300 flex items-center justify-center text-sm font-bold text-gray-600">
-                      {currentWorkspace.organization.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="font-light">{currentWorkspace.organization.name}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${showOrgSwitcher ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+          {/* Organization Dropdown or Create Button */}
+          {currentWorkspace ? (
+            <div className="dropdown dropdown-end mr-2">
+              <div tabIndex={0} role="button" className="btn btn-ghost gap-2">
+                <Avatar name={currentWorkspace.organization.name} size="sm" />
+                <span>{currentWorkspace.organization.name}</span>
+                <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                  <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                </svg>
+              </div>
+              <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-80 p-2 shadow-2xl">
+                <li className="menu-title">
+                  <span>Switch Organization</span>
+                </li>
+                {organizations.map((org) => (
+                  <li key={org.id}>
+                    <button
+                      onClick={() => switchToOrganization(org)}
+                      className={currentWorkspace?.organization.id === org.id ? 'active' : ''}
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {/* Dropdown */}
-                  {showOrgSwitcher && (
-                    <div className="absolute top-full right-0 mt-2 w-80 bg-white border border-black shadow-lg z-50">
-                      <div className="p-4 border-b border-gray-300">
-                        <h3 className="font-light text-black mb-3">Switch Organization</h3>
-                        <div className="space-y-2">
-                          {organizations.map((org) => (
-                            <button
-                              key={org.id}
-                              onClick={() => switchToOrganization(org)}
-                              className={`w-full text-left p-3 border transition-colors duration-200 ${
-                                currentWorkspace?.organization.id === org.id
-                                  ? 'border-black bg-gray-50'
-                                  : 'border-gray-300 hover:border-black'
-                              }`}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-gray-300 flex items-center justify-center text-sm font-bold text-gray-600">
-                                  {org.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-light text-black">{org.name}</div>
-                                  <div className="text-sm text-gray-600 truncate">
-                                    {org.description || 'No description'}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {org.organizationType === 'PERSONAL' ? 'Personal Account' : 'Organization'}
-                                  </div>
-                                </div>
-                                {currentWorkspace?.organization.id === org.id && (
-                                  <svg className="h-4 w-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                )}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                        <div className="mt-4 pt-4 border-t border-gray-300">
-                          <button
-                            onClick={() => {
-                              setShowOrgSwitcher(false);
-                              setShowCreateModal(true);
-                            }}
-                            className="w-full bg-black text-white px-4 py-3 hover:bg-gray-800 transition-colors duration-200"
-                          >
-                            Create New Organization
-                          </button>
-                        </div>
+                      <Avatar name={org.name} size="sm" />
+                      <div className="flex-1">
+                        <div className="font-bold">{org.name}</div>
+                        <div className="text-xs opacity-50">{org.organizationType === 'PERSONAL' ? 'Personal' : 'Organization'}</div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ) : organizations.length === 0 ? (
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-colors duration-200"
-                >
-                  Create Organization
-                </button>
-              ) : null}
-
-              {/* User menu */}
-              <span className="text-black font-light">Welcome, {user?.username}</span>
-              <button
-                onClick={handleLogout}
-                className="text-black border border-black px-6 py-2 hover:bg-black hover:text-white transition-colors duration-200"
-              >
-                Logout
-              </button>
+                      {currentWorkspace?.organization.id === org.id && (
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  </li>
+                ))}
+                <li className="mt-2 border-t pt-2">
+                  <button onClick={() => setShowCreateModal(true)} className="btn btn-primary btn-sm">
+                    Create New Organization
+                  </button>
+                </li>
+              </ul>
             </div>
+          ) : organizations.length === 0 ? (
+            <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
+              Create Organization
+            </button>
+          ) : null}
+
+          {/* User Dropdown */}
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+              <Avatar name={user?.username || 'User'} size="md" rounded />
+            </div>
+            <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-2xl">
+              <li className="menu-title">
+                <span className="break-all">{user?.username}</span>
+              </li>
+              <li><Link to="/dashboard">Dashboard</Link></li>
+              <li><button onClick={handleLogout}>Logout</button></li>
+            </ul>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Create Organization Modal */}
       <CreateOrganizationModal

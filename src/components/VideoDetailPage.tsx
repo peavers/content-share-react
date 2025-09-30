@@ -158,10 +158,10 @@ const VideoDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-base-200">
         <Navigation showUploadButton={true} />
         <div className="flex items-center justify-center h-96">
-          <p className="text-gray-600">Loading video...</p>
+          <span className="loading loading-spinner loading-lg"></span>
         </div>
       </div>
     );
@@ -169,16 +169,16 @@ const VideoDetailPage: React.FC = () => {
 
   if (error || !video) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-base-200">
         <Navigation showUploadButton={true} />
-        <div className="max-w-4xl mx-auto px-8 py-16">
-          <div className="border border-red-300 bg-red-50 p-4">
-            <p className="text-red-600">{error || 'Video not found'}</p>
+        <div className="container mx-auto px-4 py-8">
+          <div className="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error || 'Video not found'}</span>
           </div>
-          <Link
-            to="/dashboard"
-            className="mt-4 inline-block text-black hover:underline"
-          >
+          <Link to="/dashboard" className="btn btn-ghost mt-4">
             &larr; Back to Dashboard
           </Link>
         </div>
@@ -187,22 +187,18 @@ const VideoDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-base-200">
       <Navigation showUploadButton={true} />
 
-      <main className="max-w-6xl mx-auto px-8 py-16">
-        {/* Back button */}
-        <Link
-          to="/dashboard"
-          className="inline-block mb-8 text-black hover:underline"
-        >
+      <main className="container mx-auto px-4 py-8">
+        <Link to="/dashboard" className="btn btn-ghost mb-6">
           &larr; Back to Dashboard
         </Link>
 
         {/* Video Player */}
         <div className="mb-8">
           {presignedUrl && video.uploadStatus === 'COMPLETED' ? (
-            <div className="border border-black">
+            <div className="card bg-base-100 shadow-xl overflow-hidden">
               <video
                 controls
                 className="w-full bg-black"
@@ -213,127 +209,142 @@ const VideoDetailPage: React.FC = () => {
               </video>
             </div>
           ) : (
-            <div className="border border-black bg-gray-100 flex items-center justify-center" style={{ height: '400px' }}>
-              <div className="text-center">
-                <p className="text-gray-600">
-                  {video.uploadStatus === 'PENDING' ? 'Video is being processed...' : 'Video not available'}
-                </p>
-                <p className="text-sm text-gray-500 mt-2">Status: {video.uploadStatus}</p>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body items-center justify-center" style={{ minHeight: '400px' }}>
+                <div className="text-center">
+                  {video.uploadStatus === 'PENDING' && <span className="loading loading-spinner loading-lg mb-4"></span>}
+                  <p className="text-lg">
+                    {video.uploadStatus === 'PENDING' ? 'Video is being processed...' : 'Video not available'}
+                  </p>
+                  <div className="badge badge-warning mt-4">Status: {video.uploadStatus}</div>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content - Video Info */}
-          <div className="col-span-2">
-            <div className="mb-8">
-              <h1 className="text-3xl font-light text-black mb-2">{video.title}</h1>
-              {video.description && (
-                <p className="text-gray-700 mt-4 whitespace-pre-wrap">{video.description}</p>
-              )}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Title & Description */}
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h1 className="card-title text-3xl mb-4">{video.title}</h1>
+                {video.description && (
+                  <p className="opacity-70 whitespace-pre-wrap">{video.description}</p>
+                )}
+              </div>
             </div>
 
-            {/* Metadata Grid */}
-            <div className="border border-black p-6">
-              <h2 className="text-xl font-light text-black mb-4">Video Information</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Original Filename</p>
-                  <p className="text-black">{video.originalFilename}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">File Size</p>
-                  <p className="text-black">{formatFileSize(video.fileSize)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Duration</p>
-                  <p className="text-black">{formatDuration(video.durationSeconds)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Resolution</p>
-                  <p className="text-black">
-                    {video.width && video.height ? `${video.width} x ${video.height}` : 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Content Type</p>
-                  <p className="text-black">{video.contentType}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Uploaded</p>
-                  <p className="text-black">{formatDate(video.createdAt)}</p>
+            {/* Video Information */}
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Video Information</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm opacity-60">Original Filename</p>
+                    <p className="font-semibold">{video.originalFilename}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-60">File Size</p>
+                    <p className="font-semibold">{formatFileSize(video.fileSize)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-60">Duration</p>
+                    <p className="font-semibold">{formatDuration(video.durationSeconds)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-60">Resolution</p>
+                    <p className="font-semibold">
+                      {video.width && video.height ? `${video.width} x ${video.height}` : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-60">Content Type</p>
+                    <p className="font-semibold">{video.contentType}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-60">Uploaded</p>
+                    <p className="font-semibold">{formatDate(video.createdAt)}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Sidebar - Status & Actions */}
-          <div className="col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             {/* Status Card */}
-            <div className="border border-black p-6 mb-4">
-              <h2 className="text-xl font-light text-black mb-4">Status</h2>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-600">Upload Status</p>
-                  <p className={`font-medium ${
-                    video.uploadStatus === 'COMPLETED' ? 'text-green-600' :
-                    video.uploadStatus === 'FAILED' ? 'text-red-600' :
-                    'text-yellow-600'
-                  }`}>
-                    {video.uploadStatus}
-                  </p>
-                </div>
-                {video.processingStatus && (
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Status</h2>
+                <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-gray-600">Processing Status</p>
-                    <p className={`font-medium ${
-                      video.processingStatus === 'COMPLETED' ? 'text-green-600' :
-                      video.processingStatus === 'FAILED' ? 'text-red-600' :
-                      'text-yellow-600'
+                    <p className="text-sm opacity-60">Upload Status</p>
+                    <div className={`badge ${
+                      video.uploadStatus === 'COMPLETED' ? 'badge-success' :
+                      video.uploadStatus === 'FAILED' ? 'badge-error' :
+                      'badge-warning'
                     }`}>
-                      {video.processingStatus}
-                    </p>
+                      {video.uploadStatus}
+                    </div>
                   </div>
-                )}
-                <div>
-                  <p className="text-sm text-gray-600">Visibility</p>
-                  <p className="text-black font-medium">{video.visibility.toUpperCase()}</p>
+                  {video.processingStatus && (
+                    <div>
+                      <p className="text-sm opacity-60">Processing Status</p>
+                      <div className={`badge ${
+                        video.processingStatus === 'COMPLETED' ? 'badge-success' :
+                        video.processingStatus === 'FAILED' ? 'badge-error' :
+                        'badge-warning'
+                      }`}>
+                        {video.processingStatus}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm opacity-60">Visibility</p>
+                    <div className="badge badge-outline">{video.visibility.toUpperCase()}</div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Technical Details */}
-            <div className="border border-black p-6 mb-4">
-              <h2 className="text-xl font-light text-black mb-4">Technical Details</h2>
-              <div className="space-y-2">
-                <div>
-                  <p className="text-xs text-gray-600">S3 Bucket</p>
-                  <p className="text-xs text-black break-all">{video.s3Bucket}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-600">S3 Key</p>
-                  <p className="text-xs text-black break-all">{video.s3Key}</p>
-                </div>
-                {video.etag && (
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title text-sm">Technical Details</h2>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-gray-600">ETag</p>
-                    <p className="text-xs text-black break-all">{video.etag}</p>
+                    <p className="text-xs opacity-60">S3 Bucket</p>
+                    <p className="text-xs break-all">{video.s3Bucket}</p>
                   </div>
-                )}
+                  <div>
+                    <p className="text-xs opacity-60">S3 Key</p>
+                    <p className="text-xs break-all">{video.s3Key}</p>
+                  </div>
+                  {video.etag && (
+                    <div>
+                      <p className="text-xs opacity-60">ETag</p>
+                      <p className="text-xs break-all">{video.etag}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="border border-black p-6">
-              <h2 className="text-xl font-light text-black mb-4">Actions</h2>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="w-full bg-red-600 text-white px-4 py-3 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-              >
-                {deleting ? 'Deleting...' : 'Delete Video'}
-              </button>
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Actions</h2>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="btn btn-error w-full"
+                >
+                  {deleting && <span className="loading loading-spinner"></span>}
+                  {deleting ? 'Deleting...' : 'Delete Video'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

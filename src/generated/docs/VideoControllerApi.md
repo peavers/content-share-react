@@ -1,120 +1,34 @@
-# UserControllerApi
+# VideoControllerApi
 
 All URIs are relative to *http://localhost:8080*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**getUserProfile**](#getuserprofile) | **GET** /api/user/profile | |
-|[**getUserStatus**](#getuserstatus) | **GET** /api/user/status | |
-|[**updateUserProfile**](#updateuserprofile) | **PUT** /api/user/profile | |
-|[**validateToken**](#validatetoken) | **GET** /api/user/validate | |
+|[**deleteVideo**](#deletevideo) | **DELETE** /api/videos/{videoId} | |
+|[**getOrganizationVideos**](#getorganizationvideos) | **GET** /api/videos | |
+|[**getUserVideos**](#getuservideos) | **GET** /api/videos/my-videos | |
+|[**getVideo**](#getvideo) | **GET** /api/videos/{videoId} | |
+|[**getVideoPresignedUrl**](#getvideopresignedurl) | **GET** /api/videos/{videoId}/presigned-url | |
 
-# **getUserProfile**
-> UserProfileDto getUserProfile()
+# **deleteVideo**
+> deleteVideo()
 
 
 ### Example
 
 ```typescript
 import {
-    UserControllerApi,
+    VideoControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new UserControllerApi(configuration);
+const apiInstance = new VideoControllerApi(configuration);
 
-const { status, data } = await apiInstance.getUserProfile();
-```
+let videoId: number; // (default to undefined)
 
-### Parameters
-This endpoint does not have any parameters.
-
-
-### Return type
-
-**UserProfileDto**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: */*
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **getUserStatus**
-> UserStatusResponse getUserStatus()
-
-
-### Example
-
-```typescript
-import {
-    UserControllerApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new UserControllerApi(configuration);
-
-const { status, data } = await apiInstance.getUserStatus();
-```
-
-### Parameters
-This endpoint does not have any parameters.
-
-
-### Return type
-
-**UserStatusResponse**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: */*
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **updateUserProfile**
-> UserProfileDto updateUserProfile(userProfileDto)
-
-
-### Example
-
-```typescript
-import {
-    UserControllerApi,
-    Configuration,
-    UserProfileDto
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new UserControllerApi(configuration);
-
-let userProfileDto: UserProfileDto; //
-
-const { status, data } = await apiInstance.updateUserProfile(
-    userProfileDto
+const { status, data } = await apiInstance.deleteVideo(
+    videoId
 );
 ```
 
@@ -122,12 +36,12 @@ const { status, data } = await apiInstance.updateUserProfile(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **userProfileDto** | **UserProfileDto**|  | |
+| **videoId** | [**number**] |  | defaults to undefined|
 
 
 ### Return type
 
-**UserProfileDto**
+void (empty response body)
 
 ### Authorization
 
@@ -135,7 +49,50 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getOrganizationVideos**
+> Array<Video> getOrganizationVideos()
+
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+const { status, data } = await apiInstance.getOrganizationVideos();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<Video>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: */*
 
 
@@ -146,22 +103,22 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **validateToken**
-> { [key: string]: any; } validateToken()
+# **getUserVideos**
+> Array<Video> getUserVideos()
 
 
 ### Example
 
 ```typescript
 import {
-    UserControllerApi,
+    VideoControllerApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new UserControllerApi(configuration);
+const apiInstance = new VideoControllerApi(configuration);
 
-const { status, data } = await apiInstance.validateToken();
+const { status, data } = await apiInstance.getUserVideos();
 ```
 
 ### Parameters
@@ -170,7 +127,107 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**{ [key: string]: any; }**
+**Array<Video>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getVideo**
+> Video getVideo()
+
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getVideo(
+    videoId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**Video**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getVideoPresignedUrl**
+> string getVideoPresignedUrl()
+
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getVideoPresignedUrl(
+    videoId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**string**
 
 ### Authorization
 
