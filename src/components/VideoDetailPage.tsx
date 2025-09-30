@@ -123,7 +123,7 @@ const VideoDetailPage: React.FC = () => {
       );
 
       // Redirect to dashboard after successful deletion
-      navigate('/dashboard');
+      navigate('/');
     } catch (err: any) {
       console.error('Error deleting video:', err);
       setError(err.response?.data?.message || 'Failed to delete video');
@@ -178,7 +178,7 @@ const VideoDetailPage: React.FC = () => {
             </svg>
             <span>{error || 'Video not found'}</span>
           </div>
-          <Link to="/dashboard" className="btn btn-ghost mt-4">
+          <Link to="/" className="btn btn-ghost mt-4">
             &larr; Back to Dashboard
           </Link>
         </div>
@@ -191,7 +191,7 @@ const VideoDetailPage: React.FC = () => {
       <Navigation showUploadButton={true} />
 
       <main className="container mx-auto px-4 py-8">
-        <Link to="/dashboard" className="btn btn-ghost mb-6">
+        <Link to="/" className="btn btn-ghost mb-6">
           &larr; Back to Dashboard
         </Link>
 

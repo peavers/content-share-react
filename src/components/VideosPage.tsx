@@ -167,7 +167,7 @@ const VideosPage: React.FC = () => {
             <div className="max-w-md">
               <h1 className="text-3xl font-bold">No Organization Selected</h1>
               <p className="py-6">Please select an organization to view videos.</p>
-              <Link to="/dashboard" className="btn btn-primary">
+              <Link to="/" className="btn btn-primary">
                 Go to Dashboard
               </Link>
             </div>

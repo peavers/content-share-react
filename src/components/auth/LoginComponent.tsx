@@ -40,7 +40,7 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
       if (result.isSignedIn) {
         // Refresh the auth context state
         await checkAuthState();
-        navigate('/dashboard');
+        navigate('/');
       } else if (result.nextStep) {
         console.log('Next step required:', result.nextStep);
         setError(`Login incomplete. Next step: ${result.nextStep.signInStep || 'Unknown step required'}`);
@@ -59,7 +59,7 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
 
           if (result.isSignedIn) {
             await checkAuthState();
-            navigate('/dashboard');
+            navigate('/');
           } else if (result.nextStep) {
             setError(`Login incomplete. Next step: ${result.nextStep.signInStep || 'Unknown step required'}`);
           }

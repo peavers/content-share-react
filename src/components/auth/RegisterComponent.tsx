@@ -59,7 +59,7 @@ const RegisterComponent: React.FC = () => {
         // Auto sign in if no confirmation needed
         await signIn({ username, password });
         await checkAuthState();
-        navigate('/dashboard');
+        navigate('/');
       }
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -91,7 +91,7 @@ const RegisterComponent: React.FC = () => {
       // Auto sign in after confirmation
       await signIn({ username: generatedUsername, password });
       await checkAuthState();
-      navigate('/dashboard');
+      navigate('/');
     } catch (err: any) {
       console.error('Confirmation error:', err);
       if (err.name === 'CodeMismatchException') {

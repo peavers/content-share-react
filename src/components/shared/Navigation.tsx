@@ -36,7 +36,7 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
     <>
       <div className="navbar bg-base-100 shadow-lg">
         <div className="flex-1">
-          <Link to="/dashboard" className="btn btn-ghost text-xl">
+          <Link to="/" className="btn btn-ghost text-xl">
             ContentShare
           </Link>
         </div>
@@ -49,10 +49,10 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
             </Link>
           )}
 
-          {/* Back to Dashboard when on upload page */}
+          {/* Back to Videos when on upload page */}
           {location.pathname === '/upload' && (
-            <Link to="/dashboard" className="btn btn-outline mr-2">
-              Dashboard
+            <Link to="/" className="btn btn-outline mr-2">
+              Back to Videos
             </Link>
           )}
 
@@ -111,7 +111,7 @@ const Navigation: React.FC<NavigationProps> = ({ showUploadButton = true }) => {
               <li className="menu-title">
                 <span className="break-all">{user?.username}</span>
               </li>
-              <li><Link to="/dashboard">Dashboard</Link></li>
+              <li><Link to="/">Videos</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
             </ul>
           </div>
