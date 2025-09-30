@@ -26,6 +26,8 @@ export interface AuthContextType {
   getAccessToken: () => Promise<string | null>;
   getIdToken: () => Promise<string | null>;
   refreshSession: () => Promise<any>;
+  hasScope: (scope: string) => boolean;
+  userScopes: string[];
 }
 
 // AWS Amplify Types

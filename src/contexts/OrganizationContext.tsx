@@ -137,7 +137,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
         if (!org?.memberships || !user?.id) return undefined;
 
         const membership = org.memberships.find(m => m.userId === user.id);
-        return membership?.role;
+        return membership?.role as OrganizationMembershipRoleEnum | undefined;
     };
 
     // Get personal workspace
@@ -148,7 +148,10 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
     // Helper to create workspace context
     const createWorkspaceContext = (organization: Organization): WorkspaceContext => {
-        const userRole = getUserRoleInOrganization(organization.id);
+        // Get user role from organization's memberships array
+        const membership = organization.memberships?.find(m => m.userId === user?.id);
+        const userRole = membership?.role as OrganizationMembershipRoleEnum | undefined;
+
         return {
             type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,

@@ -704,6 +704,12 @@ export interface OrganizationResponse {
      * @memberof OrganizationResponse
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {Array<GetOrganizationMembers200ResponseInner>}
+     * @memberof OrganizationResponse
+     */
+    'memberships': Array<GetOrganizationMembers200ResponseInner>;
 }
 
 export const OrganizationResponseOrganizationTypeEnum = {

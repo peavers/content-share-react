@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { getCurrentUser, fetchAuthSession, signOut } from 'aws-amplify/auth';
 import type { AuthContextType, User, AmplifyAuthSession } from '../types';
+import { generatedApiService } from '../services/generatedApiService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,6 +21,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userScopes, setUserScopes] = useState<string[]>([]);
 
   // Note: JWT token handling is now done directly in apiService.js
 
@@ -34,12 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const session: AmplifyAuthSession = await fetchAuthSession();
 
       if (currentUser && session?.tokens) {
-        console.log('AuthContext - User authenticated:', {
-          userId: currentUser.userId,
-          username: currentUser.username,
-          hasIdToken: !!session.tokens.idToken,
-          hasAccessToken: !!session.tokens.accessToken
-        });
 
         // Map AWS Amplify user to generated User type
         setUser({
@@ -58,14 +54,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           personalOrganization: null // Required by generated User type
         });
         setIsAuthenticated(true);
+
+        // Fetch user profile to get scopes
+        try {
+          const profileResponse = await generatedApiService.user.getUserProfile();
+          if (profileResponse.data?.scopes) {
+            setUserScopes(profileResponse.data.scopes);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile scopes:', error);
+        }
       } else {
         setIsAuthenticated(false);
         setUser(null);
+        setUserScopes([]);
       }
     } catch (error) {
       console.error('Error checking auth state:', error);
       setIsAuthenticated(false);
       setUser(null);
+      setUserScopes([]);
     } finally {
       setLoading(false);
     }
@@ -112,6 +120,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const hasScope = (scope: string): boolean => {
+    return userScopes.includes(scope);
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -120,7 +132,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout: handleLogout,
     getAccessToken,
     getIdToken,
-    refreshSession
+    refreshSession,
+    hasScope,
+    userScopes
   };
 
   return (

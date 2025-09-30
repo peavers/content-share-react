@@ -24,6 +24,7 @@ Name | Type | Description | Notes
 **isActive** | **boolean** |  | [optional] [default to undefined]
 **createdAt** | **string** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
+**memberships** | [**Array&lt;GetOrganizationMembers200ResponseInner&gt;**](GetOrganizationMembers200ResponseInner.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -50,6 +51,7 @@ const instance: OrganizationResponse = {
     isActive,
     createdAt,
     updatedAt,
+    memberships,
 };
 ```
 
