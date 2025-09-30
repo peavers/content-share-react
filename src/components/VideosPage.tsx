@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useOrganization } from '../contexts';
 import Navigation from './shared/Navigation';
 import { videoService } from '../services/videoService';
@@ -9,6 +9,7 @@ import type { Tag } from '../generated';
 
 const VideosPage: React.FC = () => {
   const { currentWorkspace } = useOrganization();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [videos, setVideos] = useState<Video[]>([]);
   const [videosLoading, setVideosLoading] = useState(false);
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -55,11 +56,41 @@ const VideosPage: React.FC = () => {
     try {
       const tags = await tagService.getAllTags();
       setAllTags(tags);
+
+      // Check for tag query parameter and preselect
+      const tagParam = searchParams.get('tag');
+      if (tagParam) {
+        const matchingTag = tags.find(t => t.path === tagParam);
+        if (matchingTag && matchingTag.id) {
+          setSelectedTagIds([matchingTag.id]);
+          // Expand parent tags using the fetched tags
+          expandParentTags(matchingTag.path, tags);
+        }
+      }
     } catch (error) {
       console.error('Error fetching tags:', error);
     } finally {
       setTagsLoading(false);
     }
+  };
+
+  const expandParentTags = (tagPath: string | undefined, tagsList: Tag[]) => {
+    if (!tagPath) return;
+    const segments = tagPath.split('/').filter(p => p);
+    const parentPaths: string[] = [];
+
+    // Build all parent paths including the current tag itself
+    for (let i = 0; i < segments.length; i++) {
+      parentPaths.push('/' + segments.slice(0, i + 1).join('/'));
+    }
+
+    // Find and expand all parent tag IDs
+    const parentTagIds = tagsList
+      .filter(t => parentPaths.includes(t.path || ''))
+      .map(t => t.id!)
+      .filter(id => id !== undefined);
+
+    setExpandedTagIds(new Set(parentTagIds));
   };
 
   // Filter videos based on selected tags (including hierarchical matching)

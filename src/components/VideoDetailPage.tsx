@@ -4,6 +4,8 @@ import { useOrganization } from '../contexts';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import axios from 'axios';
 import Navigation from './shared/Navigation';
+import { tagService } from '../services/tagService';
+import type { Tag } from '../generated';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
@@ -42,6 +44,7 @@ const VideoDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [videoTags, setVideoTags] = useState<Tag[]>([]);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -82,6 +85,14 @@ const VideoDetailPage: React.FC = () => {
           }
         );
         setPresignedUrl(urlResponse.data);
+
+        // Fetch video tags
+        try {
+          const tags = await tagService.getVideoTags(parseInt(videoId));
+          setVideoTags(tags);
+        } catch (tagErr) {
+          console.error('Error fetching video tags:', tagErr);
+        }
       } catch (err: any) {
         console.error('Error fetching video:', err);
         setError(err.response?.data?.message || 'Failed to load video');
@@ -230,6 +241,39 @@ const VideoDetailPage: React.FC = () => {
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
                 <h1 className="card-title text-3xl mb-4">{video.title}</h1>
+
+                {/* Tags as Breadcrumbs */}
+                {videoTags.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-2">
+                      {videoTags.map((tag) => {
+                        // Parse tag path into breadcrumb segments
+                        const segments = tag.path?.split('/').filter(p => p) || [];
+                        return (
+                          <div key={tag.id} className="breadcrumbs text-sm bg-base-200 rounded-lg px-3 py-2">
+                            <ul>
+                              {segments.map((segment, index) => {
+                                // Build the path up to this segment
+                                const pathUpToSegment = '/' + segments.slice(0, index + 1).join('/');
+                                return (
+                                  <li key={index}>
+                                    <Link
+                                      to={`/?tag=${encodeURIComponent(pathUpToSegment)}`}
+                                      className="hover:text-primary"
+                                    >
+                                      {segment}
+                                    </Link>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {video.description && (
                   <p className="opacity-70 whitespace-pre-wrap">{video.description}</p>
                 )}
