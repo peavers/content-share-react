@@ -77,37 +77,27 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-8">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
+        <div className="border border-black p-12 space-y-12">
           {/* Header */}
           <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to your account</p>
+            <h2 className="text-3xl font-light text-black mb-4">ContentShare</h2>
+            <p className="text-gray-600 font-light">Sign in to your account</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-              <div className="flex">
-                <svg className="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-red-700 text-sm">{error}</p>
-              </div>
+            <div className="border border-red-300 p-4 bg-red-50">
+              <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-light text-black mb-3">
                   Email Address
                 </label>
                 <input
@@ -118,13 +108,13 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 outline-none"
+                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
                   placeholder="Enter your email"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="password" className="block text-sm font-light text-black mb-3">
                   Password
                 </label>
                 <input
@@ -135,7 +125,7 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 outline-none"
+                  className="w-full px-4 py-4 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
                   placeholder="Enter your password"
                 />
               </div>
@@ -144,7 +134,7 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full bg-black text-white py-4 px-4 hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
@@ -160,10 +150,10 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
             </button>
 
             {/* Links */}
-            <div className="flex flex-col space-y-3 text-center">
+            <div className="flex flex-col space-y-4 text-center">
               <a
                 href="/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                className="text-sm text-black border-b border-black hover:border-gray-600 transition-colors duration-200 inline-block"
               >
                 Forgot your password?
               </a>
@@ -171,7 +161,7 @@ const LoginComponent: React.FC<LoginComponentProps> = () => {
                 Don't have an account?{' '}
                 <a
                   href="/register"
-                  className="font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                  className="text-black border-b border-black hover:border-gray-600 transition-colors duration-200"
                 >
                   Sign up
                 </a>

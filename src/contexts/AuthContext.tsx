@@ -34,6 +34,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const session: AmplifyAuthSession = await fetchAuthSession();
 
       if (currentUser && session?.tokens) {
+        console.log('AuthContext - User authenticated:', {
+          userId: currentUser.userId,
+          username: currentUser.username,
+          hasIdToken: !!session.tokens.idToken,
+          hasAccessToken: !!session.tokens.accessToken
+        });
+
         // Map AWS Amplify user to generated User type
         setUser({
           id: currentUser.userId,
@@ -78,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getAccessToken = async (): Promise<string | null> => {
     try {
       const session: AmplifyAuthSession = await fetchAuthSession();
-      return session?.tokens?.accessToken?.toString() || null;
+      return session?.tokens?.idToken?.toString() || null;
     } catch (error) {
       console.error('Error getting access token:', error);
       return null;

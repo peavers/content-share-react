@@ -54,6 +54,34 @@ export interface AmplifyAuthSession {
   };
 }
 
+// Video Types
+export interface Video {
+  id?: number;
+  organizationId?: string;
+  title?: string;
+  description?: string;
+  owner?: string;
+  s3Bucket?: string;
+  s3Key?: string;
+  fileSize?: number;
+  contentType?: string;
+  originalFilename?: string;
+  etag?: string;
+  uploadId?: string;
+  durationSeconds?: number;
+  width?: number;
+  height?: number;
+  thumbnailS3Path?: string;
+  uploadStatus?: string;
+  processingStatus?: string;
+  visibility?: string;
+  sharedWith?: string[];
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  userId?: string;
+}
+
 // Video Upload Types
 export interface UploadProgress {
   uploadId: string;

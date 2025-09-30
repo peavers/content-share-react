@@ -1,16 +1,10 @@
-import { fetchAuthSession } from 'aws-amplify/auth';
 import axios from 'axios';
-import {
-  AwsS3ControllerApi,
-  OrganizationControllerApi,
-  SecurityControllerApi,
-  UserControllerApi,
-  Configuration
-} from '../generated';
+import { fetchAuthSession } from 'aws-amplify/auth';
+import type { Video } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Create axios instance with auth interceptor
+// Create axios instance
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL
 });
@@ -29,7 +23,7 @@ const getCurrentOrganizationId = (): string | null => {
   return null;
 };
 
-// Add auth header to all requests
+// Add auth and organization headers to all requests
 axiosInstance.interceptors.request.use(
   async (config) => {
     try {
@@ -44,30 +38,44 @@ axiosInstance.interceptors.request.use(
         config.headers['X-Organization-Id'] = organizationId;
       }
     } catch (error) {
-      console.error('Error fetching auth token:', error);
+      console.error('Error adding headers:', error);
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Create configuration
-const configuration = new Configuration({
-  basePath: API_BASE_URL
-});
+export class VideoService {
+  /**
+   * Get all videos for the current organization
+   */
+  async getOrganizationVideos(): Promise<Video[]> {
+    const response = await axiosInstance.get('/api/videos');
+    return response.data;
+  }
 
-// Create API instances with the axios instance that has auth
-export const awsS3Api = new AwsS3ControllerApi(configuration, API_BASE_URL, axiosInstance);
-export const organizationApi = new OrganizationControllerApi(configuration, API_BASE_URL, axiosInstance);
-export const securityApi = new SecurityControllerApi(configuration, API_BASE_URL, axiosInstance);
-export const userApi = new UserControllerApi(configuration, API_BASE_URL, axiosInstance);
+  /**
+   * Get a specific video by ID
+   */
+  async getVideo(videoId: number): Promise<Video> {
+    const response = await axiosInstance.get(`/api/videos/${videoId}`);
+    return response.data;
+  }
 
-// Export as default for backward compatibility
-export const generatedApiService = {
-  s3: awsS3Api,
-  organization: organizationApi,
-  security: securityApi,
-  user: userApi
-};
+  /**
+   * Get videos uploaded by the current user
+   */
+  async getMyVideos(): Promise<Video[]> {
+    const response = await axiosInstance.get('/api/videos/my-videos');
+    return response.data;
+  }
 
-export default generatedApiService;
+  /**
+   * Delete a video
+   */
+  async deleteVideo(videoId: number): Promise<void> {
+    await axiosInstance.delete(`/api/videos/${videoId}`);
+  }
+}
+
+export const videoService = new VideoService();

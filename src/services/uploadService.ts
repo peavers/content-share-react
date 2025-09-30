@@ -166,6 +166,10 @@ export class UploadService {
       },
       uploadId
     );
+
+    // Complete the upload to mark it as COMPLETED in the backend
+    updateProgress('completing');
+    await this.completeUpload(uploadResponse.uploadId, []);
   }
 
   private async handleMultipartUpload(

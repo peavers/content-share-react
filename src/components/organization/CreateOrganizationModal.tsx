@@ -128,14 +128,14 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white border border-black max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-4">
+        <div className="border-b border-black px-8 py-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Create Organization</h2>
+            <h2 className="text-2xl font-light text-black">Create Organization</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-black hover:text-gray-600 transition-colors duration-200"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -144,18 +144,18 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
           </div>
 
           {/* Progress indicator */}
-          <div className="mt-4">
-            <div className="flex items-center space-x-4">
+          <div className="mt-8">
+            <div className="flex items-center space-x-8">
               <StepIndicator step={1} current={currentStep} label="Basic Info" />
-              <div className="flex-1 h-0.5 bg-gray-200">
+              <div className="flex-1 h-px bg-gray-300">
                 <div
-                  className={`h-full bg-indigo-600 transition-all ${currentStep >= 2 ? 'w-full' : 'w-0'}`}
+                  className={`h-full bg-black transition-all ${currentStep >= 2 ? 'w-full' : 'w-0'}`}
                 />
               </div>
               <StepIndicator step={2} current={currentStep} label="Team Setup" />
-              <div className="flex-1 h-0.5 bg-gray-200">
+              <div className="flex-1 h-px bg-gray-300">
                 <div
-                  className={`h-full bg-indigo-600 transition-all ${currentStep >= 3 ? 'w-full' : 'w-0'}`}
+                  className={`h-full bg-black transition-all ${currentStep >= 3 ? 'w-full' : 'w-0'}`}
                 />
               </div>
               <StepIndicator step={3} current={currentStep} label="Review" />
@@ -164,9 +164,9 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
         </div>
 
         {/* Content */}
-        <div className="px-6 py-6">
+        <div className="px-8 py-8">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="mb-8 p-4 border border-red-300 bg-red-50">
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
@@ -200,20 +200,20 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 px-6 py-4 flex justify-between">
+        <div className="border-t border-black px-8 py-6 flex justify-between">
           <button
             onClick={currentStep === 1 ? onClose : () => setCurrentStep(prev => prev - 1)}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+            className="text-black border-b border-black hover:border-gray-600 transition-colors duration-200"
           >
             {currentStep === 1 ? 'Cancel' : 'Back'}
           </button>
 
-          <div className="flex space-x-3">
+          <div className="flex space-x-4">
             {currentStep < 3 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 disabled={currentStep === 1 && !canProceedToStep2}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-black text-white px-8 py-3 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 Continue
               </button>
@@ -221,7 +221,7 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
               <button
                 onClick={handleSubmit}
                 disabled={loading || !canCreateOrganization}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-black text-white px-8 py-3 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {loading ? 'Creating...' : 'Create Organization'}
               </button>
@@ -240,23 +240,23 @@ function StepIndicator({ step, current, label }: { step: number; current: number
   return (
     <div className="flex flex-col items-center">
       <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+        className={`w-8 h-8 border flex items-center justify-center text-sm font-light transition-colors duration-200 ${
           isCompleted
-            ? 'bg-indigo-600 text-white'
+            ? 'bg-black text-white border-black'
             : isCurrent
-            ? 'bg-indigo-100 text-indigo-600 border-2 border-indigo-600'
-            : 'bg-gray-200 text-gray-500'
+            ? 'bg-white text-black border-black'
+            : 'bg-white text-gray-500 border-gray-300'
         }`}
       >
         {isCompleted ? (
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ) : (
           step
         )}
       </div>
-      <span className="mt-1 text-xs font-medium text-gray-500">{label}</span>
+      <span className="mt-2 text-xs font-light text-gray-600">{label}</span>
     </div>
   );
 }
@@ -277,76 +277,76 @@ function OrganizationBasicInfo({
   slugError: string | null;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-light text-black mb-4">
           Organization name *
         </label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => onNameChange(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
           placeholder="My Organization"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-light text-black mb-4">
           Organization slug *
         </label>
         <div className="flex">
-          <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+          <span className="inline-flex items-center px-4 border border-r-0 border-gray-300 bg-gray-50 text-gray-600 text-sm">
             yourapp.com/
           </span>
           <input
             type="text"
             value={formData.slug}
             onChange={(e) => onSlugChange(e.target.value)}
-            className={`flex-1 px-3 py-2 border rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 ${
+            className={`flex-1 px-4 py-3 border focus:border-black focus:outline-none transition-colors duration-200 ${
               slugError ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="my-organization"
           />
         </div>
         {slugError && (
-          <p className="mt-1 text-sm text-red-600">{slugError}</p>
+          <p className="mt-2 text-sm text-red-600">{slugError}</p>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-light text-black mb-4">
           Description
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => onDescriptionChange(e.target.value)}
-          rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          rows={4}
+          className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
           placeholder="Brief description of your organization..."
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-light text-black mb-4">
           Visibility
         </label>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Object.values(CreateOrganizationRequestVisibilityEnum).map((visibility) => (
-            <label key={visibility} className="flex items-start">
+            <label key={visibility} className="flex items-start border border-gray-300 p-4 hover:border-black cursor-pointer transition-colors duration-200">
               <input
                 type="radio"
                 name="visibility"
                 value={visibility}
                 checked={formData.visibility === visibility}
                 onChange={(e) => onVisibilityChange(e.target.value as CreateOrganizationRequestVisibilityEnum)}
-                className="mt-1 h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                className="mt-1 h-4 w-4 text-black border-gray-300 focus:ring-black"
               />
-              <div className="ml-3">
-                <span className="text-sm font-medium text-gray-700">
+              <div className="ml-4">
+                <span className="text-sm font-light text-black">
                   {visibility === CreateOrganizationRequestVisibilityEnum.Public ? 'Public' : 'Private'}
                 </span>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600 mt-1">
                   {visibility === CreateOrganizationRequestVisibilityEnum.Public
                     ? 'Anyone can see and join this organization'
                     : 'Only invited members can access this organization'
@@ -373,35 +373,35 @@ function TeamSetupStep({
   onRemoveInvite: (index: number) => void;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Invite team members</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="text-lg font-light text-black mb-4">Invite team members</h3>
+        <p className="text-sm text-gray-600">
           Invite people to join your organization. You can always add more members later.
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {inviteList.map((invite, index) => (
-          <div key={index} className="flex items-center space-x-3">
+          <div key={index} className="flex items-center space-x-4">
             <input
               type="email"
               value={invite.email}
               onChange={(e) => onUpdateInvite(index, 'email', e.target.value)}
               placeholder="colleague@example.com"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="flex-1 px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
             />
             <select
               value={invite.role}
               onChange={(e) => onUpdateInvite(index, 'role', e.target.value as InviteMemberRequestRoleEnum)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
             >
               <option value={InviteMemberRequestRoleEnum.Member}>Member</option>
               <option value={InviteMemberRequestRoleEnum.Admin}>Admin</option>
             </select>
             <button
               onClick={() => onRemoveInvite(index)}
-              className="p-2 text-gray-400 hover:text-red-600"
+              className="p-2 text-gray-400 hover:text-black transition-colors duration-200"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -413,7 +413,7 @@ function TeamSetupStep({
 
       <button
         onClick={onAddInvite}
-        className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-300 rounded-md hover:bg-indigo-50"
+        className="flex items-center space-x-2 text-black border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors duration-200"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -434,24 +434,24 @@ function ReviewStep({
   const validInvites = inviteList.filter(invite => invite.email.trim());
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Review and create</h3>
+        <h3 className="text-lg font-light text-black">Review and create</h3>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+      <div className="border border-black p-6 space-y-4">
         <div>
-          <h4 className="font-medium text-gray-900">{formData.name}</h4>
-          <p className="text-sm text-gray-600">@{formData.slug}</p>
+          <h4 className="font-light text-lg text-black">{formData.name}</h4>
+          <p className="text-sm text-gray-600 mt-1">@{formData.slug}</p>
         </div>
 
         {formData.description && (
-          <div>
+          <div className="pt-4 border-t border-gray-300">
             <p className="text-sm text-gray-600">{formData.description}</p>
           </div>
         )}
 
-        <div className="flex items-center space-x-4 text-sm text-gray-600">
+        <div className="flex items-center space-x-4 text-sm text-gray-600 pt-4 border-t border-gray-300">
           <span className="capitalize">{formData.visibility.toLowerCase()}</span>
           <span>•</span>
           <span>Basic plan</span>
@@ -460,14 +460,14 @@ function ReviewStep({
 
       {validInvites.length > 0 && (
         <div>
-          <h4 className="font-medium text-gray-900 mb-3">
+          <h4 className="font-light text-black mb-4">
             Team members ({validInvites.length})
           </h4>
           <div className="space-y-2">
             {validInvites.map((invite, index) => (
-              <div key={index} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                <span className="text-sm text-gray-900">{invite.email}</span>
-                <span className="text-xs text-gray-500 capitalize">
+              <div key={index} className="flex items-center justify-between py-3 px-4 border border-gray-300">
+                <span className="text-sm text-black">{invite.email}</span>
+                <span className="text-xs text-gray-600 capitalize">
                   {organizationService.getRoleDisplayName(invite.role as any)}
                 </span>
               </div>

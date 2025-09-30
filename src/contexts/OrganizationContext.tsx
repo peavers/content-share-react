@@ -63,7 +63,12 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
             if (!currentWorkspace && orgs.length > 0) {
                 const personalOrg = orgs.find(org => org.organizationType === OrganizationOrganizationTypeEnum.Personal);
                 if (personalOrg) {
-                    setCurrentWorkspace(createWorkspaceContext(personalOrg));
+                    const workspace = createWorkspaceContext(personalOrg);
+                    setCurrentWorkspace(workspace);
+                } else {
+                    // If no personal org, set the first organization as default
+                    const workspace = createWorkspaceContext(orgs[0]);
+                    setCurrentWorkspace(workspace);
                 }
             }
         } catch (err) {

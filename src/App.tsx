@@ -4,28 +4,18 @@ import { Amplify } from 'aws-amplify';
 import { AuthProvider } from './contexts/AuthContext';
 import { OrganizationProvider } from './contexts/OrganizationContext';
 import awsConfig from './config/awsConfig';
-import type { AppProps } from './types';
 
-// Authentication Components
+// Components
 import LoginComponent from './components/auth/LoginComponent';
-import RegisterComponent from './components/auth/RegisterComponent';
-import ForgotPasswordComponent from './components/auth/ForgotPasswordComponent';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-
-// Layout Component
-import MainLayout from './components/layout/MainLayout';
-
-// Page Components
-import DashboardOverview from './components/dashboard/DashboardOverview';
-import VideosPage from './components/videos/VideosPage';
-import VideoUpload from './components/VideoUpload';
-import { OrganizationPage } from './components/organization/OrganizationPage';
-import { SettingsPage } from './components/settings/SettingsPage';
+import Dashboard from './components/Dashboard';
+import UploadPage from './components/UploadPage';
+import VideoDetailPage from './components/VideoDetailPage';
 
 // Configure Amplify
 Amplify.configure(awsConfig);
 
-const App: React.FC<AppProps> = () => {
+const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
@@ -34,43 +24,23 @@ const App: React.FC<AppProps> = () => {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginComponent />} />
-              <Route path="/register" element={<RegisterComponent />} />
-              <Route path="/forgot-password" element={<ForgotPasswordComponent />} />
 
-              {/* Protected Routes with Layout */}
+              {/* Protected Routes */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>
-                  <MainLayout>
-                    <DashboardOverview />
-                  </MainLayout>
+                  <Dashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/videos" element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <VideosPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              } />
+
               <Route path="/upload" element={
                 <ProtectedRoute>
-                  <MainLayout>
-                    <VideoUpload />
-                  </MainLayout>
+                  <UploadPage />
                 </ProtectedRoute>
               } />
-              <Route path="/organization" element={
+
+              <Route path="/video/:videoId" element={
                 <ProtectedRoute>
-                  <MainLayout>
-                    <OrganizationPage />
-                  </MainLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <MainLayout>
-                    <SettingsPage />
-                  </MainLayout>
+                  <VideoDetailPage />
                 </ProtectedRoute>
               } />
 

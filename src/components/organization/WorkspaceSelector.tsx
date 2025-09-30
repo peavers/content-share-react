@@ -2,6 +2,7 @@ import {useOrganization} from '../../contexts';
 import {useEffect, useRef, useState} from "react";
 import type {Organization, WorkspaceContext} from "../../types";
 import {OrganizationOrganizationTypeEnum} from "../../generated";
+import {CreateOrganizationModal} from './CreateOrganizationModal';
 
 
 interface WorkspaceSelectorProps {
@@ -17,6 +18,7 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
     } = useOrganization();
 
     const [isOpen, setIsOpen] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Close dropdown when clicking outside
@@ -119,9 +121,7 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
                         <button
                             onClick={() => {
                                 setIsOpen(false);
-                                // Open create organization modal
-                                // This would be handled by a modal state in the parent component
-                                console.log('Open create organization modal');
+                                setShowCreateModal(true);
                             }}
                             className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                         >
@@ -138,6 +138,23 @@ export function WorkspaceSelector({className = ''}: WorkspaceSelectorProps) {
                     </div>
                 </div>
             )}
+
+            {/* Create Organization Modal */}
+            <CreateOrganizationModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={(newOrganization) => {
+                    // Switch to the newly created organization
+                    const workspace: WorkspaceContext = {
+                        type: newOrganization.organizationType === OrganizationOrganizationTypeEnum.Personal ? 'personal' : 'organization',
+                        organization: newOrganization,
+                        currentUserRole: undefined, // Will be set by context
+                        permissions: []
+                    };
+                    setCurrentWorkspace(workspace);
+                    setShowCreateModal(false);
+                }}
+            />
         </div>
     );
 }
