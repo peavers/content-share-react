@@ -28,6 +28,8 @@ Name | Type | Description | Notes
 **tags** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 **createdAt** | **string** |  | [optional] [default to undefined]
 **updatedAt** | **string** |  | [optional] [default to undefined]
+**metadataExtracted** | **boolean** |  | [optional] [default to undefined]
+**metadataExtractionError** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -58,6 +60,8 @@ const instance: Video = {
     tags,
     createdAt,
     updatedAt,
+    metadataExtracted,
+    metadataExtractionError,
 };
 ```
 

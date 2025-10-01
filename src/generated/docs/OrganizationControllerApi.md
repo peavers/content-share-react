@@ -5,9 +5,13 @@ All URIs are relative to *http://localhost:8080*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**acceptInvitation**](#acceptinvitation) | **POST** /api/organizations/invitations/{token}/accept | |
+|[**acceptInvitationPublic**](#acceptinvitationpublic) | **POST** /api/organizations/public/invitations/{token}/accept | |
+|[**cancelInvitation**](#cancelinvitation) | **DELETE** /api/organizations/{organizationId}/invitations/{invitationId} | |
+|[**checkSlugAvailability**](#checkslugavailability) | **GET** /api/organizations/check-slug/{slug} | |
 |[**createOrganization**](#createorganization) | **POST** /api/organizations | |
 |[**declineInvitation**](#declineinvitation) | **POST** /api/organizations/invitations/{token}/decline | |
 |[**deleteOrganization**](#deleteorganization) | **DELETE** /api/organizations/{organizationId} | |
+|[**getCurrentUserMemberships**](#getcurrentusermemberships) | **GET** /api/organizations/my-memberships | |
 |[**getOrganization**](#getorganization) | **GET** /api/organizations/{organizationId} | |
 |[**getOrganizationInvitations**](#getorganizationinvitations) | **GET** /api/organizations/{organizationId}/invitations | |
 |[**getOrganizationMembers**](#getorganizationmembers) | **GET** /api/organizations/{organizationId}/members | |
@@ -50,6 +54,163 @@ const { status, data } = await apiInstance.acceptInvitation(
 ### Return type
 
 **OrganizationMembership**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **acceptInvitationPublic**
+> { [key: string]: string; } acceptInvitationPublic(acceptInvitationRequest)
+
+
+### Example
+
+```typescript
+import {
+    OrganizationControllerApi,
+    Configuration,
+    AcceptInvitationRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganizationControllerApi(configuration);
+
+let token: string; // (default to undefined)
+let acceptInvitationRequest: AcceptInvitationRequest; //
+
+const { status, data } = await apiInstance.acceptInvitationPublic(
+    token,
+    acceptInvitationRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **acceptInvitationRequest** | **AcceptInvitationRequest**|  | |
+| **token** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**{ [key: string]: string; }**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **cancelInvitation**
+> cancelInvitation()
+
+
+### Example
+
+```typescript
+import {
+    OrganizationControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganizationControllerApi(configuration);
+
+let organizationId: string; // (default to undefined)
+let invitationId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.cancelInvitation(
+    organizationId,
+    invitationId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **organizationId** | [**string**] |  | defaults to undefined|
+| **invitationId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **checkSlugAvailability**
+> { [key: string]: boolean; } checkSlugAvailability()
+
+
+### Example
+
+```typescript
+import {
+    OrganizationControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganizationControllerApi(configuration);
+
+let slug: string; // (default to undefined)
+
+const { status, data } = await apiInstance.checkSlugAvailability(
+    slug
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **slug** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**{ [key: string]: boolean; }**
 
 ### Authorization
 
@@ -210,6 +371,49 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getCurrentUserMemberships**
+> { [key: string]: OrganizationMembership; } getCurrentUserMemberships()
+
+
+### Example
+
+```typescript
+import {
+    OrganizationControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganizationControllerApi(configuration);
+
+const { status, data } = await apiInstance.getCurrentUserMemberships();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**{ [key: string]: OrganizationMembership; }**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
 
 
 ### HTTP response details

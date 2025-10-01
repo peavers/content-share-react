@@ -4,6 +4,7 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/AcceptInvitationRequest.md
 docs/AddTagsRequest.md
 docs/AwsS3ControllerApi.md
 docs/CognitoUserDto.md
@@ -35,5 +36,7 @@ docs/UserProfileDto.md
 docs/UserStatusResponse.md
 docs/Video.md
 docs/VideoControllerApi.md
+docs/VideoMetadata.md
+docs/VideoWithMetadataDTO.md
 git_push.sh
 index.ts

@@ -9,6 +9,8 @@ All URIs are relative to *http://localhost:8080*
 |[**getUserVideos**](#getuservideos) | **GET** /api/videos/my-videos | |
 |[**getVideo**](#getvideo) | **GET** /api/videos/{videoId} | |
 |[**getVideoPresignedUrl**](#getvideopresignedurl) | **GET** /api/videos/{videoId}/presigned-url | |
+|[**getVideoThumbnailUrl**](#getvideothumbnailurl) | **GET** /api/videos/{videoId}/thumbnail-url | Get video thumbnail presigned URL|
+|[**getVideoWithMetadata**](#getvideowithmetadata) | **GET** /api/videos/{videoId}/with-metadata | Get video with metadata|
 
 # **deleteVideo**
 > deleteVideo()
@@ -228,6 +230,108 @@ const { status, data } = await apiInstance.getVideoPresignedUrl(
 ### Return type
 
 **string**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getVideoThumbnailUrl**
+> string getVideoThumbnailUrl()
+
+Returns a presigned URL for the video thumbnail image
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getVideoThumbnailUrl(
+    videoId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**string**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getVideoWithMetadata**
+> VideoWithMetadataDTO getVideoWithMetadata()
+
+Returns a video along with its extracted metadata (if available)
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.getVideoWithMetadata(
+    videoId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**VideoWithMetadataDTO**
 
 ### Authorization
 

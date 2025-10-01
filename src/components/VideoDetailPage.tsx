@@ -1,50 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useOrganization } from '../contexts';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import axios from 'axios';
 import Navigation from './shared/Navigation';
 import { tagService } from '../services/tagService';
-import type { Tag } from '../generated';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
-
-interface Video {
-  id: number;
-  organizationId: string;
-  userId: string;
-  title: string;
-  description: string;
-  s3Bucket: string;
-  s3Key: string;
-  fileSize: number;
-  contentType: string;
-  originalFilename: string;
-  etag: string;
-  uploadId: string;
-  durationSeconds: number;
-  width: number;
-  height: number;
-  thumbnailS3Path: string;
-  uploadStatus: string;
-  processingStatus: string;
-  visibility: string;
-  sharedWith: string[];
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { videoService } from '../services/videoService';
+import type { Tag, VideoWithMetadataDTO } from '../generated';
 
 const VideoDetailPage: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const { currentWorkspace } = useOrganization();
   const navigate = useNavigate();
-  const [video, setVideo] = useState<Video | null>(null);
+  const [videoData, setVideoData] = useState<VideoWithMetadataDTO | null>(null);
   const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [refetchingMetadata, setRefetchingMetadata] = useState(false);
   const [videoTags, setVideoTags] = useState<Tag[]>([]);
+
+  const video = videoData?.video;
+  const metadata = videoData?.metadata;
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -53,40 +28,21 @@ const VideoDetailPage: React.FC = () => {
       try {
         setLoading(true);
 
-        // Get fresh token from Amplify
-        const session = await fetchAuthSession();
-        const token = session?.tokens?.idToken?.toString();
+        const data = await videoService.getVideoWithMetadata(parseInt(videoId));
+        setVideoData(data);
 
-        if (!token) {
-          setError('Not authenticated');
-          return;
+        const url = await videoService.getVideoPresignedUrl(parseInt(videoId));
+        setPresignedUrl(url);
+
+        if (data.video?.thumbnailS3Path) {
+          try {
+            const thumb = await videoService.getThumbnailUrl(parseInt(videoId));
+            setThumbnailUrl(thumb);
+          } catch (err) {
+            console.error('Error fetching thumbnail:', err);
+          }
         }
 
-        // Fetch video metadata
-        const videoResponse = await axios.get(
-          `${API_BASE_URL}/api/videos/${videoId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'X-Organization-Id': currentWorkspace.organization.id
-            }
-          }
-        );
-        setVideo(videoResponse.data);
-
-        // Fetch presigned URL for video playback
-        const urlResponse = await axios.get(
-          `${API_BASE_URL}/api/videos/${videoId}/presigned-url`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'X-Organization-Id': currentWorkspace.organization.id
-            }
-          }
-        );
-        setPresignedUrl(urlResponse.data);
-
-        // Fetch video tags
         try {
           const tags = await tagService.getVideoTags(parseInt(videoId));
           setVideoTags(tags);
@@ -104,42 +60,26 @@ const VideoDetailPage: React.FC = () => {
     fetchVideo();
   }, [videoId, currentWorkspace]);
 
-  const handleDelete = async () => {
-    if (!video || !currentWorkspace) return;
-
-    if (!window.confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
-      return;
-    }
+  const handleRefetchMetadata = async () => {
+    if (!videoId || !currentWorkspace) return;
 
     try {
-      setDeleting(true);
+      setRefetchingMetadata(true);
+      const data = await videoService.getVideoWithMetadata(parseInt(videoId));
+      setVideoData(data);
 
-      // Get fresh token from Amplify
-      const session = await fetchAuthSession();
-      const token = session?.tokens?.idToken?.toString();
-
-      if (!token) {
-        setError('Not authenticated');
-        return;
-      }
-
-      await axios.delete(
-        `${API_BASE_URL}/api/videos/${video.id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'X-Organization-Id': currentWorkspace.organization.id
-          }
+      if (data.video?.thumbnailS3Path && !thumbnailUrl) {
+        try {
+          const thumb = await videoService.getThumbnailUrl(parseInt(videoId));
+          setThumbnailUrl(thumb);
+        } catch (err) {
+          console.error('Error fetching thumbnail:', err);
         }
-      );
-
-      // Redirect to dashboard after successful deletion
-      navigate('/');
+      }
     } catch (err: any) {
-      console.error('Error deleting video:', err);
-      setError(err.response?.data?.message || 'Failed to delete video');
+      console.error('Error refetching metadata:', err);
     } finally {
-      setDeleting(false);
+      setRefetchingMetadata(false);
     }
   };
 
@@ -165,6 +105,25 @@ const VideoDetailPage: React.FC = () => {
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleString();
+  };
+
+  const formatBitrate = (bitrate: number): string => {
+    if (!bitrate) return 'N/A';
+    if (bitrate >= 1000000) {
+      return `${(bitrate / 1000000).toFixed(2)} Mbps`;
+    }
+    return `${(bitrate / 1000).toFixed(0)} Kbps`;
+  };
+
+  const formatProcessingTime = (ms: number): string => {
+    if (!ms) return 'N/A';
+    const seconds = ms / 1000;
+    if (seconds < 60) {
+      return `${seconds.toFixed(1)}s`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}m ${remainingSeconds}s`;
   };
 
   if (loading) {
@@ -201,27 +160,28 @@ const VideoDetailPage: React.FC = () => {
     <div className="min-h-screen bg-base-200">
       <Navigation showUploadButton={true} />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         <Link to="/" className="btn btn-ghost mb-6">
           &larr; Back to Dashboard
         </Link>
 
-        {/* Video Player */}
+        {/* Video Player Section */}
         <div className="mb-8">
           {presignedUrl && video.uploadStatus === 'COMPLETED' ? (
-            <div className="card bg-base-100 shadow-xl overflow-hidden">
+            <div className="bg-black rounded-xl overflow-hidden shadow-2xl">
               <video
                 controls
-                className="w-full bg-black"
-                style={{ maxHeight: '600px' }}
+                className="w-full"
+                style={{ maxHeight: '70vh' }}
+                poster={thumbnailUrl || undefined}
               >
                 <source src={presignedUrl} type={video.contentType} />
                 Your browser does not support the video tag.
               </video>
             </div>
           ) : (
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body items-center justify-center" style={{ minHeight: '400px' }}>
+            <div className="bg-base-100 rounded-xl shadow-xl overflow-hidden">
+              <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
                 <div className="text-center">
                   {video.uploadStatus === 'PENDING' && <span className="loading loading-spinner loading-lg mb-4"></span>}
                   <p className="text-lg">
@@ -234,164 +194,257 @@ const VideoDetailPage: React.FC = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content - Video Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Title & Description */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h1 className="card-title text-3xl mb-4">{video.title}</h1>
+        {/* Video Title and Meta */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-4">{video.title}</h1>
 
-                {/* Tags as Breadcrumbs */}
-                {videoTags.length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-2">
-                      {videoTags.map((tag) => {
-                        // Parse tag path into breadcrumb segments
-                        const segments = tag.path?.split('/').filter(p => p) || [];
+          {videoTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {videoTags.map((tag) => {
+                const segments = tag.path?.split('/').filter(p => p) || [];
+                return (
+                  <div key={tag.id} className="breadcrumbs text-sm bg-base-100 rounded-lg px-3 py-2 shadow">
+                    <ul>
+                      {segments.map((segment, index) => {
+                        const pathUpToSegment = '/' + segments.slice(0, index + 1).join('/');
                         return (
-                          <div key={tag.id} className="breadcrumbs text-sm bg-base-200 rounded-lg px-3 py-2">
-                            <ul>
-                              {segments.map((segment, index) => {
-                                // Build the path up to this segment
-                                const pathUpToSegment = '/' + segments.slice(0, index + 1).join('/');
-                                return (
-                                  <li key={index}>
-                                    <Link
-                                      to={`/?tag=${encodeURIComponent(pathUpToSegment)}`}
-                                      className="hover:text-primary"
-                                    >
-                                      {segment}
-                                    </Link>
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          </div>
+                          <li key={index}>
+                            <Link
+                              to={`/?tag=${encodeURIComponent(pathUpToSegment)}`}
+                              className="hover:text-primary"
+                            >
+                              {segment}
+                            </Link>
+                          </li>
                         );
                       })}
-                    </div>
+                    </ul>
                   </div>
-                )}
-
-                {video.description && (
-                  <p className="opacity-70 whitespace-pre-wrap">{video.description}</p>
-                )}
-              </div>
+                );
+              })}
             </div>
+          )}
 
-            {/* Video Information */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Video Information</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm opacity-60">Original Filename</p>
-                    <p className="font-semibold">{video.originalFilename}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-60">File Size</p>
-                    <p className="font-semibold">{formatFileSize(video.fileSize)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-60">Duration</p>
-                    <p className="font-semibold">{formatDuration(video.durationSeconds)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-60">Resolution</p>
-                    <p className="font-semibold">
-                      {video.width && video.height ? `${video.width} x ${video.height}` : 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-60">Content Type</p>
-                    <p className="font-semibold">{video.contentType}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-60">Uploaded</p>
-                    <p className="font-semibold">{formatDate(video.createdAt)}</p>
-                  </div>
-                </div>
-              </div>
+          {video.description && (
+            <p className="text-base opacity-80 whitespace-pre-wrap mb-4">{video.description}</p>
+          )}
+
+          <div className="flex flex-wrap gap-3 text-sm opacity-70">
+            <div className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {formatDate(video.createdAt)}
             </div>
+            <div className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              {formatDuration(video.durationSeconds)}
+            </div>
+            <div className="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+              </svg>
+              {formatFileSize(video.fileSize)}
+            </div>
+            {video.width && video.height && (
+              <div className="flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                </svg>
+                {video.width} × {video.height}
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Sidebar - Status & Actions */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Status Card */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Status</h2>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm opacity-60">Upload Status</p>
-                    <div className={`badge ${
-                      video.uploadStatus === 'COMPLETED' ? 'badge-success' :
-                      video.uploadStatus === 'FAILED' ? 'badge-error' :
-                      'badge-warning'
-                    }`}>
-                      {video.uploadStatus}
-                    </div>
-                  </div>
-                  {video.processingStatus && (
+        {/* Rich Metadata Display */}
+        {metadata ? (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Technical Information</h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Video Stream Info */}
+              <div className="bg-base-100 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                  </svg>
+                  Video Stream
+                </h3>
+                <dl className="space-y-3">
+                  {metadata.videoCodec && (
                     <div>
-                      <p className="text-sm opacity-60">Processing Status</p>
-                      <div className={`badge ${
-                        video.processingStatus === 'COMPLETED' ? 'badge-success' :
-                        video.processingStatus === 'FAILED' ? 'badge-error' :
-                        'badge-warning'
-                      }`}>
-                        {video.processingStatus}
-                      </div>
+                      <dt className="text-sm opacity-60">Codec</dt>
+                      <dd className="font-mono text-sm">{metadata.videoCodec}</dd>
                     </div>
                   )}
-                  <div>
-                    <p className="text-sm opacity-60">Visibility</p>
-                    <div className="badge badge-outline">{video.visibility.toUpperCase()}</div>
-                  </div>
-                </div>
+                  {metadata.videoBitrate && (
+                    <div>
+                      <dt className="text-sm opacity-60">Bitrate</dt>
+                      <dd className="font-mono text-sm">{formatBitrate(metadata.videoBitrate)}</dd>
+                    </div>
+                  )}
+                  {metadata.frameRate && (
+                    <div>
+                      <dt className="text-sm opacity-60">Frame Rate</dt>
+                      <dd className="font-mono text-sm">{metadata.frameRate.toFixed(2)} fps</dd>
+                    </div>
+                  )}
+                  {metadata.aspectRatio && (
+                    <div>
+                      <dt className="text-sm opacity-60">Aspect Ratio</dt>
+                      <dd className="font-mono text-sm">{metadata.aspectRatio}</dd>
+                    </div>
+                  )}
+                  {metadata.colorSpace && (
+                    <div>
+                      <dt className="text-sm opacity-60">Color Space</dt>
+                      <dd className="font-mono text-sm">{metadata.colorSpace}</dd>
+                    </div>
+                  )}
+                </dl>
               </div>
-            </div>
 
-            {/* Technical Details */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title text-sm">Technical Details</h2>
-                <div className="space-y-2">
+              {/* Audio Stream Info */}
+              <div className="bg-base-100 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                  Audio Stream
+                </h3>
+                {metadata.hasAudio === false ? (
+                  <div className="text-center py-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
+                    <p className="text-sm opacity-60">No audio stream</p>
+                  </div>
+                ) : (
+                  <dl className="space-y-3">
+                    {metadata.audioCodec && (
+                      <div>
+                        <dt className="text-sm opacity-60">Codec</dt>
+                        <dd className="font-mono text-sm">{metadata.audioCodec}</dd>
+                      </div>
+                    )}
+                    {metadata.audioBitrate && (
+                      <div>
+                        <dt className="text-sm opacity-60">Bitrate</dt>
+                        <dd className="font-mono text-sm">{formatBitrate(metadata.audioBitrate)}</dd>
+                      </div>
+                    )}
+                    {metadata.sampleRate && (
+                      <div>
+                        <dt className="text-sm opacity-60">Sample Rate</dt>
+                        <dd className="font-mono text-sm">{(metadata.sampleRate / 1000).toFixed(1)} kHz</dd>
+                      </div>
+                    )}
+                    {metadata.audioChannels && (
+                      <div>
+                        <dt className="text-sm opacity-60">Channels</dt>
+                        <dd className="font-mono text-sm">{metadata.audioChannels}</dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
+              </div>
+
+              {/* Processing Info */}
+              <div className="bg-base-100 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                  </svg>
+                  Processing
+                </h3>
+                <dl className="space-y-3">
+                  {metadata.processingDurationMs && (
+                    <div>
+                      <dt className="text-sm opacity-60">Processing Time</dt>
+                      <dd className="font-mono text-sm">{formatProcessingTime(metadata.processingDurationMs)}</dd>
+                    </div>
+                  )}
+                  {metadata.ffmpegVersion && (
+                    <div>
+                      <dt className="text-sm opacity-60">FFmpeg Version</dt>
+                      <dd className="font-mono text-sm">{metadata.ffmpegVersion}</dd>
+                    </div>
+                  )}
+                  {metadata.thumbnailPath && (
+                    <div>
+                      <dt className="text-sm opacity-60">Thumbnail Generated</dt>
+                      <dd className="text-sm">✓ Yes</dd>
+                    </div>
+                  )}
+                  {metadata.processedAt && (
+                    <div>
+                      <dt className="text-sm opacity-60">Processed At</dt>
+                      <dd className="text-sm">{formatDate(metadata.processedAt)}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+
+              {/* File Details */}
+              <div className="bg-base-100 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  File Details
+                </h3>
+                <dl className="space-y-3">
                   <div>
-                    <p className="text-xs opacity-60">S3 Bucket</p>
-                    <p className="text-xs break-all">{video.s3Bucket}</p>
+                    <dt className="text-sm opacity-60">Original Filename</dt>
+                    <dd className="font-mono text-sm break-all">{video.originalFilename}</dd>
                   </div>
                   <div>
-                    <p className="text-xs opacity-60">S3 Key</p>
-                    <p className="text-xs break-all">{video.s3Key}</p>
+                    <dt className="text-sm opacity-60">Content Type</dt>
+                    <dd className="font-mono text-sm">{video.contentType}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm opacity-60">Storage</dt>
+                    <dd className="font-mono text-xs break-all opacity-70">
+                      s3://{video.s3Bucket}/{video.s3Key}
+                    </dd>
                   </div>
                   {video.etag && (
                     <div>
-                      <p className="text-xs opacity-60">ETag</p>
-                      <p className="text-xs break-all">{video.etag}</p>
+                      <dt className="text-sm opacity-60">ETag</dt>
+                      <dd className="font-mono text-xs break-all opacity-70">{video.etag}</dd>
                     </div>
                   )}
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Actions</h2>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="btn btn-error w-full"
-                >
-                  {deleting && <span className="loading loading-spinner"></span>}
-                  {deleting ? 'Deleting...' : 'Delete Video'}
-                </button>
+                </dl>
               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="mb-8 flex justify-center">
+            <div className="bg-base-100 rounded-xl p-8 shadow-lg max-w-md text-center">
+              <div className="mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Processing Metadata</h3>
+              <p className="text-sm opacity-70 mb-6">
+                Your video is being processed. Technical metadata should be available really soon!
+              </p>
+              <button
+                onClick={handleRefetchMetadata}
+                disabled={refetchingMetadata}
+                className="btn btn-primary"
+              >
+                {refetchingMetadata && <span className="loading loading-spinner"></span>}
+                {refetchingMetadata ? 'Checking...' : 'Check Again'}
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

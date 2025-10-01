@@ -791,6 +791,49 @@
         }
       }
     },
+    "/api/organizations/public/invitations/{token}/accept": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "acceptInvitationPublic",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organizations/invitations/{token}/decline": {
       "post": {
         "tags": [
@@ -1062,6 +1105,72 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/videos/{videoId}/with-metadata": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "summary": "Get video with metadata",
+        "description": "Returns a video along with its extracted metadata (if available)",
+        "operationId": "getVideoWithMetadata",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoWithMetadataDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos/{videoId}/thumbnail-url": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "summary": "Get video thumbnail presigned URL",
+        "description": "Returns a presigned URL for the video thumbnail image",
+        "operationId": "getVideoThumbnailUrl",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
@@ -1342,6 +1451,29 @@
         }
       }
     },
+    "/api/organizations/my-memberships": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getCurrentUserMemberships",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/OrganizationMembership"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organizations/invitations": {
       "get": {
         "tags": [
@@ -1357,6 +1489,39 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/OrganizationInvitation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/check-slug/{slug}": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "checkSlugAvailability",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -1474,6 +1639,38 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/invitations/{invitationId}": {
+      "delete": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "cancelInvitation",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "invitationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -2190,11 +2387,25 @@
           "inviter": {
             "$ref": "#/components/schemas/User"
           },
-          "expired": {
-            "type": "boolean"
-          },
           "active": {
             "type": "boolean"
+          },
+          "expired": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AcceptInvitationRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
           }
         }
       },
@@ -2282,6 +2493,114 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "metadataExtracted": {
+            "type": "boolean"
+          },
+          "metadataExtractionError": {
+            "type": "string"
+          }
+        }
+      },
+      "VideoMetadata": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "videoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codec": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "frameRate": {
+            "type": "number"
+          },
+          "aspectRatio": {
+            "type": "string"
+          },
+          "colorSpace": {
+            "type": "string"
+          },
+          "hasAudio": {
+            "type": "boolean"
+          },
+          "audioCodec": {
+            "type": "string"
+          },
+          "audioBitrate": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "audioSampleRate": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "audioChannels": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "thumbnailWidth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "thumbnailHeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "thumbnailSizeBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "thumbnailFormat": {
+            "type": "string"
+          },
+          "processingStartedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "processingCompletedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "processingDurationMs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ffmpegVersion": {
+            "type": "string"
+          },
+          "rawFfprobeOutput": {
+            "$ref": "#/components/schemas/JSONB"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VideoWithMetadataDTO": {
+        "type": "object",
+        "description": "Video with its associated metadata",
+        "properties": {
+          "video": {
+            "$ref": "#/components/schemas/Video",
+            "description": "Video information"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/VideoMetadata",
+            "description": "Video metadata extracted by Lambda processor (may be null if not yet processed)"
           }
         }
       },

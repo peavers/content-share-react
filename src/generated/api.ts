@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface AcceptInvitationRequest
+ */
+export interface AcceptInvitationRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptInvitationRequest
+     */
+    'password': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptInvitationRequest
+     */
+    'firstName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AcceptInvitationRequest
+     */
+    'lastName': string;
+}
+/**
+ * 
+ * @export
  * @interface AddTagsRequest
  */
 export interface AddTagsRequest {
@@ -537,13 +562,13 @@ export interface OrganizationInvitation {
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'expired': boolean;
+    'active': boolean;
     /**
      * 
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'active': boolean;
+    'expired': boolean;
 }
 
 export const OrganizationInvitationRoleEnum = {
@@ -1453,6 +1478,182 @@ export interface Video {
      * @memberof Video
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Video
+     */
+    'metadataExtracted': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof Video
+     */
+    'metadataExtractionError': string;
+}
+/**
+ * 
+ * @export
+ * @interface VideoMetadata
+ */
+export interface VideoMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'id': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'videoId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'codec': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'bitrate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'frameRate': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'aspectRatio': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'colorSpace': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VideoMetadata
+     */
+    'hasAudio': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'audioCodec': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'audioBitrate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'audioSampleRate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'audioChannels': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'thumbnailWidth': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'thumbnailHeight': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'thumbnailSizeBytes': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'thumbnailFormat': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'processingStartedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'processingCompletedAt': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoMetadata
+     */
+    'processingDurationMs': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'ffmpegVersion': string;
+    /**
+     * 
+     * @type {any}
+     * @memberof VideoMetadata
+     */
+    'rawFfprobeOutput': any;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoMetadata
+     */
+    'updatedAt': string;
+}
+/**
+ * Video with its associated metadata
+ * @export
+ * @interface VideoWithMetadataDTO
+ */
+export interface VideoWithMetadataDTO {
+    /**
+     * Video information
+     * @type {Video}
+     * @memberof VideoWithMetadataDTO
+     */
+    'video': Video;
+    /**
+     * Video metadata extracted by Lambda processor (may be null if not yet processed)
+     * @type {VideoMetadata}
+     * @memberof VideoWithMetadataDTO
+     */
+    'metadata': VideoMetadata;
 }
 
 /**
@@ -1799,6 +2000,115 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         },
         /**
          * 
+         * @param {string} token 
+         * @param {AcceptInvitationRequest} acceptInvitationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        acceptInvitationPublic: async (token: string, acceptInvitationRequest: AcceptInvitationRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'token' is not null or undefined
+            assertParamExists('acceptInvitationPublic', 'token', token)
+            // verify required parameter 'acceptInvitationRequest' is not null or undefined
+            assertParamExists('acceptInvitationPublic', 'acceptInvitationRequest', acceptInvitationRequest)
+            const localVarPath = `/api/organizations/public/invitations/{token}/accept`
+                .replace(`{${"token"}}`, encodeURIComponent(String(token)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(acceptInvitationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} organizationId 
+         * @param {number} invitationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelInvitation: async (organizationId: string, invitationId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organizationId' is not null or undefined
+            assertParamExists('cancelInvitation', 'organizationId', organizationId)
+            // verify required parameter 'invitationId' is not null or undefined
+            assertParamExists('cancelInvitation', 'invitationId', invitationId)
+            const localVarPath = `/api/organizations/{organizationId}/invitations/{invitationId}`
+                .replace(`{${"organizationId"}}`, encodeURIComponent(String(organizationId)))
+                .replace(`{${"invitationId"}}`, encodeURIComponent(String(invitationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} slug 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkSlugAvailability: async (slug: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'slug' is not null or undefined
+            assertParamExists('checkSlugAvailability', 'slug', slug)
+            const localVarPath = `/api/organizations/check-slug/{slug}`
+                .replace(`{${"slug"}}`, encodeURIComponent(String(slug)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1884,6 +2194,35 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
             }
 
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCurrentUserMemberships: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/organizations/my-memberships`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -2237,6 +2576,44 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         },
         /**
          * 
+         * @param {string} token 
+         * @param {AcceptInvitationRequest} acceptInvitationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async acceptInvitationPublic(token: string, acceptInvitationRequest: AcceptInvitationRequest, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.acceptInvitationPublic(token, acceptInvitationRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.acceptInvitationPublic']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} organizationId 
+         * @param {number} invitationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async cancelInvitation(organizationId: string, invitationId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cancelInvitation(organizationId, invitationId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.cancelInvitation']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} slug 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async checkSlugAvailability(slug: string, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: boolean; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.checkSlugAvailability(slug, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.checkSlugAvailability']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2269,6 +2646,17 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteOrganization(organizationId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.deleteOrganization']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCurrentUserMemberships(options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: OrganizationMembership; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentUserMemberships(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.getCurrentUserMemberships']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -2403,6 +2791,35 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
         },
         /**
          * 
+         * @param {string} token 
+         * @param {AcceptInvitationRequest} acceptInvitationRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        acceptInvitationPublic(token: string, acceptInvitationRequest: AcceptInvitationRequest, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: string; }> {
+            return localVarFp.acceptInvitationPublic(token, acceptInvitationRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} organizationId 
+         * @param {number} invitationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cancelInvitation(organizationId: string, invitationId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.cancelInvitation(organizationId, invitationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} slug 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        checkSlugAvailability(slug: string, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: boolean; }> {
+            return localVarFp.checkSlugAvailability(slug, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2427,6 +2844,14 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
          */
         deleteOrganization(organizationId: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.deleteOrganization(organizationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCurrentUserMemberships(options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: OrganizationMembership; }> {
+            return localVarFp.getCurrentUserMemberships(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2535,6 +2960,41 @@ export class OrganizationControllerApi extends BaseAPI {
 
     /**
      * 
+     * @param {string} token 
+     * @param {AcceptInvitationRequest} acceptInvitationRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public acceptInvitationPublic(token: string, acceptInvitationRequest: AcceptInvitationRequest, options?: RawAxiosRequestConfig) {
+        return OrganizationControllerApiFp(this.configuration).acceptInvitationPublic(token, acceptInvitationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} organizationId 
+     * @param {number} invitationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public cancelInvitation(organizationId: string, invitationId: number, options?: RawAxiosRequestConfig) {
+        return OrganizationControllerApiFp(this.configuration).cancelInvitation(organizationId, invitationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} slug 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public checkSlugAvailability(slug: string, options?: RawAxiosRequestConfig) {
+        return OrganizationControllerApiFp(this.configuration).checkSlugAvailability(slug, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {CreateOrganizationRequest} createOrganizationRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2564,6 +3024,16 @@ export class OrganizationControllerApi extends BaseAPI {
      */
     public deleteOrganization(organizationId: string, options?: RawAxiosRequestConfig) {
         return OrganizationControllerApiFp(this.configuration).deleteOrganization(organizationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganizationControllerApi
+     */
+    public getCurrentUserMemberships(options?: RawAxiosRequestConfig) {
+        return OrganizationControllerApiFp(this.configuration).getCurrentUserMemberships(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4711,6 +5181,74 @@ export const VideoControllerApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Returns a presigned URL for the video thumbnail image
+         * @summary Get video thumbnail presigned URL
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVideoThumbnailUrl: async (videoId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'videoId' is not null or undefined
+            assertParamExists('getVideoThumbnailUrl', 'videoId', videoId)
+            const localVarPath = `/api/videos/{videoId}/thumbnail-url`
+                .replace(`{${"videoId"}}`, encodeURIComponent(String(videoId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns a video along with its extracted metadata (if available)
+         * @summary Get video with metadata
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVideoWithMetadata: async (videoId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'videoId' is not null or undefined
+            assertParamExists('getVideoWithMetadata', 'videoId', videoId)
+            const localVarPath = `/api/videos/{videoId}/with-metadata`
+                .replace(`{${"videoId"}}`, encodeURIComponent(String(videoId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4779,6 +5317,32 @@ export const VideoControllerApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['VideoControllerApi.getVideoPresignedUrl']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * Returns a presigned URL for the video thumbnail image
+         * @summary Get video thumbnail presigned URL
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getVideoThumbnailUrl(videoId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getVideoThumbnailUrl(videoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoControllerApi.getVideoThumbnailUrl']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * Returns a video along with its extracted metadata (if available)
+         * @summary Get video with metadata
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getVideoWithMetadata(videoId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VideoWithMetadataDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getVideoWithMetadata(videoId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoControllerApi.getVideoWithMetadata']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -4831,6 +5395,26 @@ export const VideoControllerApiFactory = function (configuration?: Configuration
          */
         getVideoPresignedUrl(videoId: number, options?: RawAxiosRequestConfig): AxiosPromise<string> {
             return localVarFp.getVideoPresignedUrl(videoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a presigned URL for the video thumbnail image
+         * @summary Get video thumbnail presigned URL
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVideoThumbnailUrl(videoId: number, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.getVideoThumbnailUrl(videoId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a video along with its extracted metadata (if available)
+         * @summary Get video with metadata
+         * @param {number} videoId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getVideoWithMetadata(videoId: number, options?: RawAxiosRequestConfig): AxiosPromise<VideoWithMetadataDTO> {
+            return localVarFp.getVideoWithMetadata(videoId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4893,6 +5477,30 @@ export class VideoControllerApi extends BaseAPI {
      */
     public getVideoPresignedUrl(videoId: number, options?: RawAxiosRequestConfig) {
         return VideoControllerApiFp(this.configuration).getVideoPresignedUrl(videoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a presigned URL for the video thumbnail image
+     * @summary Get video thumbnail presigned URL
+     * @param {number} videoId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoControllerApi
+     */
+    public getVideoThumbnailUrl(videoId: number, options?: RawAxiosRequestConfig) {
+        return VideoControllerApiFp(this.configuration).getVideoThumbnailUrl(videoId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a video along with its extracted metadata (if available)
+     * @summary Get video with metadata
+     * @param {number} videoId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoControllerApi
+     */
+    public getVideoWithMetadata(videoId: number, options?: RawAxiosRequestConfig) {
+        return VideoControllerApiFp(this.configuration).getVideoWithMetadata(videoId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

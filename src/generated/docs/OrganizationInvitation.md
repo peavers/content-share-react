@@ -17,8 +17,8 @@ Name | Type | Description | Notes
 **createdAt** | **string** |  | [optional] [default to undefined]
 **organization** | [**Organization**](Organization.md) |  | [optional] [default to undefined]
 **inviter** | [**User**](User.md) |  | [optional] [default to undefined]
-**expired** | **boolean** |  | [optional] [default to undefined]
 **active** | **boolean** |  | [optional] [default to undefined]
+**expired** | **boolean** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -38,8 +38,8 @@ const instance: OrganizationInvitation = {
     createdAt,
     organization,
     inviter,
-    expired,
     active,
+    expired,
 };
 ```
 

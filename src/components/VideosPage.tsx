@@ -17,6 +17,7 @@ const VideosPage: React.FC = () => {
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
+  const [thumbnailUrlsMap, setThumbnailUrlsMap] = useState<Map<number, string>>(new Map());
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -31,19 +32,34 @@ const VideosPage: React.FC = () => {
       const fetchedVideos = await videoService.getOrganizationVideos();
       setVideos(fetchedVideos);
 
-      // Fetch tags for each video
+      // Fetch tags and thumbnails for each video
       const tagsMap = new Map<number, Tag[]>();
+      const thumbnailsMap = new Map<number, string>();
+
       for (const video of fetchedVideos) {
         if (video.id) {
+          // Fetch tags
           try {
             const tags = await tagService.getVideoTags(video.id);
             tagsMap.set(video.id, tags);
           } catch (error) {
             console.error(`Error fetching tags for video ${video.id}:`, error);
           }
+
+          // Fetch thumbnail URL if video has a thumbnail
+          if (video.thumbnailS3Path) {
+            try {
+              const thumbnailUrl = await videoService.getThumbnailUrl(video.id);
+              thumbnailsMap.set(video.id, thumbnailUrl);
+            } catch (error) {
+              console.error(`Error fetching thumbnail for video ${video.id}:`, error);
+            }
+          }
         }
       }
+
       setVideoTagsMap(tagsMap);
+      setThumbnailUrlsMap(thumbnailsMap);
     } catch (error) {
       console.error('Error fetching videos:', error);
     } finally {
@@ -261,43 +277,55 @@ const VideosPage: React.FC = () => {
             {/* Video Grid */}
             <div className="flex-1">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filteredVideos.map((video) => (
-                  <Link
-                    key={video.id}
-                    to={`/video/${video.id}`}
-                    className="group"
-                  >
-                    {/* Thumbnail placeholder */}
-                    <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      {/* Duration badge */}
-                      {formatDuration(video.durationSeconds) && (
-                        <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
-                          {formatDuration(video.durationSeconds)}
-                        </div>
-                      )}
-                    </div>
+                {filteredVideos.map((video) => {
+                  const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
 
-                    {/* Video details */}
-                    <div className="px-1">
-                      <h3 className="font-medium text-sm line-clamp-2 mb-1 group-hover:text-primary">
-                        {video.title || video.originalFilename}
-                      </h3>
-                      <div className="text-xs opacity-60 space-y-0.5">
-                        <p>{video.contentType || 'Video'}</p>
-                        {video.width && video.height && (
-                          <p>{video.width}x{video.height}</p>
+                  return (
+                    <Link
+                      key={video.id}
+                      to={`/video/${video.id}`}
+                      className="group"
+                    >
+                      {/* Thumbnail */}
+                      <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
+                        {thumbnailUrl ? (
+                          <img
+                            src={thumbnailUrl}
+                            alt={video.title || video.originalFilename}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
                         )}
-                        <p>{video.createdAt ? new Date(video.createdAt).toLocaleDateString() : 'Unknown date'}</p>
+                        {/* Duration badge */}
+                        {formatDuration(video.durationSeconds) && (
+                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
+                            {formatDuration(video.durationSeconds)}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </Link>
-                ))}
+
+                      {/* Video details */}
+                      <div className="px-1">
+                        <h3 className="font-medium text-sm line-clamp-2 mb-1 group-hover:text-primary">
+                          {video.title || video.originalFilename}
+                        </h3>
+                        <div className="text-xs opacity-60 space-y-0.5">
+                          <p>{video.contentType || 'Video'}</p>
+                          {video.width && video.height && (
+                            <p>{video.width}x{video.height}</p>
+                          )}
+                          <p>{video.createdAt ? new Date(video.createdAt).toLocaleDateString() : 'Unknown date'}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
               {filteredVideos.length === 0 && selectedTagIds.length > 0 && (
                 <div className="text-center py-12 opacity-60">

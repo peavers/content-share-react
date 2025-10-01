@@ -4,6 +4,7 @@ import { useOrganization } from '../../contexts';
 import { videoService } from '../../services/videoService';
 import { tagService } from '../../services/tagService';
 import Navigation from '../shared/Navigation';
+import UploadVideoModal from '../upload/UploadVideoModal';
 import type { Video } from '../../types';
 import type { Tag } from '../../generated';
 
@@ -14,6 +15,7 @@ const AdminVideoManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
   const [selectedVideos, setSelectedVideos] = useState<Set<number>>(new Set());
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -154,12 +156,12 @@ const AdminVideoManagement: React.FC = () => {
               Delete Selected ({selectedVideos.size})
               </button>
             )}
-            <Link to="/upload" className="btn btn-primary gap-2">
+            <button onClick={() => setShowUploadModal(true)} className="btn btn-primary gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
               Upload Video
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -267,6 +269,16 @@ const AdminVideoManagement: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Upload Video Modal */}
+      <UploadVideoModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onSuccess={() => {
+          fetchVideos();
+          setShowUploadModal(false);
+        }}
+      />
     </div>
   );
 };
