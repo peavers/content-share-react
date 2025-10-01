@@ -16,6 +16,7 @@ const AdminVideoManagement: React.FC = () => {
   const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
   const [selectedVideos, setSelectedVideos] = useState<Set<number>>(new Set());
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -253,6 +254,12 @@ const AdminVideoManagement: React.FC = () => {
                               View
                             </Link>
                             <button
+                              onClick={() => setEditingVideo(video)}
+                              className="btn btn-ghost btn-xs"
+                            >
+                              Edit
+                            </button>
+                            <button
                               onClick={() => handleDeleteVideo(video.id!)}
                               className="btn btn-ghost btn-xs text-error"
                             >
@@ -279,6 +286,20 @@ const AdminVideoManagement: React.FC = () => {
           setShowUploadModal(false);
         }}
       />
+
+      {/* Edit Video Modal */}
+      {editingVideo && (
+        <UploadVideoModal
+          isOpen={!!editingVideo}
+          onClose={() => setEditingVideo(null)}
+          onSuccess={() => {
+            fetchVideos();
+            setEditingVideo(null);
+          }}
+          video={editingVideo}
+          videoTags={videoTagsMap.get(editingVideo.id!)?.map(t => t.path!)}
+        />
+      )}
     </div>
   );
 };

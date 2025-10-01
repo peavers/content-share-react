@@ -11,6 +11,7 @@ All URIs are relative to *http://localhost:8080*
 |[**getVideoPresignedUrl**](#getvideopresignedurl) | **GET** /api/videos/{videoId}/presigned-url | |
 |[**getVideoThumbnailUrl**](#getvideothumbnailurl) | **GET** /api/videos/{videoId}/thumbnail-url | Get video thumbnail presigned URL|
 |[**getVideoWithMetadata**](#getvideowithmetadata) | **GET** /api/videos/{videoId}/with-metadata | Get video with metadata|
+|[**updateVideo**](#updatevideo) | **PATCH** /api/videos/{videoId} | Update video metadata|
 
 # **deleteVideo**
 > deleteVideo()
@@ -340,6 +341,61 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateVideo**
+> Video updateVideo(updateVideoRequest)
+
+Update video title and description. User must be admin or video owner.
+
+### Example
+
+```typescript
+import {
+    VideoControllerApi,
+    Configuration,
+    UpdateVideoRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new VideoControllerApi(configuration);
+
+let videoId: number; // (default to undefined)
+let updateVideoRequest: UpdateVideoRequest; //
+
+const { status, data } = await apiInstance.updateVideo(
+    videoId,
+    updateVideoRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updateVideoRequest** | **UpdateVideoRequest**|  | |
+| **videoId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+**Video**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: */*
 
 

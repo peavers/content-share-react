@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface UpdateTagRequest
+ */
+export interface UpdateTagRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateTagRequest
+     */
+    'path'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateTagRequest
+     */
+    'description'?: string;
+}
+

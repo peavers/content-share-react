@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface UpdateVideoRequest
+ */
+export interface UpdateVideoRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateVideoRequest
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateVideoRequest
+     */
+    'description'?: string;
+}
+

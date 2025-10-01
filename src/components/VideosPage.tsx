@@ -195,7 +195,7 @@ const VideosPage: React.FC = () => {
           <div className="flex gap-6">
             {/* Sidebar Filters */}
             <aside className="w-64 flex-shrink-0">
-              <div className="bg-base-100 rounded-lg p-4">
+              <div className="p-4">
                 <h3 className="font-semibold mb-4">Filter by Tags</h3>
                 {tagsLoading ? (
                   <div className="flex items-center gap-2">
@@ -258,15 +258,27 @@ const VideosPage: React.FC = () => {
 
                       {/* Video details */}
                       <div className="px-1">
-                        <h3 className="font-medium text-sm line-clamp-2 mb-1 group-hover:text-primary">
+                        <h3 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary">
                           {video.title || video.originalFilename}
                         </h3>
-                        <div className="text-xs opacity-60 space-y-0.5">
-                          <p>{video.contentType || 'Video'}</p>
-                          {video.width && video.height && (
-                            <p>{video.width}x{video.height}</p>
+                        {/* Description */}
+                        {video.description && (
+                          <p className="text-xs opacity-60 line-clamp-2 mb-2">
+                            {video.description}
+                          </p>
+                        )}
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1.5 text-xs opacity-70">
+                          {video.id && videoTagsMap.get(video.id)?.slice(0, 3).map(tag => (
+                            <span key={tag.id} className="text-primary">
+                              {tag.path?.replace(/^\//, '').replace(/\//g, ' › ') || tag.name}
+                            </span>
+                          ))}
+                          {video.id && videoTagsMap.get(video.id) && videoTagsMap.get(video.id)!.length > 3 && (
+                            <span className="opacity-50">
+                              +{videoTagsMap.get(video.id)!.length - 3} more
+                            </span>
                           )}
-                          <p>{video.createdAt ? new Date(video.createdAt).toLocaleDateString() : 'Unknown date'}</p>
                         </div>
                       </div>
                     </Link>

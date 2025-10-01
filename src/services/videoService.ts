@@ -52,6 +52,14 @@ export class VideoService {
   }
 
   /**
+   * Update a video's metadata (title, description)
+   */
+  async updateVideo(videoId: number, updates: { title?: string; description?: string }): Promise<Video> {
+    const response = await generatedApiService.video.updateVideo(videoId, updates);
+    return response.data as Video;
+  }
+
+  /**
    * Delete a video
    */
   async deleteVideo(videoId: number): Promise<void> {

@@ -13,6 +13,18 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface AddTagsRequest
+ */
+export interface AddTagsRequest {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof AddTagsRequest
+     */
+    'tagPaths'?: Array<string>;
+}
+

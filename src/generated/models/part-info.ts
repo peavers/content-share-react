@@ -13,6 +13,24 @@
  */
 
 
-export * from "./api";
-export * from "./configuration";
-export * from "./models";
+
+/**
+ * 
+ * @export
+ * @interface PartInfo
+ */
+export interface PartInfo {
+    /**
+     * 
+     * @type {number}
+     * @memberof PartInfo
+     */
+    'partNumber'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PartInfo
+     */
+    'etag'?: string;
+}
+

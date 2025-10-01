@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrganization } from '../../contexts';
 import { uploadService } from '../../services/uploadService';
+import { videoService } from '../../services/videoService';
 import { tagService } from '../../services/tagService';
 import TagInput from '../shared/TagInput';
 import type { Tag } from '../../generated';
+import type { Video } from '../../types';
 import type { UploadProgress } from '../../types';
 
 interface UploadVideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  video?: Video; // If provided, modal is in edit mode
+  videoTags?: string[]; // Current tags for the video (tag paths)
 }
 
-const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, onSuccess, video, videoTags }) => {
   const { currentWorkspace } = useOrganization();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
@@ -25,11 +29,28 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isEditMode = !!video;
+
   useEffect(() => {
     if (currentWorkspace && isOpen) {
       fetchTags();
     }
   }, [currentWorkspace, isOpen]);
+
+  // Populate form when editing
+  useEffect(() => {
+    if (isOpen && video) {
+      setTitle(video.title || '');
+      setDescription(video.description || '');
+      setSelectedTags(videoTags || []);
+    } else if (isOpen && !video) {
+      // Reset form for create mode
+      setTitle('');
+      setDescription('');
+      setSelectedTags([]);
+      setSelectedFile(null);
+    }
+  }, [isOpen, video, videoTags]);
 
   const fetchTags = async () => {
     try {
@@ -81,8 +102,13 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !title.trim()) {
-      setError('Please select a video file and provide a title');
+    if (!title.trim()) {
+      setError('Please provide a title');
+      return;
+    }
+
+    if (!isEditMode && !selectedFile) {
+      setError('Please select a video file');
       return;
     }
 
@@ -96,17 +122,29 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
     setError(null);
 
     try {
-      await uploadService.uploadFile(
-        selectedFile,
-        {
+      if (isEditMode && video) {
+        // Update existing video
+        await videoService.updateVideo(video.id!, {
           title: title,
-          description: description,
-          tags: selectedTags.length > 0 ? selectedTags : undefined
-        },
-        (progress) => {
-          setUploadProgress(progress);
-        }
-      );
+          description: description
+        });
+
+        // Update tags
+        await tagService.replaceVideoTags(video.id!, selectedTags);
+      } else if (selectedFile) {
+        // Upload new video
+        await uploadService.uploadFile(
+          selectedFile,
+          {
+            title: title,
+            description: description,
+            tags: selectedTags.length > 0 ? selectedTags : undefined
+          },
+          (progress) => {
+            setUploadProgress(progress);
+          }
+        );
+      }
 
       // Reset form
       setSelectedFile(null);
@@ -118,8 +156,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
       onSuccess();
       onClose();
     } catch (err: any) {
-      console.error('Upload error:', err);
-      setError(err.message || 'Upload failed');
+      console.error(isEditMode ? 'Update error:' : 'Upload error:', err);
+      setError(err.message || (isEditMode ? 'Update failed' : 'Upload failed'));
       setUploadProgress(null);
     } finally {
       setUploading(false);
@@ -149,7 +187,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
         onDrop={handleDrop}
       >
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold">Upload Video</h3>
+          <h3 className="text-2xl font-bold">{isEditMode ? 'Edit Video' : 'Upload Video'}</h3>
           <button
             onClick={handleClose}
             className="btn btn-sm btn-circle btn-ghost"
@@ -194,7 +232,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
         )}
 
         <div className="space-y-4">
-          {/* Drag and Drop Area */}
+          {/* Drag and Drop Area - Hidden in edit mode */}
+          {!isEditMode && (
           <div className="form-control">
             <label className="label">
               <span className="label-text text-base font-medium">Video File</span>
@@ -248,6 +287,7 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
               )}
             </div>
           </div>
+          )}
 
           {/* Title */}
           <div className="form-control">
@@ -302,20 +342,31 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
           </button>
           <button
             onClick={handleUpload}
-            disabled={uploading || !selectedFile || !title.trim()}
+            disabled={uploading || (!isEditMode && !selectedFile) || !title.trim()}
             className="btn btn-primary gap-2"
           >
             {uploading ? (
               <>
                 <span className="loading loading-spinner"></span>
-                Uploading...
+                {isEditMode ? 'Saving...' : 'Uploading...'}
               </>
             ) : (
               <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                Upload Video
+                {isEditMode ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save Changes
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    Upload Video
+                  </>
+                )}
               </>
             )}
           </button>
