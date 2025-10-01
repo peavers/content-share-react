@@ -142,17 +142,25 @@ const AdminVideoManagement: React.FC = () => {
               Manage videos for {currentWorkspace.organization.name}
             </p>
           </div>
-          {selectedVideos.size > 0 && (
-            <button
-              onClick={handleBulkDelete}
-              className="btn btn-error gap-2"
-            >
+          <div className="flex gap-2">
+            {selectedVideos.size > 0 && (
+              <button
+                onClick={handleBulkDelete}
+                className="btn btn-error gap-2"
+              >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
               Delete Selected ({selectedVideos.size})
-            </button>
-          )}
+              </button>
+            )}
+            <Link to="/upload" className="btn btn-primary gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Upload Video
+            </Link>
+          </div>
         </div>
 
         {error && (

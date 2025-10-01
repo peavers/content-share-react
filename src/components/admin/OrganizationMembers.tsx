@@ -3,6 +3,7 @@ import { useOrganization } from '../../contexts';
 import { organizationMemberService } from '../../services/organizationMemberService';
 import type { OrganizationMembership, OrganizationMembershipRoleEnum, OrganizationInvitation } from '../../generated';
 import { TextInput, Select } from '../forms';
+import Navigation from '../shared/Navigation';
 
 const OrganizationMembers: React.FC = () => {
   const { currentWorkspace } = useOrganization();
@@ -146,30 +147,37 @@ const OrganizationMembers: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-64">
-          <span className="loading loading-spinner loading-lg"></span>
-        </div>
+      <div className="min-h-screen bg-base-200">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex justify-center items-center h-64">
+            <span className="loading loading-spinner loading-lg"></span>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="alert alert-error">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{error}</span>
-        </div>
+      <div className="min-h-screen bg-base-200">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-base-200">
+      <Navigation />
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Organization Members</h1>
@@ -328,7 +336,7 @@ const OrganizationMembers: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Invite Member Modal */}
       {showInviteModal && (
@@ -398,7 +406,7 @@ const OrganizationMembers: React.FC = () => {
           <div className="modal-backdrop" onClick={() => setShowInviteModal(false)}></div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
