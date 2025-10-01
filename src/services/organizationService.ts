@@ -6,15 +6,9 @@ import type {
     OrganizationMembership
 } from "../types";
 import { OrganizationMembershipRoleEnum } from "../generated";
-import { generatedApiService } from './generatedApiService';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-
+import { generatedApiService, getAuthenticatedAxios } from './generatedApiService';
 
 class OrganizationService {
-  private baseUrl = '/api/organizations';
 
   // Organization management
   async getUserOrganizations(): Promise<Organization[]> {
@@ -97,16 +91,9 @@ class OrganizationService {
 
   async checkSlugAvailability(slug: string): Promise<boolean> {
     try {
-      const session = await fetchAuthSession();
-      const token = session?.tokens?.idToken?.toString();
-
+      const axios = getAuthenticatedAxios();
       const response = await axios.get<{ available: boolean }>(
-        `${API_BASE_URL}/api/organizations/check-slug/${encodeURIComponent(slug)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        `/api/organizations/check-slug/${encodeURIComponent(slug)}`
       );
       return response.data.available;
     } catch (error) {

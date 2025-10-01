@@ -1,96 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useOrganization } from '../contexts';
 import Navigation from './shared/Navigation';
-import { videoService } from '../services/videoService';
-import { tagService } from '../services/tagService';
-import type { Video } from '../types';
+import { useVideos, useTags } from '../hooks';
 import type { Tag } from '../generated';
 
 const VideosPage: React.FC = () => {
   const { currentWorkspace } = useOrganization();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [videosLoading, setVideosLoading] = useState(false);
-  const [allTags, setAllTags] = useState<Tag[]>([]);
-  const [tagsLoading, setTagsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-  const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
-  const [thumbnailUrlsMap, setThumbnailUrlsMap] = useState<Map<number, string>>(new Map());
+
+  const {
+    videos,
+    videoTagsMap,
+    thumbnailUrlsMap,
+    loading: videosLoading
+  } = useVideos(currentWorkspace?.organization.id);
+
+  const {
+    tags: allTags,
+    loading: tagsLoading
+  } = useTags(currentWorkspace?.organization.id);
 
   useEffect(() => {
-    if (currentWorkspace) {
-      fetchVideos();
-      fetchTags();
-    }
-  }, [currentWorkspace]);
-
-  const fetchVideos = async () => {
-    setVideosLoading(true);
-    try {
-      const fetchedVideos = await videoService.getOrganizationVideos();
-      setVideos(fetchedVideos);
-
-      // Fetch tags and thumbnails for each video
-      const tagsMap = new Map<number, Tag[]>();
-      const thumbnailsMap = new Map<number, string>();
-
-      for (const video of fetchedVideos) {
-        if (video.id) {
-          // Fetch tags
-          try {
-            const tags = await tagService.getVideoTags(video.id);
-            tagsMap.set(video.id, tags);
-          } catch (error) {
-            console.error(`Error fetching tags for video ${video.id}:`, error);
-          }
-
-          // Fetch thumbnail URL if video has a thumbnail
-          if (video.thumbnailS3Path) {
-            try {
-              const thumbnailUrl = await videoService.getThumbnailUrl(video.id);
-              thumbnailsMap.set(video.id, thumbnailUrl);
-            } catch (error) {
-              console.error(`Error fetching thumbnail for video ${video.id}:`, error);
-            }
-          }
-        }
+    const tagParam = searchParams.get('tag');
+    if (tagParam && allTags.length > 0) {
+      const matchingTag = allTags.find(t => t.path === tagParam);
+      if (matchingTag && matchingTag.id) {
+        setSelectedTagIds([matchingTag.id]);
+        expandParentTags(matchingTag.path, allTags);
       }
-
-      setVideoTagsMap(tagsMap);
-      setThumbnailUrlsMap(thumbnailsMap);
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    } finally {
-      setVideosLoading(false);
     }
-  };
+  }, [searchParams, allTags]);
 
-  const fetchTags = async () => {
-    setTagsLoading(true);
-    try {
-      const tags = await tagService.getAllTags();
-      setAllTags(tags);
-
-      // Check for tag query parameter and preselect
-      const tagParam = searchParams.get('tag');
-      if (tagParam) {
-        const matchingTag = tags.find(t => t.path === tagParam);
-        if (matchingTag && matchingTag.id) {
-          setSelectedTagIds([matchingTag.id]);
-          // Expand parent tags using the fetched tags
-          expandParentTags(matchingTag.path, tags);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching tags:', error);
-    } finally {
-      setTagsLoading(false);
-    }
-  };
-
-  const expandParentTags = (tagPath: string | undefined, tagsList: Tag[]) => {
+  const expandParentTags = useCallback((tagPath: string | undefined, tagsList: Tag[]) => {
     if (!tagPath) return;
     const segments = tagPath.split('/').filter(p => p);
     const parentPaths: string[] = [];
@@ -107,35 +51,37 @@ const VideosPage: React.FC = () => {
       .filter(id => id !== undefined);
 
     setExpandedTagIds(new Set(parentTagIds));
-  };
+  }, []);
 
   // Filter videos based on selected tags (including hierarchical matching)
-  const filteredVideos = selectedTagIds.length === 0
-    ? videos
-    : videos.filter(video => {
-        if (!video.id) return false;
-        const videoTags = videoTagsMap.get(video.id) || [];
-        return selectedTagIds.some(selectedTagId => {
-          const selectedTag = allTags.find(t => t.id === selectedTagId);
-          if (!selectedTag) return false;
+  const filteredVideos = useMemo(() => {
+    if (selectedTagIds.length === 0) return videos;
 
-          // Match if video has the exact tag OR any child tag
-          return videoTags.some(vTag =>
-            vTag.id === selectedTagId ||
-            (vTag.path && selectedTag.path && vTag.path.startsWith(selectedTag.path + '/'))
-          );
-        });
+    return videos.filter(video => {
+      if (!video.id) return false;
+      const videoTags = videoTagsMap.get(video.id) || [];
+      return selectedTagIds.some(selectedTagId => {
+        const selectedTag = allTags.find(t => t.id === selectedTagId);
+        if (!selectedTag) return false;
+
+        // Match if video has the exact tag OR any child tag
+        return videoTags.some(vTag =>
+          vTag.id === selectedTagId ||
+          (vTag.path && selectedTag.path && vTag.path.startsWith(selectedTag.path + '/'))
+        );
       });
+    });
+  }, [videos, selectedTagIds, videoTagsMap, allTags]);
 
-  const toggleTag = (tagId: number) => {
+  const toggleTag = useCallback((tagId: number) => {
     setSelectedTagIds(prev =>
       prev.includes(tagId)
         ? prev.filter(id => id !== tagId)
         : [...prev, tagId]
     );
-  };
+  }, []);
 
-  const toggleExpanded = (tagId: number) => {
+  const toggleExpanded = useCallback((tagId: number) => {
     setExpandedTagIds(prev => {
       const next = new Set(prev);
       if (next.has(tagId)) {
@@ -145,13 +91,13 @@ const VideosPage: React.FC = () => {
       }
       return next;
     });
-  };
+  }, []);
 
-  const getChildTags = (parentTag: Tag): Tag[] => {
+  const getChildTags = useCallback((parentTag: Tag): Tag[] => {
     return allTags.filter(t => t.parentPath === parentTag.path);
-  };
+  }, [allTags]);
 
-  const renderTagTree = (tags: Tag[]): React.ReactNode => {
+  const renderTagTree = useCallback((tags: Tag[]): React.ReactNode => {
     return tags.map((tag) => {
       const children = getChildTags(tag);
       const hasChildren = children.length > 0;
@@ -196,14 +142,14 @@ const VideosPage: React.FC = () => {
         </div>
       );
     });
-  };
+  }, [getChildTags, expandedTagIds, selectedTagIds, toggleTag, toggleExpanded]);
 
-  const formatDuration = (seconds?: number) => {
+  const formatDuration = useCallback((seconds?: number) => {
     if (!seconds) return null;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
   if (!currentWorkspace) {
     return (

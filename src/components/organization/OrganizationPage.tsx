@@ -24,7 +24,7 @@ interface OrganizationInvitation {
 }
 
 export const OrganizationPage: React.FC = () => {
-  const { currentWorkspace, organizations, createOrganization } = useOrganization();
+  const { currentWorkspace, organizations, createOrganization, inviteMember } = useOrganization();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'invitations' | 'settings'>('overview');
@@ -98,11 +98,14 @@ export const OrganizationPage: React.FC = () => {
   };
 
   const handleInviteMember = async (data: { email: string; role: 'admin' | 'member' }) => {
+    if (!currentWorkspace) return;
+
     try {
-      // TODO: Implement invite member API call
-      console.log('Inviting member:', data);
+      await inviteMember(currentWorkspace.organization.id, {
+        email: data.email,
+        role: data.role.toUpperCase()
+      });
       setShowInviteModal(false);
-      // Refresh invitations list
       loadOrganizationData();
     } catch (error) {
       console.error('Failed to invite member:', error);

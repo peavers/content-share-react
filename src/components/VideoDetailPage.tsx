@@ -1,97 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useOrganization } from '../contexts';
 import Navigation from './shared/Navigation';
-import { tagService } from '../services/tagService';
-import { videoService } from '../services/videoService';
-import type { Tag, VideoWithMetadataDTO } from '../generated';
+import { useVideoData } from '../hooks';
+import type { VideoWithMetadataDTO } from '../generated';
 
 const VideoDetailPage: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
   const { currentWorkspace } = useOrganization();
-  const navigate = useNavigate();
-  const [videoData, setVideoData] = useState<VideoWithMetadataDTO | null>(null);
-  const [presignedUrl, setPresignedUrl] = useState<string | null>(null);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [refetchingMetadata, setRefetchingMetadata] = useState(false);
-  const [videoTags, setVideoTags] = useState<Tag[]>([]);
+
+  const {
+    videoData,
+    presignedUrl,
+    thumbnailUrl,
+    videoTags,
+    loading,
+    error,
+    refetch
+  } = useVideoData(videoId);
 
   const video = videoData?.video;
   const metadata = videoData?.metadata;
 
-  useEffect(() => {
-    const fetchVideo = async () => {
-      if (!videoId || !currentWorkspace) return;
-
-      try {
-        setLoading(true);
-
-        const data = await videoService.getVideoWithMetadata(parseInt(videoId));
-        setVideoData(data);
-
-        const url = await videoService.getVideoPresignedUrl(parseInt(videoId));
-        setPresignedUrl(url);
-
-        if (data.video?.thumbnailS3Path) {
-          try {
-            const thumb = await videoService.getThumbnailUrl(parseInt(videoId));
-            setThumbnailUrl(thumb);
-          } catch (err) {
-            console.error('Error fetching thumbnail:', err);
-          }
-        }
-
-        try {
-          const tags = await tagService.getVideoTags(parseInt(videoId));
-          setVideoTags(tags);
-        } catch (tagErr) {
-          console.error('Error fetching video tags:', tagErr);
-        }
-      } catch (err: any) {
-        console.error('Error fetching video:', err);
-        setError(err.response?.data?.message || 'Failed to load video');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchVideo();
-  }, [videoId, currentWorkspace]);
-
-  const handleRefetchMetadata = async () => {
-    if (!videoId || !currentWorkspace) return;
-
+  const handleRefetchMetadata = useCallback(async () => {
+    setRefetchingMetadata(true);
     try {
-      setRefetchingMetadata(true);
-      const data = await videoService.getVideoWithMetadata(parseInt(videoId));
-      setVideoData(data);
-
-      if (data.video?.thumbnailS3Path && !thumbnailUrl) {
-        try {
-          const thumb = await videoService.getThumbnailUrl(parseInt(videoId));
-          setThumbnailUrl(thumb);
-        } catch (err) {
-          console.error('Error fetching thumbnail:', err);
-        }
-      }
-    } catch (err: any) {
-      console.error('Error refetching metadata:', err);
+      await refetch();
     } finally {
       setRefetchingMetadata(false);
     }
-  };
+  }, [refetch]);
 
-  const formatFileSize = (bytes: number): string => {
+  const formatFileSize = useCallback((bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+  }, []);
 
-  const formatDuration = (seconds: number): string => {
+  const formatDuration = useCallback((seconds: number): string => {
     if (!seconds) return 'N/A';
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -101,21 +50,21 @@ const VideoDetailPage: React.FC = () => {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  const formatDate = (dateString: string): string => {
+  const formatDate = useCallback((dateString: string): string => {
     return new Date(dateString).toLocaleString();
-  };
+  }, []);
 
-  const formatBitrate = (bitrate: number): string => {
+  const formatBitrate = useCallback((bitrate: number): string => {
     if (!bitrate) return 'N/A';
     if (bitrate >= 1000000) {
       return `${(bitrate / 1000000).toFixed(2)} Mbps`;
     }
     return `${(bitrate / 1000).toFixed(0)} Kbps`;
-  };
+  }, []);
 
-  const formatProcessingTime = (ms: number): string => {
+  const formatProcessingTime = useCallback((ms: number): string => {
     if (!ms) return 'N/A';
     const seconds = ms / 1000;
     if (seconds < 60) {
@@ -124,7 +73,7 @@ const VideoDetailPage: React.FC = () => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}m ${remainingSeconds}s`;
-  };
+  }, []);
 
   if (loading) {
     return (

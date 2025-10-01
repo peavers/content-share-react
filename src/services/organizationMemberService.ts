@@ -1,6 +1,4 @@
-import { generatedApiService } from './generatedApiService';
-import axios from 'axios';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { generatedApiService, getAuthenticatedAxios } from './generatedApiService';
 import type {
   OrganizationMembership,
   InviteMemberRequest,
@@ -8,8 +6,6 @@ import type {
   UpdateMemberRoleRequest,
   OrganizationMembershipRoleEnum
 } from '../generated';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export class OrganizationMemberService {
   /**
@@ -69,16 +65,9 @@ export class OrganizationMemberService {
    * Cancel/delete a pending invitation
    */
   async cancelInvitation(organizationId: string, invitationId: number): Promise<void> {
-    const session = await fetchAuthSession();
-    const token = session?.tokens?.idToken?.toString();
-
+    const axios = getAuthenticatedAxios();
     await axios.delete(
-      `${API_BASE_URL}/api/organizations/${organizationId}/invitations/${invitationId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+      `/api/organizations/${organizationId}/invitations/${invitationId}`
     );
   }
 }

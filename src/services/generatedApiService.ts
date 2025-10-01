@@ -68,6 +68,9 @@ export const userApi = new UserControllerApi(configuration, API_BASE_URL, axiosI
 export const userManagementApi = new UserManagementControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const videoApi = new VideoControllerApi(configuration, API_BASE_URL, axiosInstance);
 
+// Export the axios instance for services that need to make custom API calls
+export const getAuthenticatedAxios = () => axiosInstance;
+
 // Export as default for backward compatibility
 export const generatedApiService = {
   s3: awsS3Api,
