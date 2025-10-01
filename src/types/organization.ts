@@ -18,18 +18,24 @@ export const PERMISSIONS = {
     'invite_members',
     'remove_members',
     'manage_uploads',
+    'upload_files',
     'view_analytics',
-    'manage_billing'
+    'manage_billing',
+    'manage_tags',
+    'view_admin'
   ],
   [OrganizationMembershipRoleEnum.Admin]: [
     'invite_members',
     'remove_members',
     'manage_uploads',
-    'view_analytics'
+    'upload_files',
+    'view_analytics',
+    'manage_tags',
+    'view_admin'
   ],
   [OrganizationMembershipRoleEnum.Member]: [
-    'view_uploads',
-    'upload_files'
+    'view_uploads'
+    // Read-only access - no upload_files or admin permissions
   ]
 };
 

@@ -7,6 +7,10 @@ import type {
 } from "../types";
 import { OrganizationMembershipRoleEnum } from "../generated";
 import { generatedApiService } from './generatedApiService';
+import { fetchAuthSession } from 'aws-amplify/auth';
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 
 class OrganizationService {
@@ -89,6 +93,26 @@ class OrganizationService {
   validateSlug(slug: string): boolean {
     const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
     return slugRegex.test(slug) && slug.length >= 3 && slug.length <= 50;
+  }
+
+  async checkSlugAvailability(slug: string): Promise<boolean> {
+    try {
+      const session = await fetchAuthSession();
+      const token = session?.tokens?.idToken?.toString();
+
+      const response = await axios.get<{ available: boolean }>(
+        `${API_BASE_URL}/api/organizations/check-slug/${encodeURIComponent(slug)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data.available;
+    } catch (error) {
+      console.error('Failed to check slug availability:', error);
+      return false;
+    }
   }
 
   getStorageUsagePercentage(organization: Organization): number {

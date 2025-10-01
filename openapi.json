@@ -1,1 +1,2356 @@
-{"openapi":"3.1.0","info":{"title":"OpenAPI definition","version":"v0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"paths":{"/api/user/profile":{"get":{"tags":["user-controller"],"operationId":"getUserProfile","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserProfileDto"}}}}}},"put":{"tags":["user-controller"],"operationId":"updateUserProfile","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserProfileDto"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserProfileDto"}}}}}}},"/api/tags/{tagId}":{"put":{"tags":["tag-controller"],"operationId":"updateTag","parameters":[{"name":"tagId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateTagRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Tag"}}}}}},"delete":{"tags":["tag-controller"],"operationId":"deleteTagById","parameters":[{"name":"tagId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"responses":{"200":{"description":"OK"}}}},"/api/tags/video/{videoId}":{"get":{"tags":["tag-controller"],"operationId":"getVideoTags","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Tag"}}}}}}},"put":{"tags":["tag-controller"],"operationId":"replaceVideoTags","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AddTagsRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}},"post":{"tags":["tag-controller"],"operationId":"addTagsToVideo","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AddTagsRequest"}}},"required":true},"responses":{"200":{"description":"OK"}}},"delete":{"tags":["tag-controller"],"operationId":"removeTagFromVideo","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}},{"name":"path","in":"query","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK"}}}},"/api/organizations/{organizationId}":{"get":{"tags":["organization-controller"],"operationId":"getOrganization","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/OrganizationResponse"}}}}}},"put":{"tags":["organization-controller"],"operationId":"updateOrganization","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateOrganizationRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Organization"}}}}}},"delete":{"tags":["organization-controller"],"operationId":"deleteOrganization","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK"}}}},"/api/organizations/{organizationId}/members/{targetUserId}":{"put":{"tags":["organization-controller"],"operationId":"updateMemberRole","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}},{"name":"targetUserId","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"type":"object","additionalProperties":{"type":"string"}}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/OrganizationMembership"}}}}}},"delete":{"tags":["organization-controller"],"operationId":"removeMember","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}},{"name":"targetUserId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK"}}}},"/api/tags":{"get":{"tags":["tag-controller"],"operationId":"getAllTags","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Tag"}}}}}}},"post":{"tags":["tag-controller"],"operationId":"createTag","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateTagRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Tag"}}}}}},"delete":{"tags":["tag-controller"],"operationId":"deleteTag","parameters":[{"name":"path","in":"query","required":true,"schema":{"type":"string"}},{"name":"deleteChildren","in":"query","required":false,"schema":{"type":"boolean","default":false}}],"responses":{"200":{"description":"OK"}}}},"/api/s3/upload/initiate":{"post":{"tags":["aws-s-3-controller"],"operationId":"initiateUpload","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UploadRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UploadResult"}}}}}}},"/api/s3/upload/complete/{uploadId}":{"post":{"tags":["aws-s-3-controller"],"operationId":"completeMultipartUpload","parameters":[{"name":"uploadId","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UploadCompletionRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/organizations":{"get":{"tags":["organization-controller"],"operationId":"getUserOrganizations","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/OrganizationResponse"}}}}}}},"post":{"tags":["organization-controller"],"operationId":"createOrganization","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateOrganizationRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/OrganizationResponse"}}}}}}},"/api/organizations/{organizationId}/invitations":{"post":{"tags":["organization-controller"],"operationId":"inviteMember","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/InviteMemberRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/OrganizationInvitation"}}}}}}},"/api/organizations/invitations/{token}/decline":{"post":{"tags":["organization-controller"],"operationId":"declineInvitation","parameters":[{"name":"token","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK"}}}},"/api/organizations/invitations/{token}/accept":{"post":{"tags":["organization-controller"],"operationId":"acceptInvitation","parameters":[{"name":"token","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/OrganizationMembership"}}}}}}},"/api/videos":{"get":{"tags":["video-controller"],"operationId":"getOrganizationVideos","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Video"}}}}}}}},"/api/videos/{videoId}":{"get":{"tags":["video-controller"],"operationId":"getVideo","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/Video"}}}}}},"delete":{"tags":["video-controller"],"operationId":"deleteVideo","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"responses":{"200":{"description":"OK"}}}},"/api/videos/{videoId}/presigned-url":{"get":{"tags":["video-controller"],"operationId":"getVideoPresignedUrl","parameters":[{"name":"videoId","in":"path","required":true,"schema":{"type":"integer","format":"int32"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/videos/my-videos":{"get":{"tags":["video-controller"],"operationId":"getUserVideos","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Video"}}}}}}}},"/api/user/validate":{"get":{"tags":["user-controller"],"operationId":"validateToken","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"object","additionalProperties":{}}}}}}}},"/api/user/status":{"get":{"tags":["user-controller"],"operationId":"getUserStatus","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/UserStatusResponse"}}}}}}},"/api/tags/tree":{"get":{"tags":["tag-controller"],"operationId":"getTagTree","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/TagNode"}}}}}}}},"/api/tags/root":{"get":{"tags":["tag-controller"],"operationId":"getRootTags","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Tag"}}}}}}}},"/api/tags/children":{"get":{"tags":["tag-controller"],"operationId":"getChildTags","parameters":[{"name":"parentPath","in":"query","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Tag"}}}}}}}},"/api/s3/buckets":{"get":{"tags":["aws-s-3-controller"],"operationId":"listBuckets","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"type":"string"}}}}}}}},"/api/organizations/{organizationId}/members":{"get":{"tags":["organization-controller"],"operationId":"getOrganizationMembers","parameters":[{"name":"organizationId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"organizationId":{"type":"string"},"userId":{"type":"string"},"role":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]},"status":{"type":"string","enum":["ACTIVE","PENDING","SUSPENDED"]},"joinedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"organization":{"$ref":"#/components/schemas/Organization"},"user":{"$ref":"#/components/schemas/User"}}}}}}}}}},"/api/organizations/invitations":{"get":{"tags":["organization-controller"],"operationId":"getUserInvitations","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/OrganizationInvitation"}}}}}}}},"/admin":{"get":{"tags":["security-controller"],"operationId":"adminOnly","responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}},"/api/s3/upload/{uploadId}":{"delete":{"tags":["aws-s-3-controller"],"operationId":"abortUpload","parameters":[{"name":"uploadId","in":"path","required":true,"schema":{"type":"string"}}],"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"type":"string"}}}}}}}},"components":{"schemas":{"UserProfileDto":{"type":"object","properties":{"username":{"type":"string"},"email":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"groups":{"type":"array","items":{"type":"string"}},"scopes":{"type":"array","items":{"type":"string"}},"attributes":{"type":"object","additionalProperties":{}}}},"UpdateTagRequest":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"}}},"Tag":{"type":"object","properties":{"id":{"type":"integer","format":"int32"},"organizationId":{"type":"string"},"path":{"type":"string"},"name":{"type":"string"},"parentPath":{"type":"string"},"depth":{"type":"integer","format":"int32"},"description":{"type":"string"},"color":{"type":"string"},"createdBy":{"type":"string"},"usageCount":{"type":"integer","format":"int32"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"AddTagsRequest":{"type":"object","properties":{"tagPaths":{"type":"array","items":{"type":"string"}}}},"CreateOrganizationRequest":{"type":"object","properties":{"name":{"type":"string"},"slug":{"type":"string"},"description":{"type":"string"},"avatarUrl":{"type":"string"},"websiteUrl":{"type":"string"},"organizationType":{"type":"string","enum":["PERSONAL","ORGANIZATION"]},"visibility":{"type":"string","enum":["PUBLIC","PRIVATE"]},"plan":{"type":"string"},"settings":{"type":"object","additionalProperties":{}},"inviteEmails":{"type":"array","items":{"type":"string"}},"inviteRoles":{"type":"array","items":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]}}}},"JSONB":{},"Organization":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"slug":{"type":"string"},"description":{"type":"string"},"avatarUrl":{"type":"string"},"websiteUrl":{"type":"string"},"organizationType":{"type":"string"},"visibility":{"type":"string"},"plan":{"type":"string"},"maxStorageGb":{"type":"integer","format":"int64"},"usedStorageBytes":{"type":"integer","format":"int64"},"maxMembers":{"type":"integer","format":"int32"},"maxVideos":{"type":"integer","format":"int32"},"settings":{"$ref":"#/components/schemas/JSONB"},"s3Bucket":{"type":"string"},"customDomain":{"type":"string"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"OrganizationMembership":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"organizationId":{"type":"string"},"userId":{"type":"string"},"role":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]},"status":{"type":"string","enum":["ACTIVE","PENDING","SUSPENDED"]},"joinedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"organization":{"$ref":"#/components/schemas/Organization"},"user":{"$ref":"#/components/schemas/User"}}},"User":{"type":"object","properties":{"id":{"type":"string"},"email":{"type":"string"},"username":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"avatarUrl":{"type":"string"},"personalOrganizationId":{"type":"string"},"emailVerified":{"type":"boolean"},"active":{"type":"boolean"},"lastLoginAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"organizationMemberships":{"type":"array","items":{}},"personalOrganization":{"$ref":"#/components/schemas/Organization"}}},"CreateTagRequest":{"type":"object","properties":{"path":{"type":"string"},"description":{"type":"string"},"color":{"type":"string"}}},"UploadRequest":{"type":"object","properties":{"fileName":{"type":"string"},"fileSize":{"type":"integer","format":"int64"},"contentType":{"type":"string"},"metadata":{"type":"object","additionalProperties":{"type":"string"}},"title":{"type":"string"},"description":{"type":"string"},"tags":{"type":"array","items":{"type":"string"}}}},"PresignedUrlInfo":{"type":"object","properties":{"partNumber":{"type":"integer","format":"int32"},"url":{"type":"string"},"expiresAt":{"type":"string","format":"date-time"}}},"UploadResult":{"type":"object","properties":{"uploadId":{"type":"string"},"uploadType":{"type":"string"},"fileKey":{"type":"string"},"chunkSize":{"type":"integer","format":"int64"},"totalChunks":{"type":"integer","format":"int32"},"presignedUrls":{"type":"array","items":{"$ref":"#/components/schemas/PresignedUrlInfo"}},"completeUrl":{"type":"string"}}},"PartInfo":{"type":"object","properties":{"partNumber":{"type":"integer","format":"int32"},"etag":{"type":"string"}}},"UploadCompletionRequest":{"type":"object","properties":{"parts":{"type":"array","items":{"$ref":"#/components/schemas/PartInfo"}}}},"OrganizationResponse":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"slug":{"type":"string"},"description":{"type":"string"},"avatarUrl":{"type":"string"},"websiteUrl":{"type":"string"},"organizationType":{"type":"string","enum":["PERSONAL","ORGANIZATION"]},"visibility":{"type":"string","enum":["PUBLIC","PRIVATE"]},"plan":{"type":"string"},"maxStorageGb":{"type":"integer","format":"int64"},"usedStorageBytes":{"type":"integer","format":"int64"},"maxMembers":{"type":"integer","format":"int32"},"maxVideos":{"type":"integer","format":"int32"},"settings":{"$ref":"#/components/schemas/JSONB"},"s3Bucket":{"type":"string"},"customDomain":{"type":"string"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"memberships":{"type":"array","items":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"organizationId":{"type":"string"},"userId":{"type":"string"},"role":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]},"status":{"type":"string","enum":["ACTIVE","PENDING","SUSPENDED"]},"joinedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"organization":{"$ref":"#/components/schemas/Organization"},"user":{"$ref":"#/components/schemas/User"}}}}}},"InviteMemberRequest":{"type":"object","properties":{"email":{"type":"string"},"role":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]},"message":{"type":"string"}}},"OrganizationInvitation":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"organizationId":{"type":"string"},"invitedBy":{"type":"string"},"email":{"type":"string"},"role":{"type":"string","enum":["OWNER","ADMIN","MEMBER"]},"token":{"type":"string"},"status":{"type":"string","enum":["PENDING","ACCEPTED","DECLINED","EXPIRED"]},"expiresAt":{"type":"string","format":"date-time"},"acceptedAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"organization":{"$ref":"#/components/schemas/Organization"},"inviter":{"$ref":"#/components/schemas/User"},"expired":{"type":"boolean"},"active":{"type":"boolean"}}},"Video":{"type":"object","properties":{"id":{"type":"integer","format":"int32"},"organizationId":{"type":"string"},"userId":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"},"s3Bucket":{"type":"string"},"s3Key":{"type":"string"},"fileSize":{"type":"integer","format":"int64"},"contentType":{"type":"string"},"originalFilename":{"type":"string"},"etag":{"type":"string"},"uploadId":{"type":"string"},"durationSeconds":{"type":"integer","format":"int32"},"width":{"type":"integer","format":"int32"},"height":{"type":"integer","format":"int32"},"thumbnailS3Path":{"type":"string"},"uploadStatus":{"type":"string"},"processingStatus":{"type":"string"},"visibility":{"type":"string"},"sharedWith":{"type":"array","items":{"type":"string"}},"tags":{"type":"array","items":{"type":"string"}},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},"UserStatusResponse":{"type":"object","properties":{"userId":{"type":"string"},"status":{"type":"string"},"message":{"type":"string"},"hasOrganizations":{"type":"boolean"},"organizationCount":{"type":"integer","format":"int32"},"hasPendingInvitations":{"type":"boolean"},"pendingInvitationCount":{"type":"integer","format":"int32"},"organizations":{"type":"array","items":{"$ref":"#/components/schemas/Organization"}},"pendingInvitations":{"type":"array","items":{"$ref":"#/components/schemas/OrganizationInvitation"}}}},"TagNode":{"type":"object","properties":{"tag":{"$ref":"#/components/schemas/Tag"}}}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/api/user/profile": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateUserProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags/{tagId}": {
+      "put": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTagById",
+        "parameters": [
+          {
+            "name": "tagId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/tags/video/{videoId}": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getVideoTags",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "replaceVideoTags",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "addTagsToVideo",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTagsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "removeTagFromVideo",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "updateOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "deleteOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/members/{targetUserId}": {
+      "put": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "updateMemberRole",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMembership"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "removeMember",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{username}": {
+      "get": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CognitoUserDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CognitoUserDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getAllTags",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "createTag",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tag"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "deleteChildren",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/s3/upload/initiate": {
+      "post": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "initiateUpload",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/upload/complete/{uploadId}": {
+      "post": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "completeMultipartUpload",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getUserOrganizations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "createOrganization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/invitations": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getOrganizationInvitations",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationInvitation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "inviteMember",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationInvitation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations/{token}/decline": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "declineInvitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations/{token}/accept": {
+      "post": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "acceptInvitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMembership"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{username}/groups/{groupName}": {
+      "post": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "addUserToGroup",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "removeUserFromGroup",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{username}/enable": {
+      "post": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "enableUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/{username}/disable": {
+      "post": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "disableUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "operationId": "getOrganizationVideos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Video"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos/{videoId}": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "operationId": "getVideo",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Video"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "video-controller"
+        ],
+        "operationId": "deleteVideo",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/videos/{videoId}/presigned-url": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "operationId": "getVideoPresignedUrl",
+        "parameters": [
+          {
+            "name": "videoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/videos/my-videos": {
+      "get": {
+        "tags": [
+          "video-controller"
+        ],
+        "operationId": "getUserVideos",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Video"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/validate": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "validateToken",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/status": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getUserStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags/tree": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getTagTree",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagNode"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags/root": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getRootTags",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags/children": {
+      "get": {
+        "tags": [
+          "tag-controller"
+        ],
+        "operationId": "getChildTags",
+        "parameters": [
+          {
+            "name": "parentPath",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/buckets": {
+      "get": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "listBuckets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/{organizationId}/members": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getOrganizationMembers",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      "organizationId": {
+                        "type": "string"
+                      },
+                      "userId": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string",
+                        "enum": [
+                          "OWNER",
+                          "ADMIN",
+                          "MEMBER"
+                        ]
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "ACTIVE",
+                          "PENDING",
+                          "SUSPENDED"
+                        ]
+                      },
+                      "joinedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "organization": {
+                        "$ref": "#/components/schemas/Organization"
+                      },
+                      "user": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organizations/invitations": {
+      "get": {
+        "tags": [
+          "organization-controller"
+        ],
+        "operationId": "getUserInvitations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationInvitation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "listUsers",
+        "parameters": [
+          {
+            "name": "paginationToken",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 60
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/users/groups": {
+      "get": {
+        "tags": [
+          "user-management-controller"
+        ],
+        "operationId": "listGroups",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin": {
+      "get": {
+        "tags": [
+          "security-controller"
+        ],
+        "operationId": "adminOnly",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/s3/upload/{uploadId}": {
+      "delete": {
+        "tags": [
+          "aws-s-3-controller"
+        ],
+        "operationId": "abortUpload",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserProfileDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "UpdateTagRequest": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentPath": {
+            "type": "string"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "usageCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AddTagsRequest": {
+        "type": "object",
+        "properties": {
+          "tagPaths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateOrganizationRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string"
+          },
+          "organizationType": {
+            "type": "string",
+            "enum": [
+              "PERSONAL",
+              "ORGANIZATION"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          },
+          "plan": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "inviteEmails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inviteRoles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "OWNER",
+                "ADMIN",
+                "MEMBER"
+              ]
+            }
+          }
+        }
+      },
+      "JSONB": {},
+      "Organization": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string"
+          },
+          "organizationType": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "maxStorageGb": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usedStorageBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxMembers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVideos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/JSONB"
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "customDomain": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrganizationMembership": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "PENDING",
+              "SUSPENDED"
+            ]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "personalOrganizationId": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "lastLoginAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organizationMemberships": {
+            "type": "array",
+            "items": {}
+          },
+          "personalOrganization": {
+            "$ref": "#/components/schemas/Organization"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "groupsToAdd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "groupsToRemove": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CognitoUserDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateTagRequest": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadRequest": {
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PresignedUrlInfo": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UploadResult": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string"
+          },
+          "uploadType": {
+            "type": "string"
+          },
+          "fileKey": {
+            "type": "string"
+          },
+          "chunkSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalChunks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "presignedUrls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PresignedUrlInfo"
+            }
+          },
+          "completeUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "PartInfo": {
+        "type": "object",
+        "properties": {
+          "partNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "etag": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadCompletionRequest": {
+        "type": "object",
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartInfo"
+            }
+          }
+        }
+      },
+      "OrganizationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string"
+          },
+          "organizationType": {
+            "type": "string",
+            "enum": [
+              "PERSONAL",
+              "ORGANIZATION"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          },
+          "plan": {
+            "type": "string"
+          },
+          "maxStorageGb": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usedStorageBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxMembers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxVideos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/JSONB"
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "customDomain": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "OWNER",
+                    "ADMIN",
+                    "MEMBER"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "ACTIVE",
+                    "PENDING",
+                    "SUSPENDED"
+                  ]
+                },
+                "joinedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "organization": {
+                  "$ref": "#/components/schemas/Organization"
+                },
+                "user": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InviteMemberRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "OrganizationInvitation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "invitedBy": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "token": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "DECLINED",
+              "EXPIRED"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "inviter": {
+            "$ref": "#/components/schemas/User"
+          },
+          "expired": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Video": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "s3Key": {
+            "type": "string"
+          },
+          "fileSize": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "originalFilename": {
+            "type": "string"
+          },
+          "etag": {
+            "type": "string"
+          },
+          "uploadId": {
+            "type": "string"
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "thumbnailS3Path": {
+            "type": "string"
+          },
+          "uploadStatus": {
+            "type": "string"
+          },
+          "processingStatus": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "sharedWith": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserStatusResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "hasOrganizations": {
+            "type": "boolean"
+          },
+          "organizationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasPendingInvitations": {
+            "type": "boolean"
+          },
+          "pendingInvitationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          },
+          "pendingInvitations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationInvitation"
+            }
+          }
+        }
+      },
+      "TagNode": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "$ref": "#/components/schemas/Tag"
+          }
+        }
+      },
+      "UserListResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CognitoUserDto"
+            }
+          },
+          "paginationToken": {
+            "type": "string"
+          },
+          "totalUsers": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

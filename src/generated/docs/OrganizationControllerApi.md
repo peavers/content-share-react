@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost:8080*
 |[**declineInvitation**](#declineinvitation) | **POST** /api/organizations/invitations/{token}/decline | |
 |[**deleteOrganization**](#deleteorganization) | **DELETE** /api/organizations/{organizationId} | |
 |[**getOrganization**](#getorganization) | **GET** /api/organizations/{organizationId} | |
+|[**getOrganizationInvitations**](#getorganizationinvitations) | **GET** /api/organizations/{organizationId}/invitations | |
 |[**getOrganizationMembers**](#getorganizationmembers) | **GET** /api/organizations/{organizationId}/members | |
 |[**getUserInvitations**](#getuserinvitations) | **GET** /api/organizations/invitations | |
 |[**getUserOrganizations**](#getuserorganizations) | **GET** /api/organizations | |
@@ -250,6 +251,56 @@ const { status, data } = await apiInstance.getOrganization(
 ### Return type
 
 **OrganizationResponse**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: */*
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getOrganizationInvitations**
+> Array<OrganizationInvitation> getOrganizationInvitations()
+
+
+### Example
+
+```typescript
+import {
+    OrganizationControllerApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new OrganizationControllerApi(configuration);
+
+let organizationId: string; // (default to undefined)
+
+const { status, data } = await apiInstance.getOrganizationInvitations(
+    organizationId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **organizationId** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**Array<OrganizationInvitation>**
 
 ### Authorization
 

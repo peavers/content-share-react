@@ -6,6 +6,7 @@ import {
   SecurityControllerApi,
   TagControllerApi,
   UserControllerApi,
+  UserManagementControllerApi,
   VideoControllerApi,
   Configuration
 } from '../generated';
@@ -64,6 +65,7 @@ export const organizationApi = new OrganizationControllerApi(configuration, API_
 export const securityApi = new SecurityControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const tagApi = new TagControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const userApi = new UserControllerApi(configuration, API_BASE_URL, axiosInstance);
+export const userManagementApi = new UserManagementControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const videoApi = new VideoControllerApi(configuration, API_BASE_URL, axiosInstance);
 
 // Export as default for backward compatibility
@@ -73,6 +75,7 @@ export const generatedApiService = {
   security: securityApi,
   tag: tagApi,
   user: userApi,
+  userManagement: userManagementApi,
   video: videoApi
 };
 

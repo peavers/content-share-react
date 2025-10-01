@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { organizationService } from '../../services/organizationService';
+import { TextInput, Textarea, RadioGroup, Select, FormGroup } from '../forms';
 import type { CreateOrganizationRequest } from "../../generated";
 import {
   CreateOrganizationRequestVisibilityEnum,
@@ -39,6 +40,8 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
 
   const [inviteList, setInviteList] = useState<Array<{ email: string; role: InviteMemberRequestRoleEnum }>>([]);
   const [slugError, setSlugError] = useState<string | null>(null);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [checkingSlug, setCheckingSlug] = useState(false);
 
   // Reset form when modal opens/closes
   React.useEffect(() => {
@@ -59,16 +62,33 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
       setInviteList([]);
       setError(null);
       setSlugError(null);
+      setSlugAvailable(null);
     }
   }, [isOpen]);
 
   // Auto-generate slug from name
-  const handleNameChange = useCallback((name: string) => {
+  const handleNameChange = useCallback(async (name: string) => {
     const slug = organizationService.generateSlug(name);
     setFormData(prev => ({ ...prev, name, slug }));
+    setSlugAvailable(null); // Reset availability check
 
     if (slug && !organizationService.validateSlug(slug)) {
       setSlugError('Slug must be 3-50 characters, lowercase letters, numbers, and hyphens only');
+    } else if (slug) {
+      setSlugError(null);
+      // Auto-check availability for generated slug
+      setCheckingSlug(true);
+      try {
+        const isAvailable = await organizationService.checkSlugAvailability(slug);
+        setSlugAvailable(isAvailable);
+        if (!isAvailable) {
+          setSlugError(`${slug} is already taken`);
+        }
+      } catch (error) {
+        console.error('Failed to check slug availability:', error);
+      } finally {
+        setCheckingSlug(false);
+      }
     } else {
       setSlugError(null);
     }
@@ -76,6 +96,7 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
 
   const handleSlugChange = useCallback((slug: string) => {
     setFormData(prev => ({ ...prev, slug }));
+    setSlugAvailable(null); // Reset availability check
 
     if (slug && !organizationService.validateSlug(slug)) {
       setSlugError('Slug must be 3-50 characters, lowercase letters, numbers, and hyphens only');
@@ -83,6 +104,33 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
       setSlugError(null);
     }
   }, []);
+
+  const handleSlugBlur = useCallback(async () => {
+    const slug = formData.slug;
+
+    // Don't check if slug is invalid or empty
+    if (!slug || !organizationService.validateSlug(slug)) {
+      return;
+    }
+
+    setCheckingSlug(true);
+    setSlugAvailable(null);
+
+    try {
+      const isAvailable = await organizationService.checkSlugAvailability(slug);
+      setSlugAvailable(isAvailable);
+
+      if (!isAvailable) {
+        setSlugError(`${slug} is already taken`);
+      } else {
+        setSlugError(null);
+      }
+    } catch (error) {
+      console.error('Failed to check slug availability:', error);
+    } finally {
+      setCheckingSlug(false);
+    }
+  }, [formData.slug]);
 
   const addInvite = () => {
     setInviteList(prev => [...prev, { email: '', role: InviteMemberRequestRoleEnum.Member }]);
@@ -121,99 +169,257 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
     }
   };
 
-  const canProceedToStep2 = formData.name.trim() && formData.slug.trim() && !slugError;
+  const canProceedToStep2 = formData.name.trim() && formData.slug.trim() && !slugError && slugAvailable !== false;
   const canCreateOrganization = canProceedToStep2;
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white border border-black max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="modal modal-open">
+      <div className="modal-box max-w-3xl p-0 overflow-hidden">
         {/* Header */}
-        <div className="border-b border-black px-8 py-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-light text-black">Create Organization</h2>
+        <div className="bg-primary p-6 text-primary-content">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Create Organization</h2>
             <button
               onClick={onClose}
-              className="text-black hover:text-gray-600 transition-colors duration-200"
+              className="btn btn-sm btn-circle btn-ghost text-primary-content"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              ✕
             </button>
           </div>
-
-          {/* Progress indicator */}
-          <div className="mt-8">
-            <div className="flex items-center space-x-8">
-              <StepIndicator step={1} current={currentStep} label="Basic Info" />
-              <div className="flex-1 h-px bg-gray-300">
-                <div
-                  className={`h-full bg-black transition-all ${currentStep >= 2 ? 'w-full' : 'w-0'}`}
-                />
-              </div>
-              <StepIndicator step={2} current={currentStep} label="Team Setup" />
-              <div className="flex-1 h-px bg-gray-300">
-                <div
-                  className={`h-full bg-black transition-all ${currentStep >= 3 ? 'w-full' : 'w-0'}`}
-                />
-              </div>
-              <StepIndicator step={3} current={currentStep} label="Review" />
-            </div>
-          </div>
         </div>
 
-        {/* Content */}
-        <div className="px-8 py-8">
+        {/* Progress Steps */}
+        <div className="px-6 pt-6 pb-4 bg-base-100 border-b border-base-300">
+          <ul className="steps steps-horizontal w-full">
+            <li className={`step ${currentStep >= 1 ? 'step-primary' : ''}`}>Details</li>
+            <li className={`step ${currentStep >= 2 ? 'step-primary' : ''}`}>Team</li>
+            <li className={`step ${currentStep >= 3 ? 'step-primary' : ''}`}>Review</li>
+          </ul>
+        </div>
+
+        {/* Content Area */}
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 220px)' }}>
+          {/* Error Alert */}
           {error && (
-            <div className="mb-8 p-4 border border-red-300 bg-red-50">
-              <p className="text-red-600 text-sm">{error}</p>
+            <div className="alert alert-error mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{error}</span>
             </div>
           )}
 
+          {/* Step 1: Basic Info */}
           {currentStep === 1 && (
-            <OrganizationBasicInfo
-              formData={formData}
-              onNameChange={handleNameChange}
-              onSlugChange={handleSlugChange}
-              onDescriptionChange={(description) => setFormData(prev => ({ ...prev, description }))}
-              onVisibilityChange={(visibility) => setFormData(prev => ({ ...prev, visibility }))}
-              slugError={slugError}
-            />
+            <div className="space-y-5">
+              <TextInput
+                label="Organization Name"
+                value={formData.name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Acme Corporation"
+                required
+              />
+
+              <div>
+                <label className="label">
+                  <span className="label-text font-medium">
+                    URL Slug <span className="text-error">*</span>
+                  </span>
+                </label>
+                <div className="join w-full">
+                  <span className="join-item btn btn-disabled no-animation bg-base-200 border-base-300">contentshare.app/</span>
+                  <input
+                    type="text"
+                    value={formData.slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    onBlur={handleSlugBlur}
+                    className={`input input-bordered join-item flex-1 ${
+                      slugError ? 'input-error' :
+                      slugAvailable === true ? 'input-success' : ''
+                    }`}
+                    placeholder="acme-corp"
+                  />
+                  {checkingSlug && (
+                    <span className="join-item btn btn-disabled no-animation bg-base-200 border-base-300">
+                      <span className="loading loading-spinner loading-xs"></span>
+                    </span>
+                  )}
+                  {!checkingSlug && slugAvailable === true && (
+                    <span className="join-item btn btn-disabled no-animation bg-success text-success-content border-success">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+                {slugError ? (
+                  <label className="label">
+                    <span className="label-text-alt text-error">{slugError}</span>
+                  </label>
+                ) : slugAvailable === true ? (
+                  <label className="label">
+                    <span className="label-text-alt text-success">{formData.slug} is available!</span>
+                  </label>
+                ) : (
+                  <label className="label">
+                    <span className="label-text-alt opacity-70">3-50 characters, lowercase, numbers, and hyphens</span>
+                  </label>
+                )}
+              </div>
+
+              <Textarea
+                label="Description (Optional)"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                rows={4}
+                placeholder="Tell us about your organization..."
+                showCharCount
+                maxCharCount={500}
+              />
+            </div>
           )}
 
+          {/* Step 2: Team Setup */}
           {currentStep === 2 && (
-            <TeamSetupStep
-              inviteList={inviteList}
-              onAddInvite={addInvite}
-              onUpdateInvite={updateInvite}
-              onRemoveInvite={removeInvite}
-            />
+            <div className="space-y-5">
+              <div className="alert alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span className="text-sm">You can skip this step and invite team members later from your organization settings.</span>
+              </div>
+
+              {inviteList.length > 0 ? (
+                <div className="space-y-3">
+                  {inviteList.map((invite, index) => (
+                    <div key={index} className="flex gap-2 items-end">
+                      <TextInput
+                        label={index === 0 ? "Email Address" : undefined}
+                        type="email"
+                        value={invite.email}
+                        onChange={(e) => updateInvite(index, 'email', e.target.value)}
+                        placeholder="colleague@example.com"
+                        containerClassName="flex-1"
+                      />
+                      <Select
+                        label={index === 0 ? "Role" : undefined}
+                        value={invite.role}
+                        onChange={(e) => updateInvite(index, 'role', e.target.value as InviteMemberRequestRoleEnum)}
+                        options={[
+                          { value: InviteMemberRequestRoleEnum.Member, label: 'Member' },
+                          { value: InviteMemberRequestRoleEnum.Admin, label: 'Admin' },
+                        ]}
+                        containerClassName="w-32"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeInvite(index)}
+                        className="btn btn-ghost btn-square text-error"
+                        title="Remove"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border-2 border-dashed border-base-300 rounded-lg bg-base-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <p className="text-sm opacity-60">No team members yet</p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={addInvite}
+                className="btn btn-outline btn-block gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Team Member
+              </button>
+            </div>
           )}
 
+          {/* Step 3: Review */}
           {currentStep === 3 && (
-            <ReviewStep
-              formData={formData}
-              inviteList={inviteList}
-            />
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Review Organization Details</h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-sm opacity-70 mb-1">Organization Name</div>
+                    <div className="text-lg font-medium">{formData.name}</div>
+                  </div>
+
+                  <div className="divider my-3"></div>
+
+                  <div>
+                    <div className="text-sm opacity-70 mb-1">URL</div>
+                    <div className="font-mono text-sm">contentshare.app/{formData.slug}</div>
+                  </div>
+
+                  {formData.description && (
+                    <>
+                      <div className="divider my-3"></div>
+                      <div>
+                        <div className="text-sm opacity-70 mb-1">Description</div>
+                        <div className="text-sm">{formData.description}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {inviteList.filter(i => i.email.trim()).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Team Members ({inviteList.filter(i => i.email.trim()).length})
+                  </h3>
+                  <div className="bg-base-200 rounded-lg p-4 space-y-2">
+                    {inviteList.filter(i => i.email.trim()).map((invite, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <span className="text-sm">{invite.email}</span>
+                        <span className="badge badge-sm">{invite.role}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span className="text-sm">You'll be automatically added as the organization owner with full permissions.</span>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-black px-8 py-6 flex justify-between">
-          <button
-            onClick={currentStep === 1 ? onClose : () => setCurrentStep(prev => prev - 1)}
-            className="text-black border-b border-black hover:border-gray-600 transition-colors duration-200"
-          >
-            {currentStep === 1 ? 'Cancel' : 'Back'}
-          </button>
+        {/* Footer Actions */}
+        <div className="border-t border-base-300 p-4 bg-base-100">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={currentStep === 1 ? onClose : () => setCurrentStep(prev => prev - 1)}
+              className="btn btn-ghost"
+            >
+              {currentStep === 1 ? 'Cancel' : 'Back'}
+            </button>
 
-          <div className="flex space-x-4">
             {currentStep < 3 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 disabled={currentStep === 1 && !canProceedToStep2}
-                className="bg-black text-white px-8 py-3 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className="btn btn-primary"
               >
                 Continue
               </button>
@@ -221,260 +427,16 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
               <button
                 onClick={handleSubmit}
                 disabled={loading || !canCreateOrganization}
-                className="bg-black text-white px-8 py-3 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className="btn btn-primary"
               >
+                {loading && <span className="loading loading-spinner"></span>}
                 {loading ? 'Creating...' : 'Create Organization'}
               </button>
             )}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function StepIndicator({ step, current, label }: { step: number; current: number; label: string }) {
-  const isCompleted = current > step;
-  const isCurrent = current === step;
-
-  return (
-    <div className="flex flex-col items-center">
-      <div
-        className={`w-8 h-8 border flex items-center justify-center text-sm font-light transition-colors duration-200 ${
-          isCompleted
-            ? 'bg-black text-white border-black'
-            : isCurrent
-            ? 'bg-white text-black border-black'
-            : 'bg-white text-gray-500 border-gray-300'
-        }`}
-      >
-        {isCompleted ? (
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        ) : (
-          step
-        )}
-      </div>
-      <span className="mt-2 text-xs font-light text-gray-600">{label}</span>
-    </div>
-  );
-}
-
-function OrganizationBasicInfo({
-  formData,
-  onNameChange,
-  onSlugChange,
-  onDescriptionChange,
-  onVisibilityChange,
-  slugError
-}: {
-  formData: FormData;
-  onNameChange: (name: string) => void;
-  onSlugChange: (slug: string) => void;
-  onDescriptionChange: (description: string) => void;
-  onVisibilityChange: (visibility: CreateOrganizationRequestVisibilityEnum) => void;
-  slugError: string | null;
-}) {
-  return (
-    <div className="space-y-8">
-      <div>
-        <label className="block text-sm font-light text-black mb-4">
-          Organization name *
-        </label>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => onNameChange(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-          placeholder="My Organization"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-light text-black mb-4">
-          Organization slug *
-        </label>
-        <div className="flex">
-          <span className="inline-flex items-center px-4 border border-r-0 border-gray-300 bg-gray-50 text-gray-600 text-sm">
-            yourapp.com/
-          </span>
-          <input
-            type="text"
-            value={formData.slug}
-            onChange={(e) => onSlugChange(e.target.value)}
-            className={`flex-1 px-4 py-3 border focus:border-black focus:outline-none transition-colors duration-200 ${
-              slugError ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="my-organization"
-          />
-        </div>
-        {slugError && (
-          <p className="mt-2 text-sm text-red-600">{slugError}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-light text-black mb-4">
-          Description
-        </label>
-        <textarea
-          value={formData.description}
-          onChange={(e) => onDescriptionChange(e.target.value)}
-          rows={4}
-          className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-          placeholder="Brief description of your organization..."
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-light text-black mb-4">
-          Visibility
-        </label>
-        <div className="space-y-4">
-          {Object.values(CreateOrganizationRequestVisibilityEnum).map((visibility) => (
-            <label key={visibility} className="flex items-start border border-gray-300 p-4 hover:border-black cursor-pointer transition-colors duration-200">
-              <input
-                type="radio"
-                name="visibility"
-                value={visibility}
-                checked={formData.visibility === visibility}
-                onChange={(e) => onVisibilityChange(e.target.value as CreateOrganizationRequestVisibilityEnum)}
-                className="mt-1 h-4 w-4 text-black border-gray-300 focus:ring-black"
-              />
-              <div className="ml-4">
-                <span className="text-sm font-light text-black">
-                  {visibility === CreateOrganizationRequestVisibilityEnum.Public ? 'Public' : 'Private'}
-                </span>
-                <p className="text-sm text-gray-600 mt-1">
-                  {visibility === CreateOrganizationRequestVisibilityEnum.Public
-                    ? 'Anyone can see and join this organization'
-                    : 'Only invited members can access this organization'
-                  }
-                </p>
-              </div>
-            </label>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TeamSetupStep({
-  inviteList,
-  onAddInvite,
-  onUpdateInvite,
-  onRemoveInvite
-}: {
-  inviteList: Array<{ email: string; role: InviteMemberRequestRoleEnum }>;
-  onAddInvite: () => void;
-  onUpdateInvite: (index: number, field: 'email' | 'role', value: string | InviteMemberRequestRoleEnum) => void;
-  onRemoveInvite: (index: number) => void;
-}) {
-  return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-lg font-light text-black mb-4">Invite team members</h3>
-        <p className="text-sm text-gray-600">
-          Invite people to join your organization. You can always add more members later.
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        {inviteList.map((invite, index) => (
-          <div key={index} className="flex items-center space-x-4">
-            <input
-              type="email"
-              value={invite.email}
-              onChange={(e) => onUpdateInvite(index, 'email', e.target.value)}
-              placeholder="colleague@example.com"
-              className="flex-1 px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-            />
-            <select
-              value={invite.role}
-              onChange={(e) => onUpdateInvite(index, 'role', e.target.value as InviteMemberRequestRoleEnum)}
-              className="px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-            >
-              <option value={InviteMemberRequestRoleEnum.Member}>Member</option>
-              <option value={InviteMemberRequestRoleEnum.Admin}>Admin</option>
-            </select>
-            <button
-              onClick={() => onRemoveInvite(index)}
-              className="p-2 text-gray-400 hover:text-black transition-colors duration-200"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={onAddInvite}
-        className="flex items-center space-x-2 text-black border border-black px-6 py-3 hover:bg-black hover:text-white transition-colors duration-200"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-        </svg>
-        <span>Add another member</span>
-      </button>
-    </div>
-  );
-}
-
-function ReviewStep({
-  formData,
-  inviteList
-}: {
-  formData: FormData;
-  inviteList: Array<{ email: string; role: InviteMemberRequestRoleEnum }>;
-}) {
-  const validInvites = inviteList.filter(invite => invite.email.trim());
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-lg font-light text-black">Review and create</h3>
-      </div>
-
-      <div className="border border-black p-6 space-y-4">
-        <div>
-          <h4 className="font-light text-lg text-black">{formData.name}</h4>
-          <p className="text-sm text-gray-600 mt-1">@{formData.slug}</p>
-        </div>
-
-        {formData.description && (
-          <div className="pt-4 border-t border-gray-300">
-            <p className="text-sm text-gray-600">{formData.description}</p>
-          </div>
-        )}
-
-        <div className="flex items-center space-x-4 text-sm text-gray-600 pt-4 border-t border-gray-300">
-          <span className="capitalize">{formData.visibility.toLowerCase()}</span>
-          <span>•</span>
-          <span>Basic plan</span>
-        </div>
-      </div>
-
-      {validInvites.length > 0 && (
-        <div>
-          <h4 className="font-light text-black mb-4">
-            Team members ({validInvites.length})
-          </h4>
-          <div className="space-y-2">
-            {validInvites.map((invite, index) => (
-              <div key={index} className="flex items-center justify-between py-3 px-4 border border-gray-300">
-                <span className="text-sm text-black">{invite.email}</span>
-                <span className="text-xs text-gray-600 capitalize">
-                  {organizationService.getRoleDisplayName(invite.role as any)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="modal-backdrop" onClick={onClose}></div>
     </div>
   );
 }

@@ -39,7 +39,7 @@ const LoginComponent = () => {
       if (isSignedIn) {
         // Refresh the auth context state
         await checkAuthState();
-        navigate('/dashboard');
+        navigate('/');
       } else if (nextStep) {
         console.log('Next step required:', nextStep);
         setError(`Login incomplete. Next step: ${nextStep.signInStep || 'Unknown step required'}`);
@@ -58,7 +58,7 @@ const LoginComponent = () => {
 
           if (isSignedIn) {
             await checkAuthState();
-            navigate('/dashboard');
+            navigate('/');
           } else if (nextStep) {
             setError(`Login incomplete. Next step: ${nextStep.signInStep || 'Unknown step required'}`);
           }

@@ -1,9 +1,9 @@
 import React, { useState, type FormEvent } from 'react';
 import { resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
-import type { ForgotPasswordComponentProps } from '../../types';
+import { TextInput } from '../forms';
 
-const ForgotPasswordComponent: React.FC<ForgotPasswordComponentProps> = () => {
+const ForgotPasswordComponent: React.FC = () => {
   const [step, setStep] = useState<'request' | 'confirm'>('request');
   const [email, setEmail] = useState<string>('');
   const [code, setCode] = useState<string>('');
@@ -72,152 +72,151 @@ const ForgotPasswordComponent: React.FC<ForgotPasswordComponentProps> = () => {
 
   if (step === 'confirm') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Reset your password
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Enter the code sent to your email and your new password
-            </p>
+      <div className="hero bg-base-200 min-h-screen">
+        <div className="hero-content flex-col w-full max-w-md">
+          <div className="text-center mb-4">
+            <h1 className="text-5xl font-bold">ContentShare</h1>
+            <p className="py-6">Reset your password</p>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleConfirmReset}>
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                {success}
-              </div>
-            )}
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="code" className="block text-sm font-medium text-gray-700">
-                  Verification Code
-                </label>
-                <input
-                  id="code"
-                  name="code"
-                  type="text"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Enter verification code"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                  New Password
-                </label>
-                <input
-                  id="newPassword"
-                  name="newPassword"
-                  type="password"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="New password (min 8 characters)"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm New Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </div>
-            </div>
 
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep('request')}
-                className="flex-1 py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Back
-              </button>
-            </div>
-          </form>
+          <div className="card bg-base-100 w-full shadow-2xl">
+            <form className="card-body" onSubmit={handleConfirmReset}>
+              {error && (
+                <div className="alert alert-error">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
+              {success && (
+                <div className="alert alert-success">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{success}</span>
+                </div>
+              )}
+
+              <TextInput
+                label="Verification Code"
+                type="text"
+                name="code"
+                placeholder="Enter verification code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+              />
+
+              <TextInput
+                label="New Password"
+                type="password"
+                name="newPassword"
+                placeholder="New password (min 8 characters)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+
+              <TextInput
+                label="Confirm New Password"
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                error={confirmPassword && newPassword !== confirmPassword ? 'Passwords do not match' : undefined}
+                required
+              />
+
+              <div className="form-control mt-6">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn btn-primary"
+                >
+                  {loading && <span className="loading loading-spinner"></span>}
+                  {loading ? 'Resetting...' : 'Reset Password'}
+                </button>
+              </div>
+
+              <div className="divider">OR</div>
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setStep('request')}
+                  className="link link-primary"
+                >
+                  Back to request reset
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Forgot your password?
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your email and we'll send you a reset code
-          </p>
+    <div className="hero bg-base-200 min-h-screen">
+      <div className="hero-content flex-col w-full max-w-md">
+        <div className="text-center mb-4">
+          <h1 className="text-5xl font-bold">ContentShare</h1>
+          <p className="py-6">Forgot your password?</p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleRequestReset}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-              {success}
-            </div>
-          )}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
+
+        <div className="card bg-base-100 w-full shadow-2xl">
+          <form className="card-body" onSubmit={handleRequestReset}>
+            {error && (
+              <div className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+            {success && (
+              <div className="alert alert-success">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{success}</span>
+              </div>
+            )}
+
+            <TextInput
+              label="Email Address"
               type="email"
-              autoComplete="email"
-              required
-              className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
+              name="email"
+              placeholder="email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
             />
-          </div>
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {loading ? 'Sending...' : 'Send Reset Code'}
-            </button>
-            <a
-              href="/login"
-              className="flex-1 py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-center"
-            >
-              Back to Login
-            </a>
-          </div>
-        </form>
+            <div className="form-control mt-6">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary"
+              >
+                {loading && <span className="loading loading-spinner"></span>}
+                {loading ? 'Sending...' : 'Send Reset Code'}
+              </button>
+            </div>
+
+            <div className="divider">OR</div>
+            <div className="text-center">
+              <p className="text-sm">
+                Remember your password?{' '}
+                <a href="/login" className="link link-primary">
+                  Back to login
+                </a>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
