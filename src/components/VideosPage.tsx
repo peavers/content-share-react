@@ -5,11 +5,14 @@ import Navigation from './shared/Navigation';
 import { useVideos, useTags } from '../hooks';
 import type { Tag } from '../generated';
 
+type CategoryFilter = 'all' | 'recent' | 'featured';
+
 const VideosPage: React.FC = () => {
   const { currentWorkspace } = useOrganization();
   const [searchParams] = useSearchParams();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
 
   const {
     videos,
@@ -53,7 +56,23 @@ const VideosPage: React.FC = () => {
     setExpandedTagIds(new Set(parentTagIds));
   }, []);
 
-  // Filter videos based on selected tags (including hierarchical matching)
+  // Get featured videos (videos with tags for now)
+  const featuredVideos = useMemo(() => {
+    return videos.filter(video =>
+      video.id && videoTagsMap.get(video.id) && videoTagsMap.get(video.id)!.length > 0
+    );
+  }, [videos, videoTagsMap]);
+
+  // Get recent videos (last 7 days)
+  const recentVideos = useMemo(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return videos.filter(video =>
+      video.createdAt && new Date(video.createdAt) >= sevenDaysAgo
+    );
+  }, [videos]);
+
+  // Filter videos based on selected tags (for the "All Videos" section)
   const filteredVideos = useMemo(() => {
     if (selectedTagIds.length === 0) return videos;
 
@@ -174,126 +193,241 @@ const VideosPage: React.FC = () => {
     <div className="min-h-screen bg-base-200">
       <Navigation />
 
-      <main className="w-full px-4 py-8">
-        <h2 className="text-2xl font-bold mb-6 px-4">
-          Videos in {currentWorkspace.organization.name}
-        </h2>
+      <div className="flex">
+        {/* Persistent Sidebar */}
+        <aside className="w-64 flex-shrink-0 h-screen sticky top-0 overflow-y-auto p-4">
+          <h3 className="font-semibold mb-4">Filter by Tags</h3>
+          {tagsLoading ? (
+            <div className="flex items-center gap-2">
+              <span className="loading loading-spinner loading-sm"></span>
+              <p className="text-sm opacity-60">Loading tags...</p>
+            </div>
+          ) : allTags.length === 0 ? (
+            <p className="text-sm opacity-60">No tags available</p>
+          ) : (
+            <div className="space-y-1">
+              {renderTagTree(allTags.filter(t => t.depth === 0))}
+            </div>
+          )}
+          {selectedTagIds.length > 0 && (
+            <button
+              onClick={() => setSelectedTagIds([])}
+              className="btn btn-sm btn-ghost w-full mt-4"
+            >
+              Clear Filters
+            </button>
+          )}
+        </aside>
 
-        {videosLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <span className="loading loading-spinner loading-lg"></span>
-            <p className="ml-3">Loading videos...</p>
-          </div>
-        ) : videos.length === 0 ? (
-          <div className="alert alert-info max-w-2xl mx-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>No videos uploaded yet in this organization.</span>
-          </div>
-        ) : (
-          <div className="flex gap-6">
-            {/* Sidebar Filters */}
-            <aside className="w-64 flex-shrink-0">
-              <div className="p-4">
-                <h3 className="font-semibold mb-4">Filter by Tags</h3>
-                {tagsLoading ? (
-                  <div className="flex items-center gap-2">
-                    <span className="loading loading-spinner loading-sm"></span>
-                    <p className="text-sm opacity-60">Loading tags...</p>
-                  </div>
-                ) : allTags.length === 0 ? (
-                  <p className="text-sm opacity-60">No tags available</p>
-                ) : (
-                  <div className="space-y-1">
-                    {renderTagTree(allTags.filter(t => t.depth === 0))}
-                  </div>
-                )}
-                {selectedTagIds.length > 0 && (
-                  <button
-                    onClick={() => setSelectedTagIds([])}
-                    className="btn btn-sm btn-ghost w-full mt-4"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
-            </aside>
-
-            {/* Video Grid */}
-            <div className="flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {filteredVideos.map((video) => {
-                  const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
-
-                  return (
-                    <Link
-                      key={video.id}
-                      to={`/video/${video.id}`}
-                      className="group"
-                    >
-                      {/* Thumbnail */}
-                      <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
-                        {thumbnailUrl ? (
-                          <img
-                            src={thumbnailUrl}
-                            alt={video.title || video.originalFilename}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+        {/* Main Content */}
+        <main className="flex-1 py-8">
+          {videosLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <span className="loading loading-spinner loading-lg"></span>
+              <p className="ml-3">Loading videos...</p>
+            </div>
+          ) : videos.length === 0 ? (
+            <div className="alert alert-info max-w-2xl mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>No videos uploaded yet in this organization.</span>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {/* Featured Section */}
+              {featuredVideos.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-4 px-4">Featured</h2>
+                <div className="overflow-x-auto">
+                  <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
+                    {featuredVideos.slice(0, 10).map((video) => {
+                      const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
+                      return (
+                        <Link
+                          key={video.id}
+                          to={`/video/${video.id}`}
+                          className="group flex-shrink-0"
+                          style={{ width: '280px' }}
+                        >
+                          <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
+                            {thumbnailUrl ? (
+                              <img
+                                src={thumbnailUrl}
+                                alt={video.title || video.originalFilename}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                            )}
+                            {formatDuration(video.durationSeconds) && (
+                              <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
+                                {formatDuration(video.durationSeconds)}
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {/* Duration badge */}
-                        {formatDuration(video.durationSeconds) && (
-                          <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
-                            {formatDuration(video.durationSeconds)}
+                          <div className="px-1">
+                            <h3 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary">
+                              {video.title || video.originalFilename}
+                            </h3>
+                            {video.description && (
+                              <p className="text-xs opacity-60 line-clamp-2 mb-2">
+                                {video.description}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap gap-1.5 text-xs opacity-70">
+                              {video.id && videoTagsMap.get(video.id)?.slice(0, 2).map(tag => (
+                                <span key={tag.id} className="text-primary">
+                                  {tag.path?.replace(/^\//, '').replace(/\//g, ' › ') || tag.name}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                        )}
-                      </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+              )}
 
-                      {/* Video details */}
-                      <div className="px-1">
-                        <h3 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary">
-                          {video.title || video.originalFilename}
-                        </h3>
-                        {/* Description */}
-                        {video.description && (
-                          <p className="text-xs opacity-60 line-clamp-2 mb-2">
-                            {video.description}
-                          </p>
-                        )}
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-1.5 text-xs opacity-70">
-                          {video.id && videoTagsMap.get(video.id)?.slice(0, 3).map(tag => (
-                            <span key={tag.id} className="text-primary">
-                              {tag.path?.replace(/^\//, '').replace(/\//g, ' › ') || tag.name}
-                            </span>
-                          ))}
-                          {video.id && videoTagsMap.get(video.id) && videoTagsMap.get(video.id)!.length > 3 && (
-                            <span className="opacity-50">
-                              +{videoTagsMap.get(video.id)!.length - 3} more
-                            </span>
+              {/* Recent Section */}
+              {recentVideos.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-4 px-4">Recent</h2>
+                <div className="overflow-x-auto">
+                  <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
+                    {recentVideos.slice(0, 10).map((video) => {
+                      const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
+                      return (
+                        <Link
+                          key={video.id}
+                          to={`/video/${video.id}`}
+                          className="group flex-shrink-0"
+                          style={{ width: '280px' }}
+                        >
+                          <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
+                            {thumbnailUrl ? (
+                              <img
+                                src={thumbnailUrl}
+                                alt={video.title || video.originalFilename}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                            )}
+                            {formatDuration(video.durationSeconds) && (
+                              <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
+                                {formatDuration(video.durationSeconds)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="px-1">
+                            <h3 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary">
+                              {video.title || video.originalFilename}
+                            </h3>
+                            {video.description && (
+                              <p className="text-xs opacity-60 line-clamp-2 mb-2">
+                                {video.description}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap gap-1.5 text-xs opacity-70">
+                              {video.id && videoTagsMap.get(video.id)?.slice(0, 2).map(tag => (
+                                <span key={tag.id} className="text-primary">
+                                  {tag.path?.replace(/^\//, '').replace(/\//g, ' › ') || tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+              )}
+
+              {/* All Videos Section */}
+              <section>
+              <h2 className="text-2xl font-bold mb-4 px-4">All Videos</h2>
+              <div className="px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  {filteredVideos.map((video) => {
+                    const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
+                    return (
+                      <Link
+                        key={video.id}
+                        to={`/video/${video.id}`}
+                        className="group"
+                      >
+                        <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
+                          {thumbnailUrl ? (
+                            <img
+                              src={thumbnailUrl}
+                              alt={video.title || video.originalFilename}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                          )}
+                          {formatDuration(video.durationSeconds) && (
+                            <div className="absolute bottom-1 right-1 bg-black bg-opacity-80 text-white text-xs px-1.5 py-0.5 rounded">
+                              {formatDuration(video.durationSeconds)}
+                            </div>
                           )}
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-              {filteredVideos.length === 0 && selectedTagIds.length > 0 && (
-                <div className="text-center py-12 opacity-60">
-                  <p>No videos match the selected filters</p>
+                        <div className="px-1">
+                          <h3 className="font-semibold text-sm line-clamp-2 mb-1 group-hover:text-primary">
+                            {video.title || video.originalFilename}
+                          </h3>
+                          {video.description && (
+                            <p className="text-xs opacity-60 line-clamp-2 mb-2">
+                              {video.description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5 text-xs opacity-70">
+                            {video.id && videoTagsMap.get(video.id)?.slice(0, 3).map(tag => (
+                              <span key={tag.id} className="text-primary">
+                                {tag.path?.replace(/^\//, '').replace(/\//g, ' › ') || tag.name}
+                              </span>
+                            ))}
+                            {video.id && videoTagsMap.get(video.id) && videoTagsMap.get(video.id)!.length > 3 && (
+                              <span className="opacity-50">
+                                +{videoTagsMap.get(video.id)!.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              )}
+                {filteredVideos.length === 0 && selectedTagIds.length > 0 && (
+                  <div className="text-center py-12 opacity-60">
+                    <p>No videos match the selected filters</p>
+                  </div>
+                )}
+              </div>
+              </section>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
