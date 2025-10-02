@@ -103,13 +103,13 @@ export interface OrganizationInvitation {
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'active'?: boolean;
+    'expired'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'expired'?: boolean;
+    'active'?: boolean;
 }
 
 export const OrganizationInvitationRoleEnum = {

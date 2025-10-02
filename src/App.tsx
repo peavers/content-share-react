@@ -21,6 +21,7 @@ import AdminVideoManagement from './components/admin/AdminVideoManagement';
 import UserManagement from './components/admin/UserManagement';
 import OrganizationMembers from './components/admin/OrganizationMembers';
 import AdminFAB from './components/shared/AdminFAB';
+import UserProfilePage from './components/UserProfilePage';
 
 // Configure Amplify
 Amplify.configure(awsConfig);
@@ -89,6 +90,12 @@ const App: React.FC = () => {
                   <AdminRoute requiredPermission="invite_members">
                     <OrganizationMembers />
                   </AdminRoute>
+                </ProtectedRoute>
+              } />
+
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <UserProfilePage />
                 </ProtectedRoute>
               } />
             </Routes>
