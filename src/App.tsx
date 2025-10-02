@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Amplify } from 'aws-amplify';
 import { AuthProvider } from './contexts/AuthContext';
 import { OrganizationProvider } from './contexts';
@@ -20,6 +20,7 @@ import TagManagement from './components/admin/TagManagement';
 import AdminVideoManagement from './components/admin/AdminVideoManagement';
 import UserManagement from './components/admin/UserManagement';
 import OrganizationMembers from './components/admin/OrganizationMembers';
+import AdminFAB from './components/shared/AdminFAB';
 
 // Configure Amplify
 Amplify.configure(awsConfig);
@@ -91,6 +92,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
             </Routes>
+            <AdminFAB />
             </div>
           </OrganizationProvider>
         </AuthProvider>

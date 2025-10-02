@@ -1,18 +1,29 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useOrganization } from '../contexts';
+import { useAuth, useOrganization } from '../contexts';
 import Navigation from './shared/Navigation';
+import { CreateOrganizationModal } from './organization/CreateOrganizationModal';
+import Avatar from './shared/Avatar';
+import SidebarSection from './shared/SidebarSection';
+import ExpandableContent from './shared/ExpandableContent';
+import ActionButton from './shared/ActionButton';
 import { useVideos, useTags } from '../hooks';
 import type { Tag } from '../generated';
 
 type CategoryFilter = 'all' | 'recent' | 'featured';
 
 const VideosPage: React.FC = () => {
-  const { currentWorkspace } = useOrganization();
+  const auth = useAuth();
+  const { user, logout } = auth;
+  const { currentWorkspace, organizations, setCurrentWorkspace } = useOrganization();
   const [searchParams] = useSearchParams();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [workspacesExpanded, setWorkspacesExpanded] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(true);
+  const [accountExpanded, setAccountExpanded] = useState(false);
 
   const {
     videos,
@@ -171,6 +182,24 @@ const VideosPage: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
+  const switchToOrganization = (org: any) => {
+    const workspace = {
+      type: org.organizationType === 'PERSONAL' ? 'personal' : 'organization',
+      organization: org,
+      currentUserRole: undefined,
+      permissions: []
+    };
+    setCurrentWorkspace(workspace);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   if (!currentWorkspace) {
     return (
       <div className="min-h-screen bg-base-200">
@@ -191,37 +220,16 @@ const VideosPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-base-200">
-      <Navigation />
-
-      <div className="flex">
-        {/* Persistent Sidebar */}
-        <aside className="w-64 flex-shrink-0 h-screen sticky top-0 overflow-y-auto p-4" style={{ willChange: 'scroll-position' }}>
-          <h3 className="font-semibold mb-4">Filter by Tags</h3>
-          {tagsLoading ? (
-            <div className="flex items-center gap-2">
-              <span className="loading loading-spinner loading-sm"></span>
-              <p className="text-sm opacity-60">Loading tags...</p>
-            </div>
-          ) : allTags.length === 0 ? (
-            <p className="text-sm opacity-60">No tags available</p>
-          ) : (
-            <div className="space-y-1">
-              {renderTagTree(allTags.filter(t => t.depth === 0))}
-            </div>
-          )}
-          {selectedTagIds.length > 0 && (
-            <button
-              onClick={() => setSelectedTagIds([])}
-              className="btn btn-sm btn-ghost w-full mt-4"
-            >
-              Clear Filters
-            </button>
-          )}
-        </aside>
+    <>
+      <div className="drawer lg:drawer-open min-h-screen">
+        <input id="tag-drawer" type="checkbox" className="drawer-toggle" />
 
         {/* Main Content */}
-        <main className="flex-1 py-8">
+        <div className="drawer-content flex flex-col bg-base-200">
+          {/* Navbar */}
+          <Navigation />
+
+          <main className="flex-1 py-8 lg:pl-6">
           {videosLoading ? (
             <div className="flex items-center justify-center py-12">
               <span className="loading loading-spinner loading-lg"></span>
@@ -240,16 +248,15 @@ const VideosPage: React.FC = () => {
               {featuredVideos.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold mb-4 px-4">Featured</h2>
-                <div className="overflow-x-auto">
-                  <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
+                <div className="px-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {featuredVideos.slice(0, 10).map((video) => {
                       const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
                       return (
                         <Link
                           key={video.id}
                           to={`/video/${video.id}`}
-                          className="group flex-shrink-0"
-                          style={{ width: '280px' }}
+                          className="group"
                         >
                           <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
                             {thumbnailUrl ? (
@@ -303,16 +310,15 @@ const VideosPage: React.FC = () => {
               {recentVideos.length > 0 && (
               <section>
                 <h2 className="text-2xl font-bold mb-4 px-4">Recent</h2>
-                <div className="overflow-x-auto">
-                  <div className="flex gap-4 px-4 pb-4" style={{ width: 'max-content' }}>
+                <div className="px-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {recentVideos.slice(0, 10).map((video) => {
                       const thumbnailUrl = video.id ? thumbnailUrlsMap.get(video.id) : undefined;
                       return (
                         <Link
                           key={video.id}
                           to={`/video/${video.id}`}
-                          className="group flex-shrink-0"
-                          style={{ width: '280px' }}
+                          className="group"
                         >
                           <div className="relative bg-base-300 rounded-lg overflow-hidden aspect-video mb-2">
                             {thumbnailUrl ? (
@@ -431,9 +437,172 @@ const VideosPage: React.FC = () => {
               </section>
             </div>
           )}
-        </main>
+          </main>
+        </div>
+
+        {/* Sidebar Drawer */}
+        <div className="drawer-side z-20">
+          <label htmlFor="tag-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
+          <aside className="bg-base-100 w-80 min-h-full p-4 flex flex-col">
+            {/* Site Title */}
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-base-300">
+              <Link to="/" className="flex items-center gap-2 flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span className="text-xl font-bold">ContentShare</span>
+              </Link>
+              <label htmlFor="tag-drawer" className="btn btn-sm btn-circle btn-ghost lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </label>
+            </div>
+
+            {/* Main content - scrollable */}
+            <div className="flex-1 overflow-y-auto space-y-6">
+              {/* Workspace Section */}
+              {currentWorkspace && (
+                <SidebarSection
+                  title="Workspace"
+                  isExpanded={workspacesExpanded}
+                  onToggle={() => setWorkspacesExpanded(!workspacesExpanded)}
+                >
+                  {/* Current workspace display */}
+                  <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
+                    <Avatar name={currentWorkspace.organization.name} size="sm" />
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="font-medium text-sm truncate">{currentWorkspace.organization.name}</div>
+                      <div className="text-xs opacity-60">{currentWorkspace.organization.organizationType === 'PERSONAL' ? 'Personal' : 'Team'}</div>
+                    </div>
+                  </div>
+
+                  <ExpandableContent isExpanded={workspacesExpanded}>
+                    <div className="space-y-1">
+                      {organizations
+                        .filter((org) => org.id !== currentWorkspace?.organization.id)
+                        .map((org) => (
+                          <button
+                            key={org.id}
+                            onClick={() => {
+                              switchToOrganization(org);
+                              setWorkspacesExpanded(false);
+                            }}
+                            className="w-full px-3 py-2 rounded-lg flex items-start gap-3 hover:bg-base-200 transition-colors"
+                          >
+                            <Avatar name={org.name} size="sm" />
+                            <div className="flex-1 text-left min-w-0">
+                              <div className="font-medium text-sm truncate">{org.name}</div>
+                              <div className="text-xs opacity-60">{org.organizationType === 'PERSONAL' ? 'Personal' : 'Team'}</div>
+                            </div>
+                          </button>
+                        ))}
+                      <ActionButton
+                        onClick={() => {
+                          setShowCreateModal(true);
+                          setWorkspacesExpanded(false);
+                        }}
+                        variant="primary"
+                        icon={
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                        }
+                      >
+                        Create Workspace
+                      </ActionButton>
+                    </div>
+                  </ExpandableContent>
+                </SidebarSection>
+              )}
+
+              {/* Filters Section */}
+              <SidebarSection
+                title="Filters"
+                isExpanded={filtersExpanded}
+                onToggle={() => setFiltersExpanded(!filtersExpanded)}
+              >
+                <ExpandableContent isExpanded={filtersExpanded} maxHeight="max-h-[600px]">
+                  <div className="mt-3">
+                    {tagsLoading ? (
+                      <div className="flex items-center gap-2 px-2">
+                        <span className="loading loading-spinner loading-sm"></span>
+                        <p className="text-sm opacity-60">Loading tags...</p>
+                      </div>
+                    ) : allTags.length === 0 ? (
+                      <p className="text-sm opacity-60 px-2">No tags available</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {renderTagTree(allTags.filter(t => t.depth === 0))}
+                      </div>
+                    )}
+                    {selectedTagIds.length > 0 && (
+                      <ActionButton
+                        onClick={() => setSelectedTagIds([])}
+                        variant="secondary"
+                        icon={
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        }
+                      >
+                        Clear Filters
+                      </ActionButton>
+                    )}
+                  </div>
+                </ExpandableContent>
+              </SidebarSection>
+            </div>
+
+            {/* User Profile - Bottom */}
+            <div className="pt-4 mt-4 border-t border-base-300">
+              <SidebarSection
+                title="Account"
+                isExpanded={accountExpanded}
+                onToggle={() => setAccountExpanded(!accountExpanded)}
+              >
+                {/* Current user display */}
+                <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
+                  <div className="avatar placeholder">
+                    <div className="bg-primary text-primary-content rounded-full w-8">
+                      <span className="text-sm">{user?.username?.charAt(0).toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="font-medium text-sm truncate">{user?.username}</div>
+                    <div className="text-xs opacity-60">Signed in</div>
+                  </div>
+                </div>
+
+                <ExpandableContent isExpanded={accountExpanded} maxHeight="max-h-48">
+                  <ActionButton
+                    onClick={handleLogout}
+                    variant="error"
+                    icon={
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                    }
+                  >
+                    Logout
+                  </ActionButton>
+                </ExpandableContent>
+              </SidebarSection>
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
+
+      {/* Create Organization Modal */}
+      <CreateOrganizationModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={(newOrg) => {
+          switchToOrganization(newOrg);
+          setShowCreateModal(false);
+        }}
+      />
+    </>
   );
 };
 
