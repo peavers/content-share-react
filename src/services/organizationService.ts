@@ -27,10 +27,10 @@ class OrganizationService {
   }
 
   async updateOrganization(organizationId: string, request: Partial<CreateOrganizationRequest>): Promise<Organization> {
-    const response = await generatedApiService.organization.updateOrganization({
+    const response = await generatedApiService.organization.updateOrganization(
       organizationId,
-      createOrganizationRequest: request as CreateOrganizationRequest
-    });
+      request as CreateOrganizationRequest
+    );
     return response.data;
   }
 

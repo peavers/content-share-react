@@ -3,7 +3,15 @@ import { useOrganization } from '../../contexts/OrganizationContext';
 import { CreateOrganizationModal } from './CreateOrganizationModal';
 import { InviteMemberModal } from './InviteMemberModal';
 import type { OrganizationMembership, OrganizationInvitation } from '../../generated';
-import { OrganizationInvitationStatusEnum, OrganizationMembershipRoleEnum, OrganizationMembershipStatusEnum } from '../../generated';
+import {
+  OrganizationInvitationStatusEnum,
+  OrganizationMembershipRoleEnum,
+  OrganizationMembershipStatusEnum,
+  InviteMemberRequestRoleEnum,
+  CreateOrganizationRequestOrganizationTypeEnum,
+  CreateOrganizationRequestVisibilityEnum
+} from '../../generated';
+import { organizationService } from '../../services/organizationService';
 
 export const OrganizationPage: React.FC = () => {
   const { currentWorkspace, createOrganization, inviteMember } = useOrganization();
@@ -32,7 +40,20 @@ export const OrganizationPage: React.FC = () => {
 
   const handleCreateOrganization = async (data: { name: string; description: string }) => {
     try {
-      await createOrganization(data);
+      const slug = organizationService.generateSlug(data.name);
+      await createOrganization({
+        name: data.name,
+        slug: slug,
+        description: data.description,
+        avatarUrl: '',
+        websiteUrl: '',
+        organizationType: CreateOrganizationRequestOrganizationTypeEnum.Organization,
+        visibility: CreateOrganizationRequestVisibilityEnum.Private,
+        plan: 'FREE',
+        settings: {},
+        inviteEmails: [],
+        inviteRoles: []
+      });
       setShowCreateModal(false);
     } catch (error) {
       console.error('Failed to create organization:', error);
@@ -43,12 +64,17 @@ export const OrganizationPage: React.FC = () => {
     if (!currentWorkspace) return;
 
     try {
+      const roleEnum = data.role === 'admin'
+        ? InviteMemberRequestRoleEnum.Admin
+        : InviteMemberRequestRoleEnum.Member;
+
       await inviteMember(currentWorkspace.organization.id, {
         email: data.email,
-        role: data.role.toUpperCase()
+        role: roleEnum,
+        message: `You've been invited to join ${currentWorkspace.organization.name}`
       });
       setShowInviteModal(false);
-      loadOrganizationData();
+      await loadOrganizationData();
     } catch (error) {
       console.error('Failed to invite member:', error);
     }

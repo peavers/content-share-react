@@ -5,6 +5,7 @@ import { generatedApiService } from '../services/generatedApiService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -60,7 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               lastLoginAt: userResponse.data.lastLoginAt || new Date().toISOString(),
               createdAt: userResponse.data.createdAt || new Date().toISOString(),
               updatedAt: userResponse.data.updatedAt || new Date().toISOString(),
-              personalOrganization: null
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              personalOrganization: undefined as any, // Will be populated from organization context
+              organizationMemberships: []
             });
 
             // Get scopes from profile response
@@ -82,7 +85,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               lastLoginAt: new Date().toISOString(),
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
-              personalOrganization: null
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              personalOrganization: undefined as any, // Will be populated from organization context
+              organizationMemberships: []
             });
           }
         } catch (error) {
@@ -101,7 +106,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             lastLoginAt: new Date().toISOString(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            personalOrganization: null
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            personalOrganization: undefined as any, // Will be populated from organization context
+            organizationMemberships: []
           });
         }
       } else {
@@ -150,10 +157,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const refreshSession = async (): Promise<any> => {
+  const refreshSession = async (): Promise<AmplifyAuthSession> => {
     try {
       const session = await fetchAuthSession({ forceRefresh: true });
-      return session;
+      return session as AmplifyAuthSession;
     } catch (error) {
       console.error('Error refreshing session:', error);
       throw error;

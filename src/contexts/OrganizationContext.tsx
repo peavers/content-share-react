@@ -1,7 +1,9 @@
 import type {
     Organization,
     OrganizationInvitation,
-    WorkspaceContext
+    WorkspaceContext,
+    CreateOrganizationRequest,
+    InviteMemberRequest
 } from '../types';
 import { OrganizationMembershipRoleEnum, OrganizationResponseOrganizationTypeEnum } from '../generated';
 import { hasPermission } from '../types';
@@ -21,8 +23,8 @@ interface OrganizationContextType {
     loadOrganizations: () => Promise<void>;
     loadInvitations: () => Promise<void>;
     setCurrentWorkspace: (workspace: WorkspaceContext) => void;
-    createOrganization: (request: any) => Promise<Organization>;
-    inviteMember: (organizationId: string, request: any) => Promise<OrganizationInvitation>;
+    createOrganization: (request: CreateOrganizationRequest) => Promise<Organization>;
+    inviteMember: (organizationId: string, request: InviteMemberRequest) => Promise<OrganizationInvitation>;
     acceptInvitation: (token: string) => Promise<void>;
     declineInvitation: (token: string) => Promise<void>;
 
@@ -32,6 +34,7 @@ interface OrganizationContextType {
     getPersonalWorkspace: () => WorkspaceContext | null;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined);
 
 interface OrganizationProviderProps {
@@ -39,6 +42,7 @@ interface OrganizationProviderProps {
 }
 
 // Re-export useOrganization for convenience
+// eslint-disable-next-line react-refresh/only-export-components
 export { useOrganization } from './useOrganization';
 
 export function OrganizationProvider({children}: OrganizationProviderProps) {
@@ -103,14 +107,14 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
     };
 
     // Create new organization
-    const createOrganization = async (request: any): Promise<Organization> => {
+    const createOrganization = async (request: CreateOrganizationRequest): Promise<Organization> => {
         const newOrg = await organizationService.createOrganization(request);
         await loadOrganizations(); // Refresh organizations list
         return newOrg;
     };
 
     // Invite member
-    const inviteMember = async (organizationId: string, request: any): Promise<OrganizationInvitation> => {
+    const inviteMember = async (organizationId: string, request: InviteMemberRequest): Promise<OrganizationInvitation> => {
         return await organizationService.inviteMember(organizationId, request);
     };
 
@@ -160,7 +164,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
             type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
             organization,
             currentUserRole: userRole,
-            permissions: userRole ? (hasPermission as any)(userRole, '') || [] : []
+            permissions: [] // Permissions are checked via hasPermission function
         };
     };
 
@@ -174,6 +178,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
             setCurrentWorkspaceState(null);
             setInvitations([]);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, user?.id]);
 
     // Restore workspace from localStorage
@@ -199,6 +204,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
                 setCurrentWorkspaceState(createWorkspaceContext(personalOrg));
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [organizations]);
 
     const value: OrganizationContextType = {
