@@ -563,11 +563,7 @@ const VideosPage: React.FC = () => {
               >
                 {/* Current user display */}
                 <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
-                  <div className="avatar placeholder">
-                    <div className="bg-primary text-primary-content rounded-full w-8">
-                      <span className="text-sm">{user?.username?.charAt(0).toUpperCase()}</span>
-                    </div>
-                  </div>
+                  <Avatar name={user?.username || ''} size="sm" />
                   <div className="flex-1 text-left min-w-0">
                     <div className="font-medium text-sm truncate">{user?.username}</div>
                     <div className="text-xs opacity-60">Signed in</div>
