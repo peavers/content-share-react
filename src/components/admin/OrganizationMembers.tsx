@@ -4,6 +4,7 @@ import { organizationMemberService } from '../../services/organizationMemberServ
 import type { OrganizationMembership, OrganizationMembershipRoleEnum, OrganizationInvitation } from '../../generated';
 import { TextInput, Select } from '../forms';
 import Navigation from '../shared/Navigation';
+import { DataTable, type TableColumn, type TableAction } from '../shared/DataTable';
 
 const OrganizationMembers: React.FC = () => {
   const { currentWorkspace } = useOrganization();
@@ -15,6 +16,8 @@ const OrganizationMembers: React.FC = () => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<OrganizationMembershipRoleEnum>('MEMBER');
   const [inviting, setInviting] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<Set<number>>(new Set());
+  const [selectedInvitations, setSelectedInvitations] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     loadMembers();
@@ -132,6 +135,47 @@ const OrganizationMembers: React.FC = () => {
     }
   };
 
+  const handleBulkCancelInvitations = async (invitationIds: Set<number>) => {
+    if (!currentWorkspace?.organization?.id) return;
+
+    if (!confirm(`Are you sure you want to cancel ${invitationIds.size} invitation(s)?`)) {
+      return;
+    }
+
+    try {
+      for (const invitationId of invitationIds) {
+        await organizationMemberService.cancelInvitation(currentWorkspace.organization.id, invitationId);
+      }
+      setSelectedInvitations(new Set());
+      await loadMembers();
+    } catch (err: any) {
+      console.error('Failed to cancel invitations:', err);
+      alert(err.response?.data?.message || 'Failed to cancel invitations');
+    }
+  };
+
+  const handleBulkRemoveMembers = async (memberIds: Set<number>) => {
+    if (!currentWorkspace?.organization?.id) return;
+
+    if (!confirm(`Are you sure you want to remove ${memberIds.size} member(s) from this organization?`)) {
+      return;
+    }
+
+    try {
+      for (const memberId of memberIds) {
+        const member = members.find(m => m.id === memberId);
+        if (member && member.userId) {
+          await organizationMemberService.removeMember(currentWorkspace.organization.id, member.userId);
+        }
+      }
+      setSelectedMembers(new Set());
+      await loadMembers();
+    } catch (err: any) {
+      console.error('Failed to remove members:', err);
+      alert(err.response?.data?.message || 'Failed to remove members');
+    }
+  };
+
   const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case 'OWNER':
@@ -144,6 +188,122 @@ const OrganizationMembers: React.FC = () => {
         return 'badge-ghost';
     }
   };
+
+  // Define columns for pending invitations table
+  const invitationColumns: TableColumn<OrganizationInvitation>[] = [
+    {
+      key: 'email',
+      header: 'Email',
+      render: (invitation) => (
+        <div className="flex items-center gap-2">
+          <div className="badge badge-warning badge-sm">Pending</div>
+          {invitation.email}
+        </div>
+      ),
+    },
+    {
+      key: 'role',
+      header: 'Role',
+      render: (invitation) => (
+        <span className={`badge badge-sm ${getRoleBadgeClass(invitation.role || 'MEMBER')}`}>
+          {invitation.role}
+        </span>
+      ),
+    },
+    {
+      key: 'invited',
+      header: 'Invited',
+      render: (invitation) => invitation.createdAt ? new Date(invitation.createdAt).toLocaleDateString() : 'N/A',
+    },
+    {
+      key: 'expires',
+      header: 'Expires',
+      render: (invitation) => invitation.expiresAt ? new Date(invitation.expiresAt).toLocaleDateString() : 'N/A',
+    },
+  ];
+
+  const invitationActions: TableAction<OrganizationInvitation>[] = [
+    {
+      label: 'Cancel',
+      onClick: (invitation) => handleCancelInvitation(invitation.id!, invitation.email!),
+      variant: 'error',
+    },
+  ];
+
+  const invitationBulkActions = [
+    {
+      label: `Cancel Selected (${selectedInvitations.size})`,
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      onClick: handleBulkCancelInvitations,
+      variant: 'error' as const,
+    },
+  ];
+
+  // Define columns for members table
+  const memberColumns: TableColumn<OrganizationMembership>[] = [
+    {
+      key: 'user',
+      header: 'User',
+      render: (member) => (
+        <div>
+          <div className="font-medium">{member.user?.username || 'Unknown'}</div>
+          <div className="text-sm opacity-50">{member.userId}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      render: (member) => member.user?.email || 'N/A',
+    },
+    {
+      key: 'role',
+      header: 'Role',
+      render: (member) => (
+        <select
+          className={`select select-sm select-bordered ${getRoleBadgeClass(member.role || '')}`}
+          value={member.role || 'MEMBER'}
+          onChange={(e) => handleUpdateRole(member.userId!, e.target.value as OrganizationMembershipRoleEnum)}
+          disabled={member.role === 'OWNER'}
+        >
+          <option value="MEMBER">Member</option>
+          <option value="ADMIN">Admin</option>
+          <option value="OWNER">Owner</option>
+        </select>
+      ),
+    },
+    {
+      key: 'joined',
+      header: 'Joined',
+      render: (member) => member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'N/A',
+    },
+  ];
+
+  const memberActions: TableAction<OrganizationMembership>[] = [
+    {
+      label: 'Remove',
+      onClick: (member) => handleRemoveMember(member.userId!, member.user?.username || 'this user'),
+      variant: 'error',
+      disabled: (member) => member.role === 'OWNER',
+    },
+  ];
+
+  const memberBulkActions = [
+    {
+      label: `Remove Selected (${selectedMembers.size})`,
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      onClick: handleBulkRemoveMembers,
+      variant: 'error' as const,
+    },
+  ];
 
   if (loading) {
     return (
@@ -198,142 +358,51 @@ const OrganizationMembers: React.FC = () => {
 
         {/* Pending Invitations */}
         {pendingInvitations.length > 0 && (
-          <div className="card bg-base-100 shadow-xl mb-6">
-            <div className="card-body">
-              <h2 className="card-title text-lg flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Pending Invitations ({pendingInvitations.length})
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="table table-sm">
-                  <thead>
-                    <tr>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Invited</th>
-                      <th>Expires</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingInvitations.map((invitation) => (
-                      <tr key={invitation.id}>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            <div className="badge badge-warning badge-sm">Pending</div>
-                            {invitation.email}
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`badge badge-sm ${getRoleBadgeClass(invitation.role || 'MEMBER')}`}>
-                            {invitation.role}
-                          </span>
-                        </td>
-                        <td>
-                          {invitation.createdAt ? new Date(invitation.createdAt).toLocaleDateString() : 'N/A'}
-                        </td>
-                        <td>
-                          {invitation.expiresAt ? new Date(invitation.expiresAt).toLocaleDateString() : 'N/A'}
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => handleCancelInvitation(invitation.id!, invitation.email!)}
-                            className="btn btn-ghost btn-sm text-error"
-                            title="Cancel invitation"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          <>
+            <h2 className="text-xl font-bold mb-4 mt-8">
+              Pending ({pendingInvitations.length})
+            </h2>
+            <div className="card bg-base-100 shadow-xl mb-6">
+              <div className="card-body p-0">
+                <DataTable
+                  data={pendingInvitations}
+                  columns={invitationColumns}
+                  actions={invitationActions}
+                  selectable
+                  selectedItems={selectedInvitations}
+                  onSelectionChange={setSelectedInvitations}
+                  bulkActions={invitationBulkActions}
+                  getItemId={(invitation) => invitation.id!}
+                  variant="default"
+                />
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Active Members */}
+        <h2 className="text-xl font-bold mb-4 mt-8">
+          Active Members ({members.length})
+        </h2>
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body p-0">
-            <div className="overflow-x-auto">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="text-center py-8">
-                        <div className="flex flex-col items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          <p className="opacity-60">No members found</p>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    members.map((member) => (
-                      <tr key={member.id}>
-                        <td>
-                          <div className="flex items-center gap-3">
-                            <div className="avatar placeholder">
-                              <div className="bg-neutral text-neutral-content rounded-full w-10">
-                                <span className="text-sm">
-                                  {member.user?.username?.substring(0, 2).toUpperCase() || '??'}
-                                </span>
-                              </div>
-                            </div>
-                            <div>
-                              <div className="font-medium">{member.user?.username || 'Unknown'}</div>
-                              <div className="text-sm opacity-50">{member.userId}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{member.user?.email || 'N/A'}</td>
-                        <td>
-                          <select
-                            className={`select select-sm select-bordered ${getRoleBadgeClass(member.role || '')}`}
-                            value={member.role || 'MEMBER'}
-                            onChange={(e) => handleUpdateRole(member.userId!, e.target.value as OrganizationMembershipRoleEnum)}
-                            disabled={member.role === 'OWNER'}
-                          >
-                            <option value="MEMBER">Member</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="OWNER">Owner</option>
-                          </select>
-                        </td>
-                        <td>
-                          {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'N/A'}
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => handleRemoveMember(member.userId!, member.user?.username || 'this user')}
-                            className="btn btn-ghost btn-sm text-error"
-                            disabled={member.role === 'OWNER'}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              data={members}
+              columns={memberColumns}
+              actions={memberActions}
+              emptyMessage="No members found"
+              emptyIcon={
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              }
+              selectable
+              selectedItems={selectedMembers}
+              onSelectionChange={setSelectedMembers}
+              bulkActions={memberBulkActions}
+              getItemId={(member) => member.id!}
+              variant="default"
+            />
           </div>
         </div>
       </main>

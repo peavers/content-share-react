@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { Tag } from '../../generated';
 
 interface TagInputProps {
@@ -20,7 +21,21 @@ const TagInput: React.FC<TagInputProps> = ({
   const [filteredSuggestions, setFilteredSuggestions] = useState<Tag[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const tagInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Update dropdown position when shown
+  useEffect(() => {
+    if (showSuggestions && tagInputRef.current) {
+      const rect = tagInputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width
+      });
+    }
+  }, [showSuggestions]);
 
   useEffect(() => {
     // Reset selected index when suggestions change
@@ -34,7 +49,11 @@ const TagInput: React.FC<TagInputProps> = ({
     }
 
     const input = tagInput.toLowerCase();
-    const parts = input.split('/').filter(p => p);
+    const endsWithSlash = input.endsWith('/');
+
+    // Split but don't filter empty parts yet - we need to know if there's a trailing slash
+    const allParts = input.split('/');
+    const parts = allParts.filter(p => p); // Filtered parts for path building
 
     // Build a combined list of existing tags + locally selected tags
     const localTags = selectedTags.map(path => {
@@ -65,17 +84,37 @@ const TagInput: React.FC<TagInputProps> = ({
       setFilteredSuggestions(suggestions);
       setShowSuggestions(suggestions.length > 0);
     } else {
-      // Build the parent path
-      const currentDepth = parts.length - 1;
-      const parentPath = currentDepth === 0 ? null : '/' + parts.slice(0, currentDepth).join('/');
-      const searchTerm = parts[parts.length - 1];
+      // If input ends with '/', we want to show children of the complete path typed so far
+      let parentPath: string | null;
+      let searchTerm: string;
+
+      if (endsWithSlash) {
+        // User typed "/gaming/" - show all children of /gaming
+        parentPath = '/' + parts.join('/');
+        searchTerm = '';
+      } else {
+        // User typed "/gaming/fps" - show children of /gaming that match "fps"
+        const currentDepth = parts.length - 1;
+        parentPath = currentDepth === 0 ? null : '/' + parts.slice(0, currentDepth).join('/');
+        searchTerm = parts[parts.length - 1];
+      }
+
+      console.log('[TagInput] Search:', { input, parentPath, searchTerm, endsWithSlash });
 
       // Filter tags at the appropriate level
       const suggestions = combinedTags.filter(t => {
         if (t.parentPath !== parentPath) return false;
         if (!t.name) return false;
+
+        // If no search term (trailing slash), show all children
+        if (searchTerm === '') {
+          return true;
+        }
+
         return t.name.toLowerCase().includes(searchTerm);
       });
+
+      console.log('[TagInput] Found suggestions:', suggestions.map(s => s.path));
 
       setFilteredSuggestions(suggestions);
       setShowSuggestions(suggestions.length > 0);
@@ -110,13 +149,17 @@ const TagInput: React.FC<TagInputProps> = ({
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (filteredSuggestions.length > 0) {
+        setShowSuggestions(true);
         setSelectedIndex((prev) =>
           prev < filteredSuggestions.length - 1 ? prev + 1 : prev
         );
       }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+      if (filteredSuggestions.length > 0) {
+        setShowSuggestions(true);
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+      }
     } else if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
 
@@ -142,8 +185,70 @@ const TagInput: React.FC<TagInputProps> = ({
     }
   };
 
+  // Render dropdown using portal
+  const renderDropdown = () => {
+    if (!showSuggestions || filteredSuggestions.length === 0) return null;
+
+    return createPortal(
+      <>
+        {/* Invisible backdrop to close dropdown */}
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 9998
+          }}
+          onClick={() => setShowSuggestions(false)}
+        />
+        {/* Dropdown menu */}
+        <div
+          style={{
+            position: 'fixed',
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+            zIndex: 9999
+          }}
+          className="mt-1 shadow-2xl"
+        >
+          <ul className="menu bg-base-100 rounded-box border border-base-300 max-h-80 overflow-y-auto p-2">
+            {filteredSuggestions.map((tag, index) => (
+              <li key={tag.id || tag.path}>
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectTag(tag);
+                  }}
+                  className={`flex items-start justify-between gap-3 ${index === selectedIndex ? 'active' : ''}`}
+                >
+                  <div className="flex flex-col items-start flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                      <span className="font-medium truncate">{tag.path}</span>
+                    </div>
+                    {tag.description && (
+                      <span className="text-xs opacity-60 ml-6 truncate w-full">{tag.description}</span>
+                    )}
+                  </div>
+                  <kbd className="kbd kbd-sm">↵</kbd>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </>,
+      document.body
+    );
+  };
+
   return (
-    <div className={className}>
+    <div ref={containerRef} className={className}>
       {/* Selected Tags */}
       {selectedTags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
@@ -177,34 +282,16 @@ const TagInput: React.FC<TagInputProps> = ({
           onFocus={() => tagInput && setShowSuggestions(filteredSuggestions.length > 0)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         />
-
-        {/* Suggestions Dropdown */}
-        {showSuggestions && filteredSuggestions.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            {filteredSuggestions.map((tag, index) => (
-              <button
-                key={tag.id || tag.path}
-                type="button"
-                onClick={() => selectTag(tag)}
-                className={`w-full text-left px-4 py-2 flex items-center justify-between ${
-                  index === selectedIndex ? 'bg-base-200' : 'hover:bg-base-200'
-                }`}
-              >
-                <span className="font-medium">{tag.path}</span>
-                {tag.description && (
-                  <span className="text-xs opacity-60 ml-2">{tag.description}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       <label className="label">
-        <span className="label-text-alt opacity-70">
-          Start typing to search existing tags or create new ones. Press Enter to add.
+        <span className="label-text-alt opacity-70 text-wrap break-words">
+          Type "/" to browse tags. Add "/" at the end to show children (e.g., /gaming/). Press Enter to select.
         </span>
       </label>
+
+      {/* Render dropdown via portal */}
+      {renderDropdown()}
     </div>
   );
 };

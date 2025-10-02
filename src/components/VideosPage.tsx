@@ -132,10 +132,11 @@ const VideosPage: React.FC = () => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                  className={`h-4 w-4 ${isExpanded ? 'rotate-90' : ''}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -195,7 +196,7 @@ const VideosPage: React.FC = () => {
 
       <div className="flex">
         {/* Persistent Sidebar */}
-        <aside className="w-64 flex-shrink-0 h-screen sticky top-0 overflow-y-auto p-4">
+        <aside className="w-64 flex-shrink-0 h-screen sticky top-0 overflow-y-auto p-4" style={{ willChange: 'scroll-position' }}>
           <h3 className="font-semibold mb-4">Filter by Tags</h3>
           {tagsLoading ? (
             <div className="flex items-center gap-2">
@@ -256,6 +257,8 @@ const VideosPage: React.FC = () => {
                                 src={thumbnailUrl}
                                 alt={video.title || video.originalFilename}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div className="absolute inset-0 flex items-center justify-center">
@@ -317,6 +320,8 @@ const VideosPage: React.FC = () => {
                                 src={thumbnailUrl}
                                 alt={video.title || video.originalFilename}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div className="absolute inset-0 flex items-center justify-center">

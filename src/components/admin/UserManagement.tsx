@@ -3,6 +3,7 @@ import { useOrganization } from '../../contexts';
 import { userManagementService } from '../../services/userManagementService';
 import type { CognitoUserDto } from '../../generated';
 import Navigation from '../shared/Navigation';
+import { DataTable, type TableColumn, type TableAction } from '../shared/DataTable';
 
 const UserManagement: React.FC = () => {
   const { currentWorkspace } = useOrganization();
@@ -11,6 +12,7 @@ const UserManagement: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [paginationToken, setPaginationToken] = useState<string | undefined>();
   const [availableGroups, setAvailableGroups] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
   // Modal states
   const [selectedUser, setSelectedUser] = useState<CognitoUserDto | null>(null);
@@ -50,17 +52,34 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (username: string) => {
-    if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+  const handleDeleteUser = async (user: CognitoUserDto) => {
+    if (!confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      await userManagementService.deleteUser(username);
+      await userManagementService.deleteUser(user.username);
       await fetchUsers();
     } catch (err: any) {
       console.error('Error deleting user:', err);
       setError(err.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
+  const handleBulkDelete = async (usernames: Set<string>) => {
+    if (!confirm(`Are you sure you want to delete ${usernames.size} user(s)? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      for (const username of usernames) {
+        await userManagementService.deleteUser(username);
+      }
+      setSelectedUsers(new Set());
+      await fetchUsers();
+    } catch (err: any) {
+      console.error('Error deleting users:', err);
+      setError(err.response?.data?.message || 'Failed to delete users');
     }
   };
 
@@ -196,6 +215,107 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  // Define table columns
+  const columns: TableColumn<CognitoUserDto>[] = [
+    {
+      key: 'username',
+      header: 'Username',
+      render: (user) => <span className="font-medium">{user.username}</span>,
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      render: (user) => (
+        <div className="flex items-center gap-2">
+          {user.email}
+          {user.emailVerified && (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (user) => (
+        <div className="flex gap-2">
+          <span className={`badge ${getStatusBadgeClass(user.status)}`}>
+            {user.status}
+          </span>
+          {!user.enabled && (
+            <span className="badge badge-error">Disabled</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'groups',
+      header: 'Groups',
+      render: (user) => (
+        <div className="flex gap-1 flex-wrap">
+          {user.groups.length > 0 ? (
+            user.groups.map(group => (
+              <span key={group} className="badge badge-primary badge-sm">
+                {group}
+              </span>
+            ))
+          ) : (
+            <span className="text-xs opacity-60">No groups</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'created',
+      header: 'Created',
+      render: (user) => (
+        <span className="text-sm opacity-60">
+          {new Date(user.createdDate).toLocaleDateString()}
+        </span>
+      ),
+    },
+  ];
+
+  // Define table actions
+  const actions: TableAction<CognitoUserDto>[] = [
+    {
+      label: 'Edit',
+      onClick: handleOpenEditModal,
+      variant: 'ghost',
+    },
+    {
+      label: 'Groups',
+      onClick: handleOpenGroupModal,
+      variant: 'ghost',
+    },
+    {
+      label: (user) => user.enabled ? 'Disable' : 'Enable',
+      onClick: handleToggleEnabled,
+      variant: 'ghost',
+    },
+    {
+      label: 'Delete',
+      onClick: handleDeleteUser,
+      variant: 'error',
+    },
+  ];
+
+  // Define bulk actions
+  const bulkActions = [
+    {
+      label: `Delete Selected (${selectedUsers.size})`,
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      onClick: handleBulkDelete,
+      variant: 'error' as const,
+    },
+  ];
+
   if (!currentWorkspace) {
     return (
       <div className="min-h-screen bg-base-200">
@@ -249,129 +369,33 @@ const UserManagement: React.FC = () => {
 
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <span className="loading loading-spinner loading-lg"></span>
-                <p className="ml-3">Loading users...</p>
-              </div>
-            ) : users.length === 0 ? (
-              <div className="text-center py-12 opacity-60">
-                <p>No users found.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="table table-zebra">
-                  <thead>
-                    <tr>
-                      <th>Username</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th>Groups</th>
-                      <th>Created</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map(user => (
-                      <tr key={user.username} className="hover">
-                        <td className="font-medium">{user.username}</td>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            {user.email}
-                            {user.emailVerified && (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex gap-2">
-                            <span className={`badge ${getStatusBadgeClass(user.status)}`}>
-                              {user.status}
-                            </span>
-                            {!user.enabled && (
-                              <span className="badge badge-error">Disabled</span>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex gap-1 flex-wrap">
-                            {user.groups.length > 0 ? (
-                              user.groups.map(group => (
-                                <span key={group} className="badge badge-primary badge-sm">
-                                  {group}
-                                </span>
-                              ))
-                            ) : (
-                              <span className="text-xs opacity-60">No groups</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="text-sm opacity-60">
-                          {new Date(user.createdDate).toLocaleDateString()}
-                        </td>
-                        <td>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleOpenEditModal(user)}
-                              className="btn btn-ghost btn-xs"
-                              title="Edit user"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleOpenGroupModal(user)}
-                              className="btn btn-ghost btn-xs"
-                              title="Manage groups"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleToggleEnabled(user)}
-                              className={`btn btn-ghost btn-xs ${!user.enabled ? 'text-success' : 'text-warning'}`}
-                              title={user.enabled ? 'Disable user' : 'Enable user'}
-                            >
-                              {user.enabled ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                </svg>
-                              ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                              )}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(user.username)}
-                              className="btn btn-ghost btn-xs text-error"
-                              title="Delete user"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <DataTable
+              data={users}
+              columns={columns}
+              actions={actions}
+              loading={loading}
+              emptyMessage="No users found."
+              emptyIcon={
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              }
+              selectable
+              selectedItems={selectedUsers}
+              onSelectionChange={setSelectedUsers}
+              bulkActions={bulkActions}
+              getItemId={(user) => user.username}
+              variant="zebra"
+            />
 
-                {paginationToken && (
-                  <div className="flex justify-center mt-4">
-                    <button
-                      onClick={() => fetchUsers(paginationToken)}
-                      className="btn btn-outline btn-sm"
-                    >
-                      Load More
-                    </button>
-                  </div>
-                )}
+            {paginationToken && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() => fetchUsers(paginationToken)}
+                  className="btn btn-outline btn-sm"
+                >
+                  Load More
+                </button>
               </div>
             )}
           </div>

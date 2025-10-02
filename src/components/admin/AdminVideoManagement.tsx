@@ -7,6 +7,7 @@ import Navigation from '../shared/Navigation';
 import UploadVideoModal from '../upload/UploadVideoModal';
 import type { Video } from '../../types';
 import type { Tag } from '../../generated';
+import { DataTable, type TableColumn, type TableAction } from '../shared/DataTable';
 
 const AdminVideoManagement: React.FC = () => {
   const { currentWorkspace } = useOrganization();
@@ -66,17 +67,13 @@ const AdminVideoManagement: React.FC = () => {
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedVideos.size === 0) {
-      return;
-    }
-
-    if (!confirm(`Are you sure you want to delete ${selectedVideos.size} video(s)? This action cannot be undone.`)) {
+  const handleBulkDelete = async (videoIds: Set<number>) => {
+    if (!confirm(`Are you sure you want to delete ${videoIds.size} video(s)? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      for (const videoId of selectedVideos) {
+      for (const videoId of videoIds) {
         await videoService.deleteVideo(videoId);
       }
       setSelectedVideos(new Set());
@@ -84,24 +81,6 @@ const AdminVideoManagement: React.FC = () => {
     } catch (err: any) {
       console.error('Error deleting videos:', err);
       setError(err.message || 'Failed to delete videos');
-    }
-  };
-
-  const toggleVideoSelection = (videoId: number) => {
-    const newSelection = new Set(selectedVideos);
-    if (newSelection.has(videoId)) {
-      newSelection.delete(videoId);
-    } else {
-      newSelection.add(videoId);
-    }
-    setSelectedVideos(newSelection);
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedVideos.size === videos.length) {
-      setSelectedVideos(new Set());
-    } else {
-      setSelectedVideos(new Set(videos.map(v => v.id!)));
     }
   };
 
@@ -116,6 +95,93 @@ const AdminVideoManagement: React.FC = () => {
     if (!date) return 'Unknown';
     return new Date(date).toLocaleString();
   };
+
+  // Define table columns
+  const columns: TableColumn<Video>[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      render: (video) => (
+        <Link to={`/video/${video.id}`} className="link link-hover font-medium">
+          {video.title || video.originalFilename}
+        </Link>
+      ),
+    },
+    {
+      key: 'filename',
+      header: 'Filename',
+      render: (video) => <span className="text-sm opacity-60">{video.originalFilename}</span>,
+    },
+    {
+      key: 'tags',
+      header: 'Tags',
+      render: (video) => (
+        <div className="flex flex-wrap gap-1">
+          {videoTagsMap.get(video.id!)?.map(tag => (
+            <div key={tag.id} className="badge badge-sm badge-ghost">
+              {tag.name}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      key: 'size',
+      header: 'Size',
+      render: (video) => <span className="text-sm">{formatFileSize(video.fileSize)}</span>,
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (video) => (
+        <div className={`badge badge-sm ${
+          video.uploadStatus === 'COMPLETED' ? 'badge-success' :
+          video.uploadStatus === 'FAILED' ? 'badge-error' :
+          'badge-warning'
+        }`}>
+          {video.uploadStatus}
+        </div>
+      ),
+    },
+    {
+      key: 'uploaded',
+      header: 'Uploaded',
+      render: (video) => <span className="text-sm opacity-60">{formatDate(video.createdAt)}</span>,
+    },
+  ];
+
+  // Define table actions
+  const actions: TableAction<Video>[] = [
+    {
+      label: 'View',
+      onClick: (video) => window.location.href = `/video/${video.id}`,
+      variant: 'ghost',
+    },
+    {
+      label: 'Edit',
+      onClick: setEditingVideo,
+      variant: 'ghost',
+    },
+    {
+      label: 'Delete',
+      onClick: (video) => handleDeleteVideo(video.id!),
+      variant: 'error',
+    },
+  ];
+
+  // Define bulk actions
+  const bulkActions = [
+    {
+      label: `Delete Selected (${selectedVideos.size})`,
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ),
+      onClick: handleBulkDelete,
+      variant: 'error' as const,
+    },
+  ];
 
   if (!currentWorkspace) {
     return (
@@ -145,25 +211,12 @@ const AdminVideoManagement: React.FC = () => {
               Manage videos for {currentWorkspace.organization.name}
             </p>
           </div>
-          <div className="flex gap-2">
-            {selectedVideos.size > 0 && (
-              <button
-                onClick={handleBulkDelete}
-                className="btn btn-error gap-2"
-              >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              Delete Selected ({selectedVideos.size})
-              </button>
-            )}
-            <button onClick={() => setShowUploadModal(true)} className="btn btn-primary gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              Upload Video
-            </button>
-          </div>
+          <button onClick={() => setShowUploadModal(true)} className="btn btn-primary gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Upload Video
+          </button>
         </div>
 
         {error && (
@@ -180,99 +233,24 @@ const AdminVideoManagement: React.FC = () => {
 
         <div className="card bg-base-100 shadow-xl">
           <div className="card-body p-0">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <span className="loading loading-spinner loading-lg"></span>
-                <p className="ml-3">Loading videos...</p>
-              </div>
-            ) : videos.length === 0 ? (
-              <div className="text-center py-12 opacity-60">
-                <p>No videos found in this organization.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="table table-zebra">
-                  <thead>
-                    <tr>
-                      <th>
-                        <input
-                          type="checkbox"
-                          className="checkbox checkbox-sm"
-                          checked={videos.length > 0 && selectedVideos.size === videos.length}
-                          onChange={toggleSelectAll}
-                        />
-                      </th>
-                      <th>Title</th>
-                      <th>Filename</th>
-                      <th>Tags</th>
-                      <th>Size</th>
-                      <th>Status</th>
-                      <th>Uploaded</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {videos.map((video) => (
-                      <tr key={video.id}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            className="checkbox checkbox-sm"
-                            checked={selectedVideos.has(video.id!)}
-                            onChange={() => toggleVideoSelection(video.id!)}
-                          />
-                        </td>
-                        <td>
-                          <Link to={`/video/${video.id}`} className="link link-hover font-medium">
-                            {video.title || video.originalFilename}
-                          </Link>
-                        </td>
-                        <td className="text-sm opacity-60">{video.originalFilename}</td>
-                        <td>
-                          <div className="flex flex-wrap gap-1">
-                            {videoTagsMap.get(video.id!)?.map(tag => (
-                              <div key={tag.id} className="badge badge-sm badge-ghost">
-                                {tag.name}
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="text-sm">{formatFileSize(video.fileSize)}</td>
-                        <td>
-                          <div className={`badge badge-sm ${
-                            video.uploadStatus === 'COMPLETED' ? 'badge-success' :
-                            video.uploadStatus === 'FAILED' ? 'badge-error' :
-                            'badge-warning'
-                          }`}>
-                            {video.uploadStatus}
-                          </div>
-                        </td>
-                        <td className="text-sm opacity-60">{formatDate(video.createdAt)}</td>
-                        <td>
-                          <div className="flex gap-2">
-                            <Link to={`/video/${video.id}`} className="btn btn-ghost btn-xs">
-                              View
-                            </Link>
-                            <button
-                              onClick={() => setEditingVideo(video)}
-                              className="btn btn-ghost btn-xs"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteVideo(video.id!)}
-                              className="btn btn-ghost btn-xs text-error"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <DataTable
+              data={videos}
+              columns={columns}
+              actions={actions}
+              loading={loading}
+              emptyMessage="No videos found in this organization."
+              emptyIcon={
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
+              }
+              selectable
+              selectedItems={selectedVideos}
+              onSelectionChange={setSelectedVideos}
+              bulkActions={bulkActions}
+              getItemId={(video) => video.id!}
+              variant="zebra"
+            />
           </div>
         </div>
       </main>
