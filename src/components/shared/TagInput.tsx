@@ -68,7 +68,7 @@ const TagInput: React.FC<TagInputProps> = ({
         name,
         depth,
         parentPath
-      } as Tag;
+      } as unknown as Tag;
     });
 
     // Combine and deduplicate (prefer existing tags)

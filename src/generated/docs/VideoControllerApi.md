@@ -28,7 +28,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.deleteVideo(
     videoId
@@ -39,7 +39,7 @@ const { status, data } = await apiInstance.deleteVideo(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -164,7 +164,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.getVideo(
     videoId
@@ -175,7 +175,7 @@ const { status, data } = await apiInstance.getVideo(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -214,7 +214,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.getVideoPresignedUrl(
     videoId
@@ -225,7 +225,7 @@ const { status, data } = await apiInstance.getVideoPresignedUrl(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -265,7 +265,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.getVideoThumbnailUrl(
     videoId
@@ -276,7 +276,7 @@ const { status, data } = await apiInstance.getVideoThumbnailUrl(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -316,7 +316,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.getVideoWithMetadata(
     videoId
@@ -327,7 +327,7 @@ const { status, data } = await apiInstance.getVideoWithMetadata(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -368,7 +368,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new VideoControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 let updateVideoRequest: UpdateVideoRequest; //
 
 const { status, data } = await apiInstance.updateVideo(
@@ -382,7 +382,7 @@ const { status, data } = await apiInstance.updateVideo(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **updateVideoRequest** | **UpdateVideoRequest**|  | |
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type

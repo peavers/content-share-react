@@ -5,7 +5,7 @@ import { videoService } from '../../services/videoService';
 import { tagService } from '../../services/tagService';
 import TagInput from '../shared/TagInput';
 import type { Tag } from '../../generated';
-import type { Video } from '../../types';
+import type { Video } from '../../generated';
 import type { UploadProgress } from '../../types';
 
 interface UploadVideoModalProps {
@@ -157,7 +157,8 @@ const UploadVideoModal: React.FC<UploadVideoModalProps> = ({ isOpen, onClose, on
       onClose();
     } catch (err: any) {
       console.error(isEditMode ? 'Update error:' : 'Upload error:', err);
-      setError(err.message || (isEditMode ? 'Update failed' : 'Upload failed'));
+      const errorMessage = err.response?.data?.message || err.response?.data || err.message || (isEditMode ? 'Update failed' : 'Upload failed');
+      setError(errorMessage);
       setUploadProgress(null);
     } finally {
       setUploading(false);

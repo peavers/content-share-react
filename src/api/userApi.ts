@@ -1,5 +1,4 @@
-import type { UserResponse } from '../generated/models/user-response';
-import type { UpdateUserProfileRequest } from '../generated/models/update-user-profile-request';
+import type { UserResponse, UpdateUserProfileRequest } from '../generated';
 import { userApi } from '../services/generatedApiService';
 
 export const getUserProfile = async (): Promise<UserResponse> => {

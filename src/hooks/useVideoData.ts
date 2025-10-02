@@ -28,13 +28,11 @@ export const useVideoData = (videoId: string | undefined): UseVideoDataReturn =>
       setLoading(true);
       setError(null);
 
-      const videoIdNum = parseInt(videoId);
-
       // Fetch all data in parallel
       const [data, url, tags] = await Promise.all([
-        videoService.getVideoWithMetadata(videoIdNum),
-        videoService.getVideoPresignedUrl(videoIdNum),
-        tagService.getVideoTags(videoIdNum).catch(() => [])
+        videoService.getVideoWithMetadata(videoId),
+        videoService.getVideoPresignedUrl(videoId),
+        tagService.getVideoTags(videoId).catch(() => [])
       ]);
 
       setVideoData(data);
@@ -44,7 +42,7 @@ export const useVideoData = (videoId: string | undefined): UseVideoDataReturn =>
       // Fetch thumbnail if available
       if (data.video?.thumbnailS3Path) {
         try {
-          const thumb = await videoService.getThumbnailUrl(videoIdNum);
+          const thumb = await videoService.getThumbnailUrl(videoId);
           setThumbnailUrl(thumb);
         } catch (err) {
           console.error('Error fetching thumbnail:', err);

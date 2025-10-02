@@ -7,7 +7,7 @@ import type { UserResponse } from '../generated';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 const UserProfilePage: React.FC = () => {
-  const { user, logout, userScopes } = useAuth();
+  const { logout, userScopes } = useAuth();
   const [profile, setProfile] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -146,7 +146,11 @@ const UserProfilePage: React.FC = () => {
             <div className="sticky top-8">
               {/* Large Avatar */}
               <div className="mb-6">
-                <Avatar name={profile.username || 'User'} size="2xl" />
+                <Avatar
+                  name={profile.firstName && profile.lastName ? `${profile.firstName} ${profile.lastName}` : profile.username || 'User'}
+                  avatarUrl={profile.avatarUrl}
+                  size="2xl"
+                />
               </div>
 
               {/* User Info */}

@@ -235,7 +235,7 @@ function OrganizationOption({ organization, isSelected, onClick }: OrganizationO
         </div>
         {!isPersonal && (
           <p className="text-xs text-gray-500 mt-0.5">
-            {organization.memberCount || 0} member{(organization.memberCount || 0) !== 1 ? 's' : ''}
+            {/* Members count not available */}
           </p>
         )}
       </div>

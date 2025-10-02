@@ -5,7 +5,7 @@ import { videoService } from '../../services/videoService';
 import { tagService } from '../../services/tagService';
 import Navigation from '../shared/Navigation';
 import UploadVideoModal from '../upload/UploadVideoModal';
-import type { Video } from '../../types';
+import type { Video } from '../../generated';
 import type { Tag } from '../../generated';
 import { DataTable, type TableColumn, type TableAction } from '../shared/DataTable';
 
@@ -14,8 +14,8 @@ const AdminVideoManagement: React.FC = () => {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
-  const [selectedVideos, setSelectedVideos] = useState<Set<number>>(new Set());
+  const [videoTagsMap, setVideoTagsMap] = useState<Map<string, Tag[]>>(new Map());
+  const [selectedVideos, setSelectedVideos] = useState<Set<string>>(new Set());
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
 
@@ -33,7 +33,7 @@ const AdminVideoManagement: React.FC = () => {
       setVideos(fetchedVideos);
 
       // Fetch tags for each video
-      const tagsMap = new Map<number, Tag[]>();
+      const tagsMap = new Map<string, Tag[]>();
       for (const video of fetchedVideos) {
         if (video.id) {
           try {
@@ -53,7 +53,7 @@ const AdminVideoManagement: React.FC = () => {
     }
   };
 
-  const handleDeleteVideo = async (videoId: number) => {
+  const handleDeleteVideo = async (videoId: string) => {
     if (!confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
       return;
     }
@@ -67,7 +67,7 @@ const AdminVideoManagement: React.FC = () => {
     }
   };
 
-  const handleBulkDelete = async (videoIds: Set<number>) => {
+  const handleBulkDelete = async (videoIds: Set<string>) => {
     if (!confirm(`Are you sure you want to delete ${videoIds.size} video(s)? This action cannot be undone.`)) {
       return;
     }

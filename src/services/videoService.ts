@@ -1,6 +1,5 @@
 import { generatedApiService } from './generatedApiService';
-import type { Video } from '../types';
-import type { VideoWithMetadataDTO } from '../generated';
+import type { Video, VideoWithMetadataDTO } from '../generated';
 
 export class VideoService {
   /**
@@ -14,7 +13,7 @@ export class VideoService {
   /**
    * Get a specific video by ID
    */
-  async getVideo(videoId: number): Promise<Video> {
+  async getVideo(videoId: string): Promise<Video> {
     const response = await generatedApiService.video.getVideo(videoId);
     return response.data as Video;
   }
@@ -22,7 +21,7 @@ export class VideoService {
   /**
    * Get a specific video with its metadata by ID
    */
-  async getVideoWithMetadata(videoId: number): Promise<VideoWithMetadataDTO> {
+  async getVideoWithMetadata(videoId: string): Promise<VideoWithMetadataDTO> {
     const response = await generatedApiService.video.getVideoWithMetadata(videoId);
     return response.data;
   }
@@ -30,7 +29,7 @@ export class VideoService {
   /**
    * Get presigned URL for video playback
    */
-  async getVideoPresignedUrl(videoId: number): Promise<string> {
+  async getVideoPresignedUrl(videoId: string): Promise<string> {
     const response = await generatedApiService.video.getVideoPresignedUrl(videoId);
     return response.data;
   }
@@ -46,7 +45,7 @@ export class VideoService {
   /**
    * Get presigned URL for video thumbnail
    */
-  async getThumbnailUrl(videoId: number): Promise<string> {
+  async getThumbnailUrl(videoId: string): Promise<string> {
     const response = await generatedApiService.video.getVideoThumbnailUrl(videoId);
     return response.data;
   }
@@ -54,15 +53,19 @@ export class VideoService {
   /**
    * Update a video's metadata (title, description)
    */
-  async updateVideo(videoId: number, updates: { title?: string; description?: string }): Promise<Video> {
-    const response = await generatedApiService.video.updateVideo(videoId, updates);
+  async updateVideo(videoId: string, updates: { title?: string; description?: string }): Promise<Video> {
+    const updateRequest = {
+      title: updates.title || '',
+      description: updates.description || ''
+    };
+    const response = await generatedApiService.video.updateVideo(videoId, updateRequest);
     return response.data as Video;
   }
 
   /**
    * Delete a video
    */
-  async deleteVideo(videoId: number): Promise<void> {
+  async deleteVideo(videoId: string): Promise<void> {
     await generatedApiService.video.deleteVideo(videoId);
   }
 }

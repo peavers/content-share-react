@@ -1,27 +1,15 @@
 import axios, { type AxiosProgressEvent } from 'axios';
 import type {
-  CompletedPart,
   UploadProgress
 } from '../types';
-import type { UploadRequest, UploadResult, UploadCompletionRequest } from '../generated';
+import type { UploadRequest, UploadResult, UploadCompletionRequest, PartInfo } from '../generated';
 import { generatedApiService } from './generatedApiService';
 
 export class UploadService {
   private activeUploads = new Map<string, AbortController>();
 
   async initiateUpload(request: UploadRequest): Promise<UploadResult> {
-    // Convert to generated API request format
-    const uploadRequest: UploadRequest = {
-      fileName: request.fileName,
-      fileSize: request.fileSize,
-      contentType: request.contentType,
-      metadata: request.metadata || {},
-      title: request.title || '',
-      description: request.description || '',
-      tags: request.tags || undefined
-    };
-
-    const response = await generatedApiService.s3.initiateUpload(uploadRequest);
+    const response = await generatedApiService.s3.initiateUpload(request);
     return response.data;
   }
 
@@ -55,7 +43,7 @@ export class UploadService {
 
   async completeUpload(
     uploadId: string,
-    completedParts: CompletedPart[]
+    completedParts: PartInfo[]
   ): Promise<void> {
     // Convert to generated API request format
     const request: UploadCompletionRequest = {
@@ -123,15 +111,34 @@ export class UploadService {
     try {
       updateProgress('preparing');
 
+      // Determine content type - fallback to extension-based detection if file.type is empty
+      let contentType = file.type;
+      if (!contentType || contentType === '') {
+        const extension = file.name.split('.').pop()?.toLowerCase();
+        const mimeTypes: { [key: string]: string } = {
+          'mp4': 'video/mp4',
+          'webm': 'video/webm',
+          'ogg': 'video/ogg',
+          'mov': 'video/quicktime',
+          'avi': 'video/x-msvideo',
+          'mkv': 'video/x-matroska',
+          'flv': 'video/x-flv',
+          'wmv': 'video/x-ms-wmv'
+        };
+        contentType = extension ? (mimeTypes[extension] || 'video/mp4') : 'video/mp4';
+      }
+
       const initiateRequest: UploadRequest = {
         fileName: file.name,
         fileSize: file.size,
-        contentType: file.type,
-        title: metadata.title,
-        description: metadata.description,
-        tags: metadata.tags
+        contentType: contentType,
+        metadata: {},
+        title: metadata.title || '',
+        description: metadata.description || '',
+        tags: metadata.tags || []
       };
 
+      console.log('Upload request:', initiateRequest);
       const uploadResponse = await this.initiateUpload(initiateRequest);
       updateProgress('uploading');
 
@@ -179,7 +186,7 @@ export class UploadService {
     uploadId: string
   ): Promise<void> {
     const chunkSize = uploadResponse.chunkSize || 104857600; // 100MB default
-    const completedParts: CompletedPart[] = [];
+    const completedParts: PartInfo[] = [];
     let uploadedBytes = 0;
 
     for (let i = 0; i < uploadResponse.presignedUrls.length; i++) {

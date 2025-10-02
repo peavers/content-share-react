@@ -1,13 +1,10 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useOrganization } from '../contexts';
 import Navigation from './shared/Navigation';
 import { useVideoData } from '../hooks';
-import type { VideoWithMetadataDTO } from '../generated';
 
 const VideoDetailPage: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
-  const { currentWorkspace } = useOrganization();
   const [refetchingMetadata, setRefetchingMetadata] = useState(false);
 
   const {
@@ -78,7 +75,7 @@ const VideoDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-base-200">
-        <Navigation showUploadButton={true} />
+        <Navigation />
         <div className="flex items-center justify-center h-96">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
@@ -89,7 +86,7 @@ const VideoDetailPage: React.FC = () => {
   if (error || !video) {
     return (
       <div className="min-h-screen bg-base-200">
-        <Navigation showUploadButton={true} />
+        <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="alert alert-error">
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -107,7 +104,7 @@ const VideoDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-base-200">
-      <Navigation showUploadButton={true} />
+      <Navigation />
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <Link to="/" className="btn btn-ghost mb-6">
@@ -223,16 +220,16 @@ const VideoDetailPage: React.FC = () => {
                   Video Stream
                 </h3>
                 <dl className="space-y-3">
-                  {metadata.videoCodec && (
+                  {metadata.codec && (
                     <div>
                       <dt className="text-sm opacity-60">Codec</dt>
-                      <dd className="font-mono text-sm">{metadata.videoCodec}</dd>
+                      <dd className="font-mono text-sm">{metadata.codec}</dd>
                     </div>
                   )}
-                  {metadata.videoBitrate && (
+                  {metadata.bitrate && (
                     <div>
                       <dt className="text-sm opacity-60">Bitrate</dt>
-                      <dd className="font-mono text-sm">{formatBitrate(metadata.videoBitrate)}</dd>
+                      <dd className="font-mono text-sm">{formatBitrate(metadata.bitrate)}</dd>
                     </div>
                   )}
                   {metadata.frameRate && (
@@ -286,10 +283,10 @@ const VideoDetailPage: React.FC = () => {
                         <dd className="font-mono text-sm">{formatBitrate(metadata.audioBitrate)}</dd>
                       </div>
                     )}
-                    {metadata.sampleRate && (
+                    {metadata.audioSampleRate && (
                       <div>
                         <dt className="text-sm opacity-60">Sample Rate</dt>
-                        <dd className="font-mono text-sm">{(metadata.sampleRate / 1000).toFixed(1)} kHz</dd>
+                        <dd className="font-mono text-sm">{(metadata.audioSampleRate / 1000).toFixed(1)} kHz</dd>
                       </div>
                     )}
                     {metadata.audioChannels && (
@@ -323,16 +320,16 @@ const VideoDetailPage: React.FC = () => {
                       <dd className="font-mono text-sm">{metadata.ffmpegVersion}</dd>
                     </div>
                   )}
-                  {metadata.thumbnailPath && (
+                  {metadata.thumbnailWidth && (
                     <div>
                       <dt className="text-sm opacity-60">Thumbnail Generated</dt>
                       <dd className="text-sm">✓ Yes</dd>
                     </div>
                   )}
-                  {metadata.processedAt && (
+                  {metadata.processingCompletedAt && (
                     <div>
                       <dt className="text-sm opacity-60">Processed At</dt>
-                      <dd className="text-sm">{formatDate(metadata.processedAt)}</dd>
+                      <dd className="text-sm">{formatDate(metadata.processingCompletedAt)}</dd>
                     </div>
                   )}
                 </dl>

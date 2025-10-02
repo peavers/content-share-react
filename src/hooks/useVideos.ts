@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { videoService } from '../services/videoService';
 import { tagService } from '../services/tagService';
-import type { Video } from '../types';
-import type { Tag } from '../generated';
+import type { Video, Tag } from '../generated';
 
 interface UseVideosReturn {
   videos: Video[];
-  videoTagsMap: Map<number, Tag[]>;
-  thumbnailUrlsMap: Map<number, string>;
+  videoTagsMap: Map<string, Tag[]>;
+  thumbnailUrlsMap: Map<string, string>;
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -15,8 +14,8 @@ interface UseVideosReturn {
 
 export const useVideos = (organizationId: string | undefined): UseVideosReturn => {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [videoTagsMap, setVideoTagsMap] = useState<Map<number, Tag[]>>(new Map());
-  const [thumbnailUrlsMap, setThumbnailUrlsMap] = useState<Map<number, string>>(new Map());
+  const [videoTagsMap, setVideoTagsMap] = useState<Map<string, Tag[]>>(new Map());
+  const [thumbnailUrlsMap, setThumbnailUrlsMap] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,12 +54,12 @@ export const useVideos = (organizationId: string | undefined): UseVideosReturn =
       ]);
 
       // Build maps
-      const tagsMap = new Map<number, Tag[]>();
+      const tagsMap = new Map<string, Tag[]>();
       videoIds.forEach((id, index) => {
         tagsMap.set(id, tagsResults[index]);
       });
 
-      const thumbnailsMap = new Map<number, string>();
+      const thumbnailsMap = new Map<string, string>();
       let thumbnailIndex = 0;
       fetchedVideos.forEach(video => {
         if (video.id && video.thumbnailS3Path && thumbnailResults[thumbnailIndex]) {

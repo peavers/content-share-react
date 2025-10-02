@@ -2,35 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { CreateOrganizationModal } from './CreateOrganizationModal';
 import { InviteMemberModal } from './InviteMemberModal';
-
-interface OrganizationMember {
-  id: string;
-  userId: string;
-  username: string;
-  email: string;
-  role: 'owner' | 'admin' | 'member';
-  joinedAt: string;
-  status: 'active' | 'pending' | 'suspended';
-}
-
-interface OrganizationInvitation {
-  id: string;
-  email: string;
-  role: 'admin' | 'member';
-  invitedBy: string;
-  status: 'pending' | 'accepted' | 'declined' | 'expired';
-  createdAt: string;
-  expiresAt: string;
-}
+import type { OrganizationMembership, OrganizationInvitation } from '../../generated';
+import { OrganizationInvitationStatusEnum, OrganizationMembershipRoleEnum, OrganizationMembershipStatusEnum } from '../../generated';
 
 export const OrganizationPage: React.FC = () => {
-  const { currentWorkspace, organizations, createOrganization, inviteMember } = useOrganization();
+  const { currentWorkspace, createOrganization, inviteMember } = useOrganization();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'members' | 'invitations' | 'settings'>('overview');
-  const [members, setMembers] = useState<OrganizationMember[]>([]);
+  const [members, setMembers] = useState<OrganizationMembership[]>([]);
   const [invitations, setInvitations] = useState<OrganizationInvitation[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (currentWorkspace && currentWorkspace.type === 'organization') {
@@ -39,52 +20,13 @@ export const OrganizationPage: React.FC = () => {
   }, [currentWorkspace]);
 
   const loadOrganizationData = async () => {
-    setLoading(true);
     try {
-      // Mock data for now - replace with actual API calls
-      setMembers([
-        {
-          id: '1',
-          userId: 'user1',
-          username: 'john.doe',
-          email: 'john@company.com',
-          role: 'owner',
-          joinedAt: '2024-01-15T10:00:00Z',
-          status: 'active'
-        },
-        {
-          id: '2',
-          userId: 'user2',
-          username: 'alice.smith',
-          email: 'alice@company.com',
-          role: 'admin',
-          joinedAt: '2024-02-01T14:30:00Z',
-          status: 'active'
-        },
-        {
-          id: '3',
-          userId: 'user3',
-          username: 'bob.wilson',
-          email: 'bob@company.com',
-          role: 'member',
-          joinedAt: '2024-02-15T09:15:00Z',
-          status: 'active'
-        }
-      ]);
-
-      setInvitations([
-        {
-          id: '1',
-          email: 'sarah@company.com',
-          role: 'member',
-          invitedBy: 'john.doe',
-          status: 'pending',
-          createdAt: '2024-03-01T10:00:00Z',
-          expiresAt: '2024-03-08T10:00:00Z'
-        }
-      ]);
-    } finally {
-      setLoading(false);
+      // TODO: Replace with actual API calls
+      // For now, just clear the mock data
+      setMembers([]);
+      setInvitations([]);
+    } catch (error) {
+      console.error('Error loading organization data:', error);
     }
   };
 
@@ -112,28 +54,29 @@ export const OrganizationPage: React.FC = () => {
     }
   };
 
-  const getRoleColor = (role: string) => {
+  const getRoleColor = (role: OrganizationMembershipRoleEnum) => {
     switch (role) {
-      case 'owner':
+      case OrganizationMembershipRoleEnum.Owner:
         return 'bg-purple-100 text-purple-800';
-      case 'admin':
+      case OrganizationMembershipRoleEnum.Admin:
         return 'bg-blue-100 text-blue-800';
-      case 'member':
+      case OrganizationMembershipRoleEnum.Member:
         return 'bg-green-100 text-green-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: OrganizationMembershipStatusEnum | OrganizationInvitationStatusEnum) => {
     switch (status) {
-      case 'active':
+      case OrganizationMembershipStatusEnum.Active:
         return 'bg-green-100 text-green-800';
-      case 'pending':
+      case OrganizationMembershipStatusEnum.Pending:
+      case OrganizationInvitationStatusEnum.Pending:
         return 'bg-yellow-100 text-yellow-800';
-      case 'suspended':
+      case OrganizationMembershipStatusEnum.Suspended:
         return 'bg-red-100 text-red-800';
-      case 'expired':
+      case OrganizationInvitationStatusEnum.Expired:
         return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -168,7 +111,7 @@ export const OrganizationPage: React.FC = () => {
     );
   }
 
-  if (currentWorkspace.organizationType === 'personal') {
+  if (currentWorkspace.type === 'personal') {
     return (
       <div className="p-6 max-w-7xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
@@ -194,8 +137,8 @@ export const OrganizationPage: React.FC = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{currentWorkspace.name}</h1>
-            <p className="mt-2 text-gray-600">{currentWorkspace.description || 'Manage your organization settings and members'}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{currentWorkspace.organization.name}</h1>
+            <p className="mt-2 text-gray-600">{currentWorkspace.organization.description || 'Manage your organization settings and members'}</p>
           </div>
           <div className="flex space-x-3">
             <button
@@ -231,7 +174,7 @@ export const OrganizationPage: React.FC = () => {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as 'overview' | 'members' | 'invitations' | 'settings')}
               className={`${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
@@ -268,7 +211,7 @@ export const OrganizationPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Pending Invitations</p>
-                  <p className="text-3xl font-bold text-gray-900">{invitations.filter(inv => inv.status === 'pending').length}</p>
+                  <p className="text-3xl font-bold text-gray-900">{invitations.filter(inv => inv.status === OrganizationInvitationStatusEnum.Pending).length}</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,7 +225,7 @@ export const OrganizationPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Plan</p>
-                  <p className="text-3xl font-bold text-gray-900 capitalize">{currentWorkspace.plan || 'Basic'}</p>
+                  <p className="text-3xl font-bold text-gray-900 capitalize">{currentWorkspace.organization.plan || 'Basic'}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,34 +242,34 @@ export const OrganizationPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <dt className="text-sm font-medium text-gray-500">Name</dt>
-                <dd className="mt-1 text-sm text-gray-900">{currentWorkspace.name}</dd>
+                <dd className="mt-1 text-sm text-gray-900">{currentWorkspace.organization.name}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Visibility</dt>
                 <dd className="mt-1">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    currentWorkspace.visibility === 'public' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    currentWorkspace.organization.visibility === 'public' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {currentWorkspace.visibility || 'Private'}
+                    {currentWorkspace.organization.visibility || 'Private'}
                   </span>
                 </dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Created</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {currentWorkspace.createdAt ? formatDate(currentWorkspace.createdAt) : 'Unknown'}
+                  {currentWorkspace.organization.createdAt ? formatDate(currentWorkspace.organization.createdAt) : 'Unknown'}
                 </dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-gray-500">Storage Used</dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {currentWorkspace.usedStorageBytes || 0} bytes of {currentWorkspace.maxStorageGb || 100} GB
+                  {currentWorkspace.organization.usedStorageBytes || 0} bytes of {currentWorkspace.organization.maxStorageGb || 100} GB
                 </dd>
               </div>
-              {currentWorkspace.description && (
+              {currentWorkspace.organization.description && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-gray-500">Description</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{currentWorkspace.description}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">{currentWorkspace.organization.description}</dd>
                 </div>
               )}
             </div>
@@ -363,12 +306,12 @@ export const OrganizationPage: React.FC = () => {
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-4">
                           <span className="text-sm font-medium text-gray-700">
-                            {member.username[0].toUpperCase()}
+                            {member.user?.username?.[0].toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{member.username}</div>
-                          <div className="text-sm text-gray-500">{member.email}</div>
+                          <div className="text-sm font-medium text-gray-900">{member.user?.username}</div>
+                          <div className="text-sm text-gray-500">{member.user?.email}</div>
                         </div>
                       </div>
                     </td>
@@ -386,7 +329,7 @@ export const OrganizationPage: React.FC = () => {
                       {formatDate(member.joinedAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {member.role !== 'owner' && (
+                      {member.role !== OrganizationMembershipRoleEnum.Owner && (
                         <button className="text-red-600 hover:text-red-900">Remove</button>
                       )}
                     </td>
@@ -471,8 +414,9 @@ export const OrganizationPage: React.FC = () => {
       {/* Modals */}
       {showCreateModal && (
         <CreateOrganizationModal
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateOrganization}
+          onSuccess={handleCreateOrganization}
         />
       )}
 

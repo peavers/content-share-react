@@ -1,5 +1,5 @@
 import { generatedApiService } from './generatedApiService';
-import type { Tag } from '../generated';
+import type { Tag, TagNode } from '../generated';
 
 export class TagService {
   /**
@@ -13,7 +13,7 @@ export class TagService {
   /**
    * Get hierarchical tag tree
    */
-  async getTagTree(): Promise<any[]> {
+  async getTagTree(): Promise<TagNode[]> {
     const response = await generatedApiService.tag.getTagTree();
     return response.data;
   }
@@ -38,11 +38,12 @@ export class TagService {
    * Create or get a tag by path
    */
   async createTag(request: { path: string; description?: string; color?: string }): Promise<Tag> {
-    const response = await generatedApiService.tag.createTag({
+    const createRequest = {
       path: request.path,
       description: request.description,
       color: request.color
-    });
+    };
+    const response = await generatedApiService.tag.createTag(createRequest);
     return response.data;
   }
 
@@ -50,10 +51,11 @@ export class TagService {
    * Update a tag
    */
   async updateTag(tagId: number, request: { path: string; description?: string }): Promise<Tag> {
-    const response = await generatedApiService.tag.updateTag(tagId, {
+    const updateRequest = {
       path: request.path,
       description: request.description
-    });
+    };
+    const response = await generatedApiService.tag.updateTag(tagId, updateRequest);
     return response.data;
   }
 
@@ -74,7 +76,7 @@ export class TagService {
   /**
    * Get tags for a specific video
    */
-  async getVideoTags(videoId: number): Promise<Tag[]> {
+  async getVideoTags(videoId: string): Promise<Tag[]> {
     const response = await generatedApiService.tag.getVideoTags(videoId);
     return response.data;
   }
@@ -82,21 +84,21 @@ export class TagService {
   /**
    * Add tags to a video
    */
-  async addTagsToVideo(videoId: number, tagPaths: string[]): Promise<void> {
+  async addTagsToVideo(videoId: string, tagPaths: string[]): Promise<void> {
     await generatedApiService.tag.addTagsToVideo(videoId, { tagPaths });
   }
 
   /**
    * Replace all tags on a video
    */
-  async replaceVideoTags(videoId: number, tagPaths: string[]): Promise<void> {
+  async replaceVideoTags(videoId: string, tagPaths: string[]): Promise<void> {
     await generatedApiService.tag.replaceVideoTags(videoId, { tagPaths });
   }
 
   /**
    * Remove a tag from a video
    */
-  async removeTagFromVideo(videoId: number, path: string): Promise<void> {
+  async removeTagFromVideo(videoId: string, path: string): Promise<void> {
     await generatedApiService.tag.removeTagFromVideo(videoId, path);
   }
 }

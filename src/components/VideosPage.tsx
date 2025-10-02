@@ -8,18 +8,15 @@ import SidebarSection from './shared/SidebarSection';
 import ExpandableContent from './shared/ExpandableContent';
 import ActionButton from './shared/ActionButton';
 import { useVideos, useTags } from '../hooks';
-import type { Tag } from '../generated';
-
-type CategoryFilter = 'all' | 'recent' | 'featured';
+import type { Tag, Organization } from '../generated';
 
 const VideosPage: React.FC = () => {
   const auth = useAuth();
   const { user } = auth;
-  const { currentWorkspace, organizations, setCurrentWorkspace } = useOrganization();
+  const { currentWorkspace, organizations, setCurrentWorkspace, loading: orgLoading } = useOrganization();
   const [searchParams] = useSearchParams();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [workspacesExpanded, setWorkspacesExpanded] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(true);
@@ -37,6 +34,22 @@ const VideosPage: React.FC = () => {
     loading: tagsLoading
   } = useTags(currentWorkspace?.organization.id);
 
+  const expandParentTags = useCallback((tagPath: string | undefined, tagsList: Tag[]) => {
+    if (!tagPath) return;
+    const pathParts = tagPath.split('/').filter(Boolean);
+    const parentIds: number[] = [];
+
+    for (let i = 1; i < pathParts.length; i++) {
+      const parentPath = '/' + pathParts.slice(0, i).join('/');
+      const parentTag = tagsList.find(t => t.path === parentPath);
+      if (parentTag && parentTag.id) {
+        parentIds.push(parentTag.id);
+      }
+    }
+
+    setExpandedTagIds(prev => new Set([...prev, ...parentIds]));
+  }, []);
+
   useEffect(() => {
     const tagParam = searchParams.get('tag');
     if (tagParam && allTags.length > 0) {
@@ -46,26 +59,7 @@ const VideosPage: React.FC = () => {
         expandParentTags(matchingTag.path, allTags);
       }
     }
-  }, [searchParams, allTags]);
-
-  const expandParentTags = useCallback((tagPath: string | undefined, tagsList: Tag[]) => {
-    if (!tagPath) return;
-    const segments = tagPath.split('/').filter(p => p);
-    const parentPaths: string[] = [];
-
-    // Build all parent paths including the current tag itself
-    for (let i = 0; i < segments.length; i++) {
-      parentPaths.push('/' + segments.slice(0, i + 1).join('/'));
-    }
-
-    // Find and expand all parent tag IDs
-    const parentTagIds = tagsList
-      .filter(t => parentPaths.includes(t.path || ''))
-      .map(t => t.id!)
-      .filter(id => id !== undefined);
-
-    setExpandedTagIds(new Set(parentTagIds));
-  }, []);
+  }, [searchParams, allTags, expandParentTags]);
 
   // Get featured videos (videos with tags for now)
   const featuredVideos = useMemo(() => {
@@ -182,9 +176,9 @@ const VideosPage: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
-  const switchToOrganization = (org: any) => {
+  const switchToOrganization = (org: Organization) => {
     const workspace = {
-      type: org.organizationType === 'PERSONAL' ? 'personal' : 'organization',
+      type: org.organizationType === 'PERSONAL' ? 'personal' as const : 'organization' as const,
       organization: org,
       currentUserRole: undefined,
       permissions: []
@@ -192,18 +186,62 @@ const VideosPage: React.FC = () => {
     setCurrentWorkspace(workspace);
   };
 
+  // Show welcome/onboarding if no workspace exists
   if (!currentWorkspace) {
+    // Check if user has NO organizations at all (first time user)
+    if (organizations.length === 0 && !orgLoading) {
+      return (
+        <div className="min-h-screen bg-base-200">
+          <Navigation />
+          <div className="hero min-h-[calc(100vh-4rem)]">
+            <div className="hero-content text-center">
+              <div className="max-w-2xl">
+                <h1 className="text-5xl font-bold mb-4">Welcome! 👋</h1>
+                <p className="text-xl mb-8">
+                  Let's get you started by creating your first workspace
+                </p>
+
+                <div className="card bg-base-100 shadow-xl">
+                  <div className="card-body">
+                    <h2 className="card-title justify-center mb-4">Create Your Workspace</h2>
+                    <p className="text-base-content/70 mb-6">
+                      A workspace is your personal or team space for organizing and sharing videos.
+                      You can create additional workspaces later.
+                    </p>
+
+                    <button
+                      onClick={() => setShowCreateModal(true)}
+                      className="btn btn-primary btn-lg w-full"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Your First Workspace
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Reuse existing modal */}
+          <CreateOrganizationModal
+            isOpen={showCreateModal}
+            onClose={() => setShowCreateModal(false)}
+          />
+        </div>
+      );
+    }
+
+    // User has organizations but none selected
     return (
       <div className="min-h-screen bg-base-200">
         <Navigation />
-        <div className="hero min-h-[calc(100vh-4rem)] bg-base-200">
+        <div className="hero min-h-[calc(100vh-4rem)]">
           <div className="hero-content text-center">
             <div className="max-w-md">
-              <h1 className="text-3xl font-bold">No Organization Selected</h1>
-              <p className="py-6">Please select an organization to view videos.</p>
-              <Link to="/" className="btn btn-primary">
-                Go to Dashboard
-              </Link>
+              <h1 className="text-3xl font-bold">No Workspace Selected</h1>
+              <p className="py-6">Please select a workspace from the sidebar to view videos.</p>
             </div>
           </div>
         </div>
@@ -461,8 +499,12 @@ const VideosPage: React.FC = () => {
                   onToggle={() => setWorkspacesExpanded(!workspacesExpanded)}
                 >
                   {/* Current workspace display */}
-                  <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
-                    <Avatar name={currentWorkspace.organization.name} size="sm" />
+                    <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
+                    <Avatar
+                      name={currentWorkspace.organization.name}
+                      avatarUrl={currentWorkspace.organization.avatarUrl}
+                      size="sm"
+                    />
                     <div className="flex-1 text-left min-w-0">
                       <div className="font-medium text-sm truncate">{currentWorkspace.organization.name}</div>
                       <div className="text-xs opacity-60">{currentWorkspace.organization.organizationType === 'PERSONAL' ? 'Personal' : 'Team'}</div>
@@ -482,7 +524,11 @@ const VideosPage: React.FC = () => {
                             }}
                             className="w-full px-3 py-2 rounded-lg flex items-start gap-3 hover:bg-base-200 transition-colors"
                           >
-                            <Avatar name={org.name} size="sm" />
+                            <Avatar
+                              name={org.name}
+                              avatarUrl={org.avatarUrl}
+                              size="sm"
+                            />
                             <div className="flex-1 text-left min-w-0">
                               <div className="font-medium text-sm truncate">{org.name}</div>
                               <div className="text-xs opacity-60">{org.organizationType === 'PERSONAL' ? 'Personal' : 'Team'}</div>
@@ -555,9 +601,17 @@ const VideosPage: React.FC = () => {
               >
                 {/* Current user display */}
                 <div className="px-2 py-3 bg-base-200 rounded-lg mb-2 flex items-center gap-2">
-                  <Avatar name={user?.username || ''} size="sm" />
+                  <Avatar
+                    name={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email || ''}
+                    avatarUrl={user?.avatarUrl}
+                    size="sm"
+                  />
                   <div className="flex-1 text-left min-w-0">
-                    <div className="font-medium text-sm truncate">{user?.username}</div>
+                    <div className="font-medium text-sm truncate">
+                      {user?.firstName && user?.lastName
+                        ? `${user.firstName} ${user.lastName}`
+                        : user?.email}
+                    </div>
                     <div className="text-xs opacity-60">Signed in</div>
                   </div>
                 </div>

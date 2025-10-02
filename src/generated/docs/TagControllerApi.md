@@ -33,7 +33,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new TagControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 let addTagsRequest: AddTagsRequest; //
 
 const { status, data } = await apiInstance.addTagsToVideo(
@@ -47,7 +47,7 @@ const { status, data } = await apiInstance.addTagsToVideo(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **addTagsRequest** | **AddTagsRequest**|  | |
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -419,7 +419,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new TagControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 
 const { status, data } = await apiInstance.getVideoTags(
     videoId
@@ -430,7 +430,7 @@ const { status, data } = await apiInstance.getVideoTags(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -469,7 +469,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new TagControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 let path: string; // (default to undefined)
 
 const { status, data } = await apiInstance.removeTagFromVideo(
@@ -482,7 +482,7 @@ const { status, data } = await apiInstance.removeTagFromVideo(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 | **path** | [**string**] |  | defaults to undefined|
 
 
@@ -523,7 +523,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new TagControllerApi(configuration);
 
-let videoId: number; // (default to undefined)
+let videoId: string; // (default to undefined)
 let addTagsRequest: AddTagsRequest; //
 
 const { status, data } = await apiInstance.replaceVideoTags(
@@ -537,7 +537,7 @@ const { status, data } = await apiInstance.replaceVideoTags(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **addTagsRequest** | **AddTagsRequest**|  | |
-| **videoId** | [**number**] |  | defaults to undefined|
+| **videoId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type

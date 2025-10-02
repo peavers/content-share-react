@@ -17,7 +17,7 @@ const AcceptInvitation: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:8080/api/organizations/public/invitations/${token}/accept`,
         {
           password: formData.password,

@@ -27,9 +27,10 @@ class OrganizationService {
   }
 
   async updateOrganization(organizationId: string, request: Partial<CreateOrganizationRequest>): Promise<Organization> {
-    // Note: The generated client may not have an updateOrganization method
-    // This might need to be implemented or the endpoint might use PUT on createOrganization
-    const response = await generatedApiService.organization.createOrganization(request as CreateOrganizationRequest);
+    const response = await generatedApiService.organization.updateOrganization({
+      organizationId,
+      createOrganizationRequest: request as CreateOrganizationRequest
+    });
     return response.data;
   }
 

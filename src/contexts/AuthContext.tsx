@@ -36,33 +36,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const session: AmplifyAuthSession = await fetchAuthSession();
 
       if (currentUser && session?.tokens) {
-
-        // Map AWS Amplify user to generated User type
-        setUser({
-          id: currentUser.userId,
-          email: currentUser.signInDetails?.loginId || '', // Use loginId as email
-          username: currentUser.username,
-          firstName: '',
-          lastName: '',
-          avatarUrl: '',
-          personalOrganizationId: '', // Will be set from API
-          emailVerified: true,
-          active: true,
-          lastLoginAt: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          personalOrganization: null // Required by generated User type
-        });
         setIsAuthenticated(true);
 
-        // Fetch user profile to get scopes
+        // Fetch full user data from database
         try {
-          const profileResponse = await generatedApiService.user.getUserProfile();
-          if (profileResponse.data?.scopes) {
-            setUserScopes(profileResponse.data.scopes);
+          const [userResponse, profileResponse] = await Promise.all([
+            generatedApiService.user.getCurrentUser(),
+            generatedApiService.user.getUserProfile()
+          ]);
+
+          if (userResponse.data) {
+            // Use database user data
+            setUser({
+              id: userResponse.data.id || currentUser.userId,
+              email: userResponse.data.email || currentUser.signInDetails?.loginId || '',
+              username: userResponse.data.username || currentUser.username,
+              firstName: userResponse.data.firstName || '',
+              lastName: userResponse.data.lastName || '',
+              avatarUrl: userResponse.data.avatarUrl || '',
+              personalOrganizationId: '', // Will be set from API later if needed
+              emailVerified: userResponse.data.emailVerified ?? true,
+              active: userResponse.data.isActive ?? true,
+              lastLoginAt: userResponse.data.lastLoginAt || new Date().toISOString(),
+              createdAt: userResponse.data.createdAt || new Date().toISOString(),
+              updatedAt: userResponse.data.updatedAt || new Date().toISOString(),
+              personalOrganization: null
+            });
+
+            // Get scopes from profile response
+            if (profileResponse.data?.scopes) {
+              setUserScopes(profileResponse.data.scopes);
+            }
+          } else {
+            // Fallback to Cognito user if API fails
+            setUser({
+              id: currentUser.userId,
+              email: currentUser.signInDetails?.loginId || '',
+              username: currentUser.username,
+              firstName: '',
+              lastName: '',
+              avatarUrl: '',
+              personalOrganizationId: '',
+              emailVerified: true,
+              active: true,
+              lastLoginAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              personalOrganization: null
+            });
           }
         } catch (error) {
-          console.error('Error fetching user profile scopes:', error);
+          console.error('Error fetching user profile:', error);
+          // Fallback to Cognito user if API fails
+          setUser({
+            id: currentUser.userId,
+            email: currentUser.signInDetails?.loginId || '',
+            username: currentUser.username,
+            firstName: '',
+            lastName: '',
+            avatarUrl: '',
+            personalOrganizationId: '',
+            emailVerified: true,
+            active: true,
+            lastLoginAt: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            personalOrganization: null
+          });
         }
       } else {
         setIsAuthenticated(false);

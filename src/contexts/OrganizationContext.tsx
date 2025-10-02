@@ -51,7 +51,9 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
     // Load user's organizations
     const loadOrganizations = async () => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated || !user?.id) {
+            return;
+        }
 
         setLoading(true);
         setError(null);
@@ -150,7 +152,9 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
     const createWorkspaceContext = (organization: Organization): WorkspaceContext => {
         // Get user role from organization's memberships array
         const membership = organization.memberships?.find(m => m.userId === user?.id);
-        const userRole = membership?.role as OrganizationMembershipRoleEnum | undefined;
+        // Convert role to uppercase to match enum (API returns lowercase, enum is uppercase)
+        const roleString = membership?.role?.toString().toUpperCase();
+        const userRole = roleString as OrganizationMembershipRoleEnum | undefined;
 
         return {
             type: organization.organizationType === OrganizationResponseOrganizationTypeEnum.Personal ? 'personal' : 'organization',
@@ -162,15 +166,15 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
 
     // Load data on mount and when authentication changes
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && user?.id) {
             loadOrganizations();
             loadInvitations();
-        } else {
+        } else if (!isAuthenticated) {
             setOrganizations([]);
             setCurrentWorkspaceState(null);
             setInvitations([]);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, user?.id]);
 
     // Restore workspace from localStorage
     useEffect(() => {

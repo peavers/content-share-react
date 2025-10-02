@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useOrganization } from '../../contexts/OrganizationContext';
 import { organizationService } from '../../services/organizationService';
-import { TextInput, Textarea, RadioGroup, Select, FormGroup } from '../forms';
+import { TextInput, Textarea, Select } from '../forms';
 import type { CreateOrganizationRequest } from "../../generated";
 import {
   CreateOrganizationRequestVisibilityEnum,
@@ -14,7 +14,7 @@ interface CreateOrganizationModalProps {
   onSuccess?: (organization: any) => void;
 }
 
-interface FormData extends CreateOrganizationRequest {
+interface OrgFormData extends CreateOrganizationRequest {
   inviteEmails: string[];
   inviteRoles: InviteMemberRequestRoleEnum[];
 }
@@ -25,7 +25,7 @@ export function CreateOrganizationModal({ isOpen, onClose, onSuccess }: CreateOr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',

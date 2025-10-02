@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 export interface TableColumn<T> {
   key: string;
@@ -257,5 +257,3 @@ export function DataTable<T>({
   );
 }
 
-// Explicit re-exports for clarity
-export type { TableColumn, TableAction, DataTableProps };

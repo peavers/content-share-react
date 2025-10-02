@@ -6,7 +6,7 @@ export class UserManagementService {
    * List all users with pagination
    */
   async listUsers(paginationToken?: string, limit: number = 60): Promise<UserListResponse> {
-    const response = await generatedApiService.userManagement.listUsers(paginationToken, limit);
+    const response = await generatedApiService.userManagement.listUsers({ paginationToken, limit });
     return response.data;
   }
 
@@ -14,7 +14,7 @@ export class UserManagementService {
    * Get detailed information about a specific user
    */
   async getUser(username: string): Promise<CognitoUserDto> {
-    const response = await generatedApiService.userManagement.getUser(username);
+    const response = await generatedApiService.userManagement.getUser({ username });
     return response.data;
   }
 
@@ -22,7 +22,7 @@ export class UserManagementService {
    * Update user details
    */
   async updateUser(username: string, updateRequest: UpdateUserRequest): Promise<CognitoUserDto> {
-    const response = await generatedApiService.userManagement.updateUser(username, updateRequest);
+    const response = await generatedApiService.userManagement.updateUser({ username, updateUserRequest: updateRequest });
     return response.data;
   }
 
@@ -30,35 +30,35 @@ export class UserManagementService {
    * Delete a user
    */
   async deleteUser(username: string): Promise<void> {
-    await generatedApiService.userManagement.deleteUser(username);
+    await generatedApiService.userManagement.deleteUser({ username });
   }
 
   /**
    * Add user to a group
    */
   async addUserToGroup(username: string, groupName: string): Promise<void> {
-    await generatedApiService.userManagement.addUserToGroup(username, groupName);
+    await generatedApiService.userManagement.addUserToGroup({ username, groupName });
   }
 
   /**
    * Remove user from a group
    */
   async removeUserFromGroup(username: string, groupName: string): Promise<void> {
-    await generatedApiService.userManagement.removeUserFromGroup(username, groupName);
+    await generatedApiService.userManagement.removeUserFromGroup({ username, groupName });
   }
 
   /**
    * Enable a user account
    */
   async enableUser(username: string): Promise<void> {
-    await generatedApiService.userManagement.enableUser(username);
+    await generatedApiService.userManagement.enableUser({ username });
   }
 
   /**
    * Disable a user account
    */
   async disableUser(username: string): Promise<void> {
-    await generatedApiService.userManagement.disableUser(username);
+    await generatedApiService.userManagement.disableUser({ username });
   }
 
   /**

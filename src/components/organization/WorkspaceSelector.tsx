@@ -178,7 +178,7 @@ function WorkspaceOption({organization, isSelected, onClick}: WorkspaceOptionPro
                 <div className="truncate font-medium">{organization.name}</div>
                 {organization.organizationType === OrganizationResponseOrganizationTypeEnum.Organization && (
                     <div className="text-xs text-gray-500">
-                        {organization.memberCount || 0} member{(organization.memberCount || 0) !== 1 ? 's' : ''}
+                        {/* Members count not available */}
                     </div>
                 )}
             </div>

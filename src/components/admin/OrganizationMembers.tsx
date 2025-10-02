@@ -4,6 +4,7 @@ import { organizationMemberService } from '../../services/organizationMemberServ
 import type { OrganizationMembership, OrganizationMembershipRoleEnum, OrganizationInvitation } from '../../generated';
 import { TextInput, Select } from '../forms';
 import Navigation from '../shared/Navigation';
+import Avatar from '../shared/Avatar';
 import { DataTable, type TableColumn, type TableAction } from '../shared/DataTable';
 
 const OrganizationMembers: React.FC = () => {
@@ -19,12 +20,12 @@ const OrganizationMembers: React.FC = () => {
   const [selectedMembers, setSelectedMembers] = useState<Set<number>>(new Set());
   const [selectedInvitations, setSelectedInvitations] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    loadMembers();
-  }, [currentWorkspace]);
-
   const loadMembers = async () => {
-    if (!currentWorkspace?.organization?.id) {
+    const orgId = currentWorkspace?.organization?.id;
+    console.log('loadMembers called, orgId:', orgId);
+
+    if (!orgId) {
+      console.log('No orgId, skipping load');
       setError('No organization selected');
       setLoading(false);
       return;
@@ -33,9 +34,10 @@ const OrganizationMembers: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Fetching members for organization:', orgId);
       const [membersData, invitationsData] = await Promise.all([
-        organizationMemberService.getMembers(currentWorkspace.organization.id),
-        organizationMemberService.getPendingInvitations(currentWorkspace.organization.id)
+        organizationMemberService.getMembers(orgId),
+        organizationMemberService.getPendingInvitations(orgId)
       ]);
       setMembers(membersData);
       setPendingInvitations(invitationsData);
@@ -46,6 +48,13 @@ const OrganizationMembers: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log('useEffect triggered, currentWorkspace?.organization?.id:', currentWorkspace?.organization?.id);
+    if (currentWorkspace?.organization?.id) {
+      loadMembers();
+    }
+  }, [currentWorkspace?.organization?.id]);
 
   const handleInviteMember = async () => {
     if (!currentWorkspace?.organization?.id || !inviteEmail.trim()) {
@@ -249,9 +258,22 @@ const OrganizationMembers: React.FC = () => {
       key: 'user',
       header: 'User',
       render: (member) => (
-        <div>
-          <div className="font-medium">{member.user?.username || 'Unknown'}</div>
-          <div className="text-sm opacity-50">{member.userId}</div>
+        <div className="flex items-center gap-3">
+          <Avatar
+            name={member.user?.firstName && member.user?.lastName
+              ? `${member.user.firstName} ${member.user.lastName}`
+              : member.user?.email || member.user?.username || 'Unknown'}
+            avatarUrl={member.user?.avatarUrl}
+            size="sm"
+          />
+          <div>
+            <div className="font-medium">
+              {member.user?.firstName && member.user?.lastName
+                ? `${member.user.firstName} ${member.user.lastName}`
+                : member.user?.username || 'Unknown'}
+            </div>
+            <div className="text-sm opacity-50">{member.user?.email || member.userId}</div>
+          </div>
         </div>
       ),
     },

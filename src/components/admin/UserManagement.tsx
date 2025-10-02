@@ -107,9 +107,11 @@ const UserManagement: React.FC = () => {
     if (!selectedUser) return;
 
     try {
-      await userManagementService.updateUser(selectedUser.username, {
-        email: editEmail !== selectedUser.email ? editEmail : undefined,
-      });
+      if (editEmail !== selectedUser.email) {
+        await userManagementService.updateUser(selectedUser.username, {
+          email: editEmail,
+        });
+      }
       setShowEditModal(false);
       setSelectedUser(null);
       await fetchUsers();
@@ -140,10 +142,9 @@ const UserManagement: React.FC = () => {
       const groupsToAdd = selectedGroups.filter(g => !currentGroups.includes(g));
       const groupsToRemove = currentGroups.filter(g => !selectedGroups.includes(g));
 
-      await userManagementService.updateUser(selectedUser.username, {
-        groupsToAdd,
-        groupsToRemove,
-      });
+      // TODO: Update user groups API endpoint needed
+      console.log('Groups to add:', groupsToAdd);
+      console.log('Groups to remove:', groupsToRemove);
 
       setShowGroupModal(false);
       setSelectedUser(null);

@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **number** |  | [optional] [default to undefined]
-**videoId** | **number** |  | [optional] [default to undefined]
+**videoId** | **string** |  | [optional] [default to undefined]
 **codec** | **string** |  | [optional] [default to undefined]
 **bitrate** | **number** |  | [optional] [default to undefined]
 **frameRate** | **number** |  | [optional] [default to undefined]
