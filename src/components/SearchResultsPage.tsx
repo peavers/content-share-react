@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from './shared/Navigation';
 import { useSearch } from '../hooks';
+import { useOrganization } from '../contexts/OrganizationContext';
 import type { VideoSearchDocument } from '../generated';
 
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const [activeTab, setActiveTab] = useState<'all' | 'videos' | 'users' | 'organizations'>('all');
+  const navigate = useNavigate();
+  const { switchWorkspace } = useOrganization();
 
   const { results, loading, search } = useSearch();
 
@@ -66,9 +69,15 @@ const SearchResultsPage: React.FC = () => {
   };
 
   const VideoCard: React.FC<{ video: VideoSearchDocument }> = ({ video }) => (
-    <Link
-      to={`/video/${video.videoId}`}
-      className="card card-compact bg-base-100 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 group"
+    <div
+      onClick={() => {
+        // Switch to video's organization before navigating
+        if (video.organization_id) {
+          switchWorkspace(video.organization_id);
+        }
+        navigate(`/video/${video.video_id}`);
+      }}
+      className="card card-compact bg-base-100 shadow-md hover:shadow-xl transition-all duration-200 hover:-translate-y-1 group cursor-pointer"
     >
       {/* Thumbnail */}
       <figure className="relative aspect-video bg-base-300 overflow-hidden">
@@ -95,9 +104,9 @@ const SearchResultsPage: React.FC = () => {
           </svg>
         </div>
         {/* Duration badge */}
-        {video.durationSeconds && (
+        {video.duration_seconds && (
           <div className="absolute bottom-2 right-2 badge badge-neutral badge-sm font-mono">
-            {formatDuration(video.durationSeconds)}
+            {formatDuration(video.duration_seconds)}
           </div>
         )}
         {/* Resolution badge */}
@@ -120,10 +129,10 @@ const SearchResultsPage: React.FC = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span>{video.userFullName || video.userUsername}</span>
+            <span>{video.user_full_name || video.user_username}</span>
           </div>
           <span>•</span>
-          <span>{formatDate(video.createdAt)}</span>
+          <span>{formatDate(video.created_at)}</span>
         </div>
 
         {/* Description */}
@@ -150,21 +159,21 @@ const SearchResultsPage: React.FC = () => {
         )}
 
         {/* Organization */}
-        {video.organizationName && (
+        {video.organization_name && (
           <div className="flex items-center gap-1 text-xs text-base-content/50 mt-1">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            <span>{video.organizationName}</span>
+            <span>{video.organization_name}</span>
           </div>
         )}
 
         {/* File info */}
         <div className="text-xs text-base-content/40 mt-1">
-          {formatFileSize(video.fileSize)}
+          {formatFileSize(video.file_size)}
         </div>
       </div>
-    </Link>
+    </div>
   );
 
   return (
@@ -258,7 +267,7 @@ const SearchResultsPage: React.FC = () => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredVideos.map(video => (
-                <VideoCard key={video.videoId} video={video} />
+                <VideoCard key={video.video_id} video={video} />
               ))}
             </div>
           </div>

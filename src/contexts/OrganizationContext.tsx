@@ -32,6 +32,7 @@ interface OrganizationContextType {
     hasPermissionInCurrentWorkspace: (permission: string) => boolean;
     getUserRoleInOrganization: (organizationId: string) => OrganizationMembershipRoleEnum | undefined;
     getPersonalWorkspace: () => WorkspaceContext | null;
+    switchWorkspace: (organizationId: string) => void;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -64,19 +65,7 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
         try {
             const orgs = await organizationService.getUserOrganizations();
             setOrganizations(orgs);
-
-            // Set default workspace to personal workspace if none selected
-            if (!currentWorkspace && orgs.length > 0) {
-                const personalOrg = orgs.find(org => org.organizationType === OrganizationResponseOrganizationTypeEnum.Personal);
-                if (personalOrg) {
-                    const workspace = createWorkspaceContext(personalOrg);
-                    setCurrentWorkspace(workspace);
-                } else {
-                    // If no personal org, set the first organization as default
-                    const workspace = createWorkspaceContext(orgs[0]);
-                    setCurrentWorkspace(workspace);
-                }
-            }
+            // Workspace initialization is handled by the useEffect that restores from localStorage
         } catch (err) {
             setError('Failed to load organizations');
             console.error('Error loading organizations:', err);
@@ -152,6 +141,14 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
         return personalOrg ? createWorkspaceContext(personalOrg) : null;
     };
 
+    // Switch to a different workspace by organization ID
+    const switchWorkspace = (organizationId: string) => {
+        const org = organizations.find(o => o.id === organizationId);
+        if (org) {
+            setCurrentWorkspace(createWorkspaceContext(org));
+        }
+    };
+
     // Helper to create workspace context
     const createWorkspaceContext = (organization: Organization): WorkspaceContext => {
         // Get user role from organization's memberships array
@@ -222,7 +219,8 @@ export function OrganizationProvider({children}: OrganizationProviderProps) {
         declineInvitation,
         hasPermissionInCurrentWorkspace,
         getUserRoleInOrganization,
-        getPersonalWorkspace
+        getPersonalWorkspace,
+        switchWorkspace
     };
 
     return (

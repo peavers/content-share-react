@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSearch } from '../../hooks';
+import { useOrganization } from '../../contexts/OrganizationContext';
 import type { VideoSearchDocument, UserSearchDocument, OrganizationSearchDocument } from '../../generated';
 
 interface SearchBarProps {
@@ -23,6 +24,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { results, loading, search } = useSearch();
+  const { switchWorkspace } = useOrganization();
 
   // Instant results for dropdown (limit to 4 videos, 3 users, 2 orgs)
   const instantResults = {
@@ -218,13 +220,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   </div>
                   {instantResults.videos.map(video => (
                     <Link
-                      key={video.videoId}
-                      to={`/video/${video.videoId}`}
+                      key={video.video_id}
+                      to={`/video/${video.video_id}`}
                       className="flex items-start gap-3 p-2 rounded-lg hover:bg-base-200 transition-colors"
                       onMouseDown={(e) => {
                         // Prevent blur from happening before navigation
                         e.preventDefault();
-                        navigate(`/video/${video.videoId}`);
+                        // Switch to video's organization before navigating
+                        if (video.organization_id) {
+                          switchWorkspace(video.organization_id);
+                        }
+                        navigate(`/video/${video.video_id}`);
                         setShowDropdown(false);
                         setQuery('');
                       }}
@@ -251,9 +257,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
                             d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                           />
                         </svg>
-                        {video.durationSeconds && (
+                        {video.duration_seconds && (
                           <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded font-mono">
-                            {formatDuration(video.durationSeconds)}
+                            {formatDuration(video.duration_seconds)}
                           </span>
                         )}
                       </div>
@@ -264,11 +270,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                           {video.title || 'Untitled Video'}
                         </h4>
                         <div className="flex items-center gap-2 text-xs text-base-content/60">
-                          <span>{video.userFullName || video.userUsername}</span>
-                          {video.organizationName && (
+                          <span>{video.user_full_name || video.user_username}</span>
+                          {video.organization_name && (
                             <>
                               <span>•</span>
-                              <span>{video.organizationName}</span>
+                              <span>{video.organization_name}</span>
                             </>
                           )}
                         </div>
