@@ -9,7 +9,7 @@ export class UploadService {
   private activeUploads = new Map<string, AbortController>();
 
   async initiateUpload(request: UploadRequest): Promise<UploadResult> {
-    const response = await generatedApiService.s3.initiateUpload(request);
+    const response = await generatedApiService.videoUpload.initiateUpload(request);
     return response.data;
   }
 
@@ -53,7 +53,7 @@ export class UploadService {
       }))
     };
 
-    await generatedApiService.s3.completeMultipartUpload(uploadId, request);
+    await generatedApiService.videoUpload.completeMultipartUpload(uploadId, request);
   }
 
   async abortUpload(uploadId: string): Promise<void> {
@@ -63,7 +63,7 @@ export class UploadService {
       this.activeUploads.delete(uploadId);
     }
 
-    await generatedApiService.s3.abortUpload(uploadId);
+    await generatedApiService.videoUpload.abortUpload(uploadId);
   }
 
   cancelUpload(uploadId: string): void {

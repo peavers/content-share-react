@@ -12,7 +12,7 @@ export class OrganizationMemberService {
    * Get all members of an organization
    */
   async getMembers(organizationId: string): Promise<OrganizationMembership[]> {
-    const response = await generatedApiService.organization.getOrganizationMembers({ organizationId });
+    const response = await generatedApiService.organization.getOrganizationMembers(organizationId);
     return response.data;
   }
 
@@ -25,7 +25,7 @@ export class OrganizationMemberService {
     role: OrganizationMembershipRoleEnum
   ): Promise<OrganizationInvitation> {
     const request: InviteMemberRequest = { email, role };
-    const response = await generatedApiService.organization.inviteMember({ organizationId, inviteMemberRequest: request });
+    const response = await generatedApiService.organization.inviteMember(organizationId, request);
     return response.data;
   }
 
@@ -38,11 +38,11 @@ export class OrganizationMemberService {
     role: OrganizationMembershipRoleEnum
   ): Promise<OrganizationMembership> {
     const request: UpdateMemberRoleRequest = { role };
-    const response = await generatedApiService.organization.updateMemberRole({
+    const response = await generatedApiService.organization.updateMemberRole(
       organizationId,
-      targetUserId: userId,
-      updateMemberRoleRequest: request
-    });
+      userId,
+      request
+    );
     return response.data;
   }
 
@@ -50,14 +50,14 @@ export class OrganizationMemberService {
    * Remove a member from the organization
    */
   async removeMember(organizationId: string, userId: string): Promise<void> {
-    await generatedApiService.organization.removeMember({ organizationId, targetUserId: userId });
+    await generatedApiService.organization.removeMember(organizationId, userId);
   }
 
   /**
    * Get pending invitations for the organization
    */
   async getPendingInvitations(organizationId: string): Promise<OrganizationInvitation[]> {
-    const response = await generatedApiService.organization.getOrganizationInvitations({ organizationId });
+    const response = await generatedApiService.organization.getOrganizationInvitations(organizationId);
     return response.data;
   }
 

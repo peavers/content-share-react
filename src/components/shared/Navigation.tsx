@@ -1,14 +1,15 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeSwitcher from './ThemeSwitcher';
+import SearchBar from './SearchBar';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
 
   return (
-    <div className="navbar bg-base-200 px-4 py-3">
-      <div className="flex-1 gap-2">
+    <div className="navbar bg-base-200 px-4 py-3 gap-4">
+      <div className="flex gap-2">
         {/* Hamburger menu for mobile */}
         <label htmlFor="tag-drawer" className="btn btn-ghost btn-square drawer-button lg:hidden">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,6 +25,11 @@ const Navigation: React.FC = () => {
             </svg>
           </Link>
         )}
+      </div>
+
+      {/* Center Search Bar - YouTube style */}
+      <div className="flex-1 max-w-2xl mx-auto">
+        <SearchBar />
       </div>
 
       <div className="flex-none">

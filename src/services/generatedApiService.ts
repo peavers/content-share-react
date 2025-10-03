@@ -1,13 +1,14 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import axios from 'axios';
 import {
-  AwsS3ControllerApi,
   OrganizationControllerApi,
+  SearchControllerApi,
   SecurityControllerApi,
   TagControllerApi,
   UserControllerApi,
   UserManagementControllerApi,
   VideoControllerApi,
+  VideoUploadControllerApi,
   Configuration
 } from '../generated';
 
@@ -60,26 +61,28 @@ const configuration = new Configuration({
 });
 
 // Create API instances with the axios instance that has auth
-export const awsS3Api = new AwsS3ControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const organizationApi = new OrganizationControllerApi(configuration, API_BASE_URL, axiosInstance);
+export const searchApi = new SearchControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const securityApi = new SecurityControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const tagApi = new TagControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const userApi = new UserControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const userManagementApi = new UserManagementControllerApi(configuration, API_BASE_URL, axiosInstance);
 export const videoApi = new VideoControllerApi(configuration, API_BASE_URL, axiosInstance);
+export const videoUploadApi = new VideoUploadControllerApi(configuration, API_BASE_URL, axiosInstance);
 
 // Export the axios instance for services that need to make custom API calls
 export const getAuthenticatedAxios = () => axiosInstance;
 
 // Export as default for backward compatibility
 export const generatedApiService = {
-  s3: awsS3Api,
   organization: organizationApi,
+  search: searchApi,
   security: securityApi,
   tag: tagApi,
   user: userApi,
   userManagement: userManagementApi,
-  video: videoApi
+  video: videoApi,
+  videoUpload: videoUploadApi
 };
 
 export default generatedApiService;

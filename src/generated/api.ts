@@ -64,6 +64,67 @@ export interface AddTagsRequest {
 /**
  * 
  * @export
+ * @interface BulkIngestionResult
+ */
+export interface BulkIngestionResult {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof BulkIngestionResult
+     */
+    'success': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof BulkIngestionResult
+     */
+    'message': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkIngestionResult
+     */
+    'videosIndexed': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkIngestionResult
+     */
+    'organizationsIndexed': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkIngestionResult
+     */
+    'usersIndexed': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BulkIngestionResult
+     */
+    'startTime': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BulkIngestionResult
+     */
+    'endTime': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkIngestionResult
+     */
+    'durationMs': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof BulkIngestionResult
+     */
+    'totalIndexed': number;
+}
+/**
+ * 
+ * @export
  * @interface CognitoUserDto
  */
 export interface CognitoUserDto {
@@ -796,6 +857,97 @@ export type OrganizationResponseVisibilityEnum = typeof OrganizationResponseVisi
 /**
  * 
  * @export
+ * @interface OrganizationSearchDocument
+ */
+export interface OrganizationSearchDocument {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'slug': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'visibility': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'plan': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'organization_id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'website_url': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'organization_type': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganizationSearchDocument
+     */
+    'member_count': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganizationSearchDocument
+     */
+    'video_count': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof OrganizationSearchDocument
+     */
+    'used_storage_gb': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'updated_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganizationSearchDocument
+     */
+    'searchable_text': string;
+}
+/**
+ * 
+ * @export
  * @interface PartInfo
  */
 export interface PartInfo {
@@ -836,6 +988,37 @@ export interface PresignedUrlInfo {
      * @memberof PresignedUrlInfo
      */
     'expiresAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface SearchResponse
+ */
+export interface SearchResponse {
+    /**
+     * 
+     * @type {Array<VideoSearchDocument>}
+     * @memberof SearchResponse
+     */
+    'videos': Array<VideoSearchDocument>;
+    /**
+     * 
+     * @type {Array<UserSearchDocument>}
+     * @memberof SearchResponse
+     */
+    'users': Array<UserSearchDocument>;
+    /**
+     * 
+     * @type {Array<OrganizationSearchDocument>}
+     * @memberof SearchResponse
+     */
+    'organizations': Array<OrganizationSearchDocument>;
+    /**
+     * 
+     * @type {number}
+     * @memberof SearchResponse
+     */
+    'total_results': number;
 }
 /**
  * 
@@ -1375,6 +1558,91 @@ export interface UserResponse {
 /**
  * 
  * @export
+ * @interface UserSearchDocument
+ */
+export interface UserSearchDocument {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'email': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'user_id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'first_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'last_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'full_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'avatar_url': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserSearchDocument
+     */
+    'organization_ids': Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserSearchDocument
+     */
+    'organization_names': Array<string>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserSearchDocument
+     */
+    'is_active': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'last_login_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserSearchDocument
+     */
+    'searchable_text': string;
+}
+/**
+ * 
+ * @export
  * @interface UserStatusResponse
  */
 export interface UserStatusResponse {
@@ -1736,6 +2004,187 @@ export interface VideoMetadata {
     'updatedAt': string;
 }
 /**
+ * 
+ * @export
+ * @interface VideoSearchDocument
+ */
+export interface VideoSearchDocument {
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'title': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'description': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoSearchDocument
+     */
+    'width': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoSearchDocument
+     */
+    'height': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'visibility': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof VideoSearchDocument
+     */
+    'tags': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'codec': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'video_id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'original_filename': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoSearchDocument
+     */
+    'file_size': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'content_type': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoSearchDocument
+     */
+    'duration_seconds': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'upload_status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'processing_status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'user_id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'user_email': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'user_username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'user_full_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'organization_id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'organization_name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'organization_slug': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'organization_type': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof VideoSearchDocument
+     */
+    'tag_categories': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'audio_codec': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoSearchDocument
+     */
+    'frame_rate': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'aspect_ratio': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'created_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'updated_at': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VideoSearchDocument
+     */
+    'searchable_text': string;
+}
+/**
  * Video with its associated metadata
  * @export
  * @interface VideoWithMetadataDTO
@@ -1756,22 +2205,55 @@ export interface VideoWithMetadataDTO {
 }
 
 /**
- * AwsS3ControllerApi - axios parameter creator
+ * OpenSearchControllerApi - axios parameter creator
  * @export
  */
-export const AwsS3ControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+export const OpenSearchControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} uploadId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        abortUpload: async (uploadId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'uploadId' is not null or undefined
-            assertParamExists('abortUpload', 'uploadId', uploadId)
-            const localVarPath = `/api/s3/upload/{uploadId}`
-                .replace(`{${"uploadId"}}`, encodeURIComponent(String(uploadId)));
+        bulkIngest: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/opensearch/bulk-ingest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteDocument: async (index: string, id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'index' is not null or undefined
+            assertParamExists('deleteDocument', 'index', index)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteDocument', 'id', id)
+            const localVarPath = `/api/opensearch/index/{index}/{id}`
+                .replace(`{${"index"}}`, encodeURIComponent(String(index)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1796,18 +2278,15 @@ export const AwsS3ControllerApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string} uploadId 
-         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {string} index 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        completeMultipartUpload: async (uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'uploadId' is not null or undefined
-            assertParamExists('completeMultipartUpload', 'uploadId', uploadId)
-            // verify required parameter 'uploadCompletionRequest' is not null or undefined
-            assertParamExists('completeMultipartUpload', 'uploadCompletionRequest', uploadCompletionRequest)
-            const localVarPath = `/api/s3/upload/complete/{uploadId}`
-                .replace(`{${"uploadId"}}`, encodeURIComponent(String(uploadId)));
+        deleteIndex: async (index: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'index' is not null or undefined
+            assertParamExists('deleteIndex', 'index', index)
+            const localVarPath = `/api/opensearch/indices/{index}`
+                .replace(`{${"index"}}`, encodeURIComponent(String(index)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1815,53 +2294,15 @@ export const AwsS3ControllerApiAxiosParamCreator = function (configuration?: Con
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
 
     
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(uploadCompletionRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {UploadRequest} uploadRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        initiateUpload: async (uploadRequest: UploadRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'uploadRequest' is not null or undefined
-            assertParamExists('initiateUpload', 'uploadRequest', uploadRequest)
-            const localVarPath = `/api/s3/upload/initiate`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(uploadRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1873,8 +2314,8 @@ export const AwsS3ControllerApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listBuckets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/s3/buckets`;
+        health: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/opensearch/health`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1897,51 +2338,206 @@ export const AwsS3ControllerApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} id 
+         * @param {{ [key: string]: any; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        indexDocument: async (index: string, id: string, requestBody: { [key: string]: any; }, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'index' is not null or undefined
+            assertParamExists('indexDocument', 'index', index)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('indexDocument', 'id', id)
+            // verify required parameter 'requestBody' is not null or undefined
+            assertParamExists('indexDocument', 'requestBody', requestBody)
+            const localVarPath = `/api/opensearch/index/{index}/{id}`
+                .replace(`{${"index"}}`, encodeURIComponent(String(index)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(requestBody, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initializeIndices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/opensearch/indices/initialize`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} q 
+         * @param {string} [organizationId] 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        search1: async (q: string, organizationId?: string, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('search1', 'q', q)
+            const localVarPath = `/api/opensearch/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (organizationId !== undefined) {
+                localVarQueryParameter['organizationId'] = organizationId;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchDocuments: async (index: string, query?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'index' is not null or undefined
+            assertParamExists('searchDocuments', 'index', index)
+            const localVarPath = `/api/opensearch/search/{index}`
+                .replace(`{${"index"}}`, encodeURIComponent(String(index)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
 /**
- * AwsS3ControllerApi - functional programming interface
+ * OpenSearchControllerApi - functional programming interface
  * @export
  */
-export const AwsS3ControllerApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = AwsS3ControllerApiAxiosParamCreator(configuration)
+export const OpenSearchControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = OpenSearchControllerApiAxiosParamCreator(configuration)
     return {
         /**
          * 
-         * @param {string} uploadId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async abortUpload(uploadId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.abortUpload(uploadId, options);
+        async bulkIngest(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BulkIngestionResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.bulkIngest(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AwsS3ControllerApi.abortUpload']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.bulkIngest']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {string} uploadId 
-         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {string} index 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.completeMultipartUpload(uploadId, uploadCompletionRequest, options);
+        async deleteDocument(index: string, id: string, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDocument(index, id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AwsS3ControllerApi.completeMultipartUpload']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.deleteDocument']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
-         * @param {UploadRequest} uploadRequest 
+         * @param {string} index 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UploadResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateUpload(uploadRequest, options);
+        async deleteIndex(index: string, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteIndex(index, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AwsS3ControllerApi.initiateUpload']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.deleteIndex']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1949,110 +2545,248 @@ export const AwsS3ControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listBuckets(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listBuckets(options);
+        async health(options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: string; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.health(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AwsS3ControllerApi.listBuckets']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.health']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} id 
+         * @param {{ [key: string]: any; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async indexDocument(index: string, id: string, requestBody: { [key: string]: any; }, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.indexDocument(index, id, requestBody, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.indexDocument']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async initializeIndices(options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initializeIndices(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.initializeIndices']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} q 
+         * @param {string} [organizationId] 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async search1(q: string, organizationId?: string, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.search1(q, organizationId, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.search1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async searchDocuments(index: string, query?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchDocuments(index, query, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OpenSearchControllerApi.searchDocuments']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * AwsS3ControllerApi - factory interface
+ * OpenSearchControllerApi - factory interface
  * @export
  */
-export const AwsS3ControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = AwsS3ControllerApiFp(configuration)
+export const OpenSearchControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = OpenSearchControllerApiFp(configuration)
     return {
         /**
          * 
-         * @param {string} uploadId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        abortUpload(uploadId: string, options?: RawAxiosRequestConfig): AxiosPromise<string> {
-            return localVarFp.abortUpload(uploadId, options).then((request) => request(axios, basePath));
+        bulkIngest(options?: RawAxiosRequestConfig): AxiosPromise<BulkIngestionResult> {
+            return localVarFp.bulkIngest(options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string} uploadId 
-         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {string} index 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
-            return localVarFp.completeMultipartUpload(uploadId, uploadCompletionRequest, options).then((request) => request(axios, basePath));
+        deleteDocument(index: string, id: string, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.deleteDocument(index, id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {UploadRequest} uploadRequest 
+         * @param {string} index 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig): AxiosPromise<UploadResult> {
-            return localVarFp.initiateUpload(uploadRequest, options).then((request) => request(axios, basePath));
+        deleteIndex(index: string, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.deleteIndex(index, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listBuckets(options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
-            return localVarFp.listBuckets(options).then((request) => request(axios, basePath));
+        health(options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: string; }> {
+            return localVarFp.health(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} id 
+         * @param {{ [key: string]: any; }} requestBody 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        indexDocument(index: string, id: string, requestBody: { [key: string]: any; }, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.indexDocument(index, id, requestBody, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initializeIndices(options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
+            return localVarFp.initializeIndices(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} q 
+         * @param {string} [organizationId] 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        search1(q: string, organizationId?: string, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<SearchResponse> {
+            return localVarFp.search1(q, organizationId, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} index 
+         * @param {string} [query] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        searchDocuments(index: string, query?: string, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.searchDocuments(index, query, options).then((request) => request(axios, basePath));
         },
     };
 };
 
 /**
- * AwsS3ControllerApi - object-oriented interface
+ * OpenSearchControllerApi - object-oriented interface
  * @export
- * @class AwsS3ControllerApi
+ * @class OpenSearchControllerApi
  * @extends {BaseAPI}
  */
-export class AwsS3ControllerApi extends BaseAPI {
+export class OpenSearchControllerApi extends BaseAPI {
     /**
      * 
-     * @param {string} uploadId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AwsS3ControllerApi
+     * @memberof OpenSearchControllerApi
      */
-    public abortUpload(uploadId: string, options?: RawAxiosRequestConfig) {
-        return AwsS3ControllerApiFp(this.configuration).abortUpload(uploadId, options).then((request) => request(this.axios, this.basePath));
+    public bulkIngest(options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).bulkIngest(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string} uploadId 
-     * @param {UploadCompletionRequest} uploadCompletionRequest 
+     * @param {string} index 
+     * @param {string} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AwsS3ControllerApi
+     * @memberof OpenSearchControllerApi
      */
-    public completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig) {
-        return AwsS3ControllerApiFp(this.configuration).completeMultipartUpload(uploadId, uploadCompletionRequest, options).then((request) => request(this.axios, this.basePath));
+    public deleteDocument(index: string, id: string, options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).deleteDocument(index, id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {UploadRequest} uploadRequest 
+     * @param {string} index 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AwsS3ControllerApi
+     * @memberof OpenSearchControllerApi
      */
-    public initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig) {
-        return AwsS3ControllerApiFp(this.configuration).initiateUpload(uploadRequest, options).then((request) => request(this.axios, this.basePath));
+    public deleteIndex(index: string, options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).deleteIndex(index, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AwsS3ControllerApi
+     * @memberof OpenSearchControllerApi
      */
-    public listBuckets(options?: RawAxiosRequestConfig) {
-        return AwsS3ControllerApiFp(this.configuration).listBuckets(options).then((request) => request(this.axios, this.basePath));
+    public health(options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).health(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} index 
+     * @param {string} id 
+     * @param {{ [key: string]: any; }} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OpenSearchControllerApi
+     */
+    public indexDocument(index: string, id: string, requestBody: { [key: string]: any; }, options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).indexDocument(index, id, requestBody, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OpenSearchControllerApi
+     */
+    public initializeIndices(options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).initializeIndices(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} q 
+     * @param {string} [organizationId] 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OpenSearchControllerApi
+     */
+    public search1(q: string, organizationId?: string, limit?: number, options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).search1(q, organizationId, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} index 
+     * @param {string} [query] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OpenSearchControllerApi
+     */
+    public searchDocuments(index: string, query?: string, options?: RawAxiosRequestConfig) {
+        return OpenSearchControllerApiFp(this.configuration).searchDocuments(index, query, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -3170,6 +3904,121 @@ export class OrganizationControllerApi extends BaseAPI {
      */
     public updateOrganization(organizationId: string, createOrganizationRequest: CreateOrganizationRequest, options?: RawAxiosRequestConfig) {
         return OrganizationControllerApiFp(this.configuration).updateOrganization(organizationId, createOrganizationRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * SearchControllerApi - axios parameter creator
+ * @export
+ */
+export const SearchControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} q 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        search: async (q: string, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'q' is not null or undefined
+            assertParamExists('search', 'q', q)
+            const localVarPath = `/api/search`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (q !== undefined) {
+                localVarQueryParameter['q'] = q;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * SearchControllerApi - functional programming interface
+ * @export
+ */
+export const SearchControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = SearchControllerApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} q 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async search(q: string, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SearchResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.search(q, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['SearchControllerApi.search']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * SearchControllerApi - factory interface
+ * @export
+ */
+export const SearchControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = SearchControllerApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} q 
+         * @param {number} [limit] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        search(q: string, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<SearchResponse> {
+            return localVarFp.search(q, limit, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * SearchControllerApi - object-oriented interface
+ * @export
+ * @class SearchControllerApi
+ * @extends {BaseAPI}
+ */
+export class SearchControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {string} q 
+     * @param {number} [limit] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SearchControllerApi
+     */
+    public search(q: string, limit?: number, options?: RawAxiosRequestConfig) {
+        return SearchControllerApiFp(this.configuration).search(q, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5738,6 +6587,309 @@ export class VideoControllerApi extends BaseAPI {
      */
     public updateVideo(videoId: string, updateVideoRequest: UpdateVideoRequest, options?: RawAxiosRequestConfig) {
         return VideoControllerApiFp(this.configuration).updateVideo(videoId, updateVideoRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * VideoUploadControllerApi - axios parameter creator
+ * @export
+ */
+export const VideoUploadControllerApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        abortUpload: async (uploadId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadId' is not null or undefined
+            assertParamExists('abortUpload', 'uploadId', uploadId)
+            const localVarPath = `/api/s3/upload/{uploadId}`
+                .replace(`{${"uploadId"}}`, encodeURIComponent(String(uploadId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        completeMultipartUpload: async (uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadId' is not null or undefined
+            assertParamExists('completeMultipartUpload', 'uploadId', uploadId)
+            // verify required parameter 'uploadCompletionRequest' is not null or undefined
+            assertParamExists('completeMultipartUpload', 'uploadCompletionRequest', uploadCompletionRequest)
+            const localVarPath = `/api/s3/upload/complete/{uploadId}`
+                .replace(`{${"uploadId"}}`, encodeURIComponent(String(uploadId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadCompletionRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {UploadRequest} uploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateUpload: async (uploadRequest: UploadRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadRequest' is not null or undefined
+            assertParamExists('initiateUpload', 'uploadRequest', uploadRequest)
+            const localVarPath = `/api/s3/upload/initiate`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBuckets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/s3/buckets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * VideoUploadControllerApi - functional programming interface
+ * @export
+ */
+export const VideoUploadControllerApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = VideoUploadControllerApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async abortUpload(uploadId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.abortUpload(uploadId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoUploadControllerApi.abortUpload']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.completeMultipartUpload(uploadId, uploadCompletionRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoUploadControllerApi.completeMultipartUpload']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {UploadRequest} uploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UploadResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateUpload(uploadRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoUploadControllerApi.initiateUpload']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listBuckets(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listBuckets(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['VideoUploadControllerApi.listBuckets']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * VideoUploadControllerApi - factory interface
+ * @export
+ */
+export const VideoUploadControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = VideoUploadControllerApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        abortUpload(uploadId: string, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.abortUpload(uploadId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} uploadId 
+         * @param {UploadCompletionRequest} uploadCompletionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig): AxiosPromise<string> {
+            return localVarFp.completeMultipartUpload(uploadId, uploadCompletionRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {UploadRequest} uploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig): AxiosPromise<UploadResult> {
+            return localVarFp.initiateUpload(uploadRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listBuckets(options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
+            return localVarFp.listBuckets(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * VideoUploadControllerApi - object-oriented interface
+ * @export
+ * @class VideoUploadControllerApi
+ * @extends {BaseAPI}
+ */
+export class VideoUploadControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {string} uploadId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoUploadControllerApi
+     */
+    public abortUpload(uploadId: string, options?: RawAxiosRequestConfig) {
+        return VideoUploadControllerApiFp(this.configuration).abortUpload(uploadId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} uploadId 
+     * @param {UploadCompletionRequest} uploadCompletionRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoUploadControllerApi
+     */
+    public completeMultipartUpload(uploadId: string, uploadCompletionRequest: UploadCompletionRequest, options?: RawAxiosRequestConfig) {
+        return VideoUploadControllerApiFp(this.configuration).completeMultipartUpload(uploadId, uploadCompletionRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {UploadRequest} uploadRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoUploadControllerApi
+     */
+    public initiateUpload(uploadRequest: UploadRequest, options?: RawAxiosRequestConfig) {
+        return VideoUploadControllerApiFp(this.configuration).initiateUpload(uploadRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VideoUploadControllerApi
+     */
+    public listBuckets(options?: RawAxiosRequestConfig) {
+        return VideoUploadControllerApiFp(this.configuration).listBuckets(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

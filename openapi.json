@@ -650,7 +650,7 @@
     "/api/s3/upload/initiate": {
       "post": {
         "tags": [
-          "aws-s-3-controller"
+          "video-upload-controller"
         ],
         "operationId": "initiateUpload",
         "requestBody": {
@@ -680,7 +680,7 @@
     "/api/s3/upload/complete/{uploadId}": {
       "post": {
         "tags": [
-          "aws-s-3-controller"
+          "video-upload-controller"
         ],
         "operationId": "completeMultipartUpload",
         "parameters": [
@@ -928,6 +928,134 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/OrganizationMembership"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/opensearch/indices/initialize": {
+      "post": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "initializeIndices",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/opensearch/index/{index}/{id}": {
+      "post": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "indexDocument",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {}
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "deleteDocument",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/opensearch/bulk-ingest": {
+      "post": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "bulkIngest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkIngestionResult"
                 }
               }
             }
@@ -1438,10 +1566,50 @@
         }
       }
     },
+    "/api/search": {
+      "get": {
+        "tags": [
+          "search-controller"
+        ],
+        "operationId": "search",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/s3/buckets": {
       "get": {
         "tags": [
-          "aws-s-3-controller"
+          "video-upload-controller"
         ],
         "operationId": "listBuckets",
         "responses": {
@@ -1586,6 +1754,116 @@
         }
       }
     },
+    "/api/opensearch/search": {
+      "get": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "search_1",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/opensearch/search/{index}": {
+      "get": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "searchDocuments",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "*"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/opensearch/health": {
+      "get": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": [
@@ -1672,7 +1950,7 @@
     "/api/s3/upload/{uploadId}": {
       "delete": {
         "tags": [
-          "aws-s-3-controller"
+          "video-upload-controller"
         ],
         "operationId": "abortUpload",
         "parameters": [
@@ -1727,6 +2005,37 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/opensearch/indices/{index}": {
+      "delete": {
+        "tags": [
+          "open-search-controller"
+        ],
+        "operationId": "deleteIndex",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {}
+                }
+              }
+            }
           }
         }
       }
@@ -2511,6 +2820,45 @@
           }
         }
       },
+      "BulkIngestionResult": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "videosIndexed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizationsIndexed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usersIndexed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationMs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalIndexed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "UpdateVideoRequest": {
         "type": "object",
         "properties": {
@@ -2762,6 +3110,242 @@
         "properties": {
           "tag": {
             "$ref": "#/components/schemas/Tag"
+          }
+        }
+      },
+      "OrganizationSearchDocument": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "organization_id": {
+            "type": "string"
+          },
+          "website_url": {
+            "type": "string"
+          },
+          "organization_type": {
+            "type": "string"
+          },
+          "member_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "video_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "used_storage_gb": {
+            "type": "number",
+            "format": "double"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "searchable_text": {
+            "type": "string"
+          }
+        }
+      },
+      "SearchResponse": {
+        "type": "object",
+        "properties": {
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VideoSearchDocument"
+            }
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserSearchDocument"
+            }
+          },
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationSearchDocument"
+            }
+          },
+          "total_results": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UserSearchDocument": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "avatar_url": {
+            "type": "string"
+          },
+          "organization_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organization_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_login_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "searchable_text": {
+            "type": "string"
+          }
+        }
+      },
+      "VideoSearchDocument": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "codec": {
+            "type": "string"
+          },
+          "video_id": {
+            "type": "string"
+          },
+          "original_filename": {
+            "type": "string"
+          },
+          "file_size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upload_status": {
+            "type": "string"
+          },
+          "processing_status": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string"
+          },
+          "user_username": {
+            "type": "string"
+          },
+          "user_full_name": {
+            "type": "string"
+          },
+          "organization_id": {
+            "type": "string"
+          },
+          "organization_name": {
+            "type": "string"
+          },
+          "organization_slug": {
+            "type": "string"
+          },
+          "organization_type": {
+            "type": "string"
+          },
+          "tag_categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "audio_codec": {
+            "type": "string"
+          },
+          "frame_rate": {
+            "type": "number",
+            "format": "double"
+          },
+          "aspect_ratio": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "searchable_text": {
+            "type": "string"
           }
         }
       },

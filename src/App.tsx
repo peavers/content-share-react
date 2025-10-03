@@ -23,6 +23,7 @@ import OrganizationMembers from './components/admin/OrganizationMembers';
 import OrganizationSettings from './components/admin/OrganizationSettings';
 import AdminFAB from './components/shared/AdminFAB';
 import UserProfilePage from './components/UserProfilePage';
+import SearchResultsPage from './components/SearchResultsPage';
 import Footer from './components/shared/Footer';
 
 // Configure Amplify
@@ -106,6 +107,12 @@ const App: React.FC = () => {
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <UserProfilePage />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/search" element={
+                <ProtectedRoute>
+                  <SearchResultsPage />
                 </ProtectedRoute>
               } />
             </Routes>
