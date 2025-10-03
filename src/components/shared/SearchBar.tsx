@@ -161,16 +161,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className="input input-ghost w-full px-2 focus:outline-none text-sm bg-transparent border-none"
           />
 
-          {/* Keyboard Shortcut Hint (when not focused and empty) */}
-          {!isFocused && !query && (
-            <div className="hidden sm:flex items-center gap-1 mr-3 text-xs text-base-content/40 flex-shrink-0">
-              <kbd className="kbd kbd-xs">⌘</kbd>
-              <kbd className="kbd kbd-xs">K</kbd>
-            </div>
-          )}
-
-          {/* Clear Button (when has text) */}
-          {query && (
+          {/* Keyboard Shortcut Hint (when empty) or Clear Button (when has text) */}
+          {query ? (
             <button
               type="button"
               onMouseDown={handleClear} // Use onMouseDown instead of onClick to fire before blur
@@ -192,6 +184,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 />
               </svg>
             </button>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1 mr-3 text-xs text-base-content/40 flex-shrink-0">
+              <kbd className="kbd kbd-xs">⌘</kbd>
+              <kbd className="kbd kbd-xs">K</kbd>
+            </div>
           )}
         </div>
       </form>
