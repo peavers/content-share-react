@@ -13,14 +13,12 @@ const TagManagement: React.FC = () => {
   const [expandedTagIds, setExpandedTagIds] = useState<Set<number>>(new Set());
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [editName, setEditName] = useState('');
-  const [editDescription, setEditDescription] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTags, setNewTags] = useState<string[]>([]);
 
   useEffect(() => {
-    if (currentWorkspace) {
-      fetchTags();
-    }
+    // AdminRoute ensures currentWorkspace exists before rendering this component
+    fetchTags();
   }, [currentWorkspace]);
 
   const fetchTags = async () => {
@@ -80,13 +78,11 @@ const TagManagement: React.FC = () => {
   const handleStartEdit = (tag: Tag) => {
     setEditingTag(tag);
     setEditName(tag.name || '');
-    setEditDescription(tag.description || '');
   };
 
   const handleCancelEdit = () => {
     setEditingTag(null);
     setEditName('');
-    setEditDescription('');
   };
 
   const handleSaveEdit = async () => {
@@ -103,12 +99,11 @@ const TagManagement: React.FC = () => {
 
       await tagService.updateTag(editingTag.id!, {
         path: newPath,
-        description: editDescription.trim() || undefined
+        description: undefined
       });
 
       setEditingTag(null);
       setEditName('');
-      setEditDescription('');
       await fetchTags();
     } catch (err: any) {
       console.error('Error updating tag:', err);
@@ -168,14 +163,7 @@ const TagManagement: React.FC = () => {
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Tag name"
                 />
-                <input
-                  type="text"
-                  className="input input-sm input-bordered flex-1"
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder="Description (optional)"
-                />
-                <button onClick={handleSaveEdit} className="btn btn-success btn-sm">
+                <button onClick={handleSaveEdit} className="btn btn-primary btn-sm">
                   Save
                 </button>
                 <button onClick={handleCancelEdit} className="btn btn-ghost btn-sm">
@@ -186,29 +174,20 @@ const TagManagement: React.FC = () => {
               <>
                 <div className="flex-1">
                   <div className="font-medium">{tag.name}</div>
-                  {tag.description && (
-                    <div className="text-xs opacity-60">{tag.description}</div>
-                  )}
                   <div className="text-xs opacity-40">{tag.path}</div>
                 </div>
-                <div className="opacity-0 group-hover:opacity-100 flex gap-1">
+                <div className="opacity-0 group-hover:opacity-100 flex gap-2">
                   <button
                     onClick={() => handleStartEdit(tag)}
-                    className="btn btn-ghost btn-xs"
-                    title="Edit tag"
+                    className="btn btn-ghost btn-sm"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                    Edit
                   </button>
                   <button
                     onClick={() => handleDeleteTag(tag)}
-                    className="btn btn-ghost btn-xs text-error"
-                    title="Delete tag"
+                    className="btn btn-ghost btn-sm text-error"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    Delete
                   </button>
                 </div>
               </>
@@ -225,22 +204,7 @@ const TagManagement: React.FC = () => {
     });
   };
 
-  if (!currentWorkspace) {
-    return (
-      <div className="min-h-screen bg-base-200">
-        <Navigation />
-        <div className="hero min-h-[calc(100vh-4rem)]">
-          <div className="hero-content text-center">
-            <div className="max-w-md">
-              <h1 className="text-3xl font-bold">No Organization Selected</h1>
-              <p className="py-6">Please select an organization to manage tags.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // AdminRoute ensures currentWorkspace exists before rendering this component
   return (
     <div className="min-h-screen bg-base-200">
       <Navigation />
@@ -276,7 +240,7 @@ const TagManagement: React.FC = () => {
           </div>
         )}
 
-        <div className="card bg-base-100 shadow-xl">
+        <div className="card bg-base-100">
           <div className="card-body">
             {loading ? (
               <div className="flex items-center justify-center py-12">

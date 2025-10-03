@@ -129,8 +129,10 @@ export function DataTable<T>({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <span className="loading loading-spinner loading-lg"></span>
-        <p className="ml-3">Loading...</p>
+        <div className="text-center">
+          <span className="loading loading-spinner loading-lg"></span>
+          <p className="mt-4 text-base-content/60">Loading...</p>
+        </div>
       </div>
     );
   }

@@ -22,10 +22,9 @@ const UserManagement: React.FC = () => {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
   useEffect(() => {
-    if (currentWorkspace) {
-      fetchUsers();
-      fetchGroups();
-    }
+    // AdminRoute ensures currentWorkspace exists before rendering this component
+    fetchUsers();
+    fetchGroups();
   }, [currentWorkspace]);
 
   const fetchUsers = async (token?: string) => {
@@ -317,22 +316,7 @@ const UserManagement: React.FC = () => {
     },
   ];
 
-  if (!currentWorkspace) {
-    return (
-      <div className="min-h-screen bg-base-200">
-        <Navigation />
-        <div className="hero min-h-[calc(100vh-4rem)]">
-          <div className="hero-content text-center">
-            <div className="max-w-md">
-              <h1 className="text-3xl font-bold">No Organization Selected</h1>
-              <p className="py-6">Please select an organization to manage users.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // AdminRoute ensures currentWorkspace exists before rendering this component
   return (
     <div className="min-h-screen bg-base-200">
       <Navigation />
@@ -368,7 +352,7 @@ const UserManagement: React.FC = () => {
           </div>
         )}
 
-        <div className="card bg-base-100 shadow-xl">
+        <div className="card bg-base-100">
           <div className="card-body">
             <DataTable
               data={users}

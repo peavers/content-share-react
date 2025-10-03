@@ -14,12 +14,11 @@ const OrganizationSettings: React.FC = () => {
   const [success, setSuccess] = useState(false);
 
   // Load current organization settings
+  // AdminRoute ensures currentWorkspace exists before rendering this component
   useEffect(() => {
-    if (currentWorkspace?.organization) {
-      setName(currentWorkspace.organization.name || '');
-      setDescription(currentWorkspace.organization.description || '');
-      setAvatarUrl(currentWorkspace.organization.avatarUrl || '');
-    }
+    setName(currentWorkspace?.organization.name || '');
+    setDescription(currentWorkspace?.organization.description || '');
+    setAvatarUrl(currentWorkspace?.organization.avatarUrl || '');
   }, [currentWorkspace]);
 
   const handleSave = async () => {
@@ -57,23 +56,8 @@ const OrganizationSettings: React.FC = () => {
     }
   };
 
-  if (!currentWorkspace) {
-    return (
-      <div className="min-h-screen bg-base-200">
-        <Navigation />
-        <div className="hero min-h-[calc(100vh-4rem)]">
-          <div className="hero-content text-center">
-            <div className="max-w-md">
-              <h1 className="text-3xl font-bold">No Organization Selected</h1>
-              <p className="py-6">Please select an organization to manage its settings.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const organization = currentWorkspace.organization;
+  // AdminRoute ensures currentWorkspace exists before rendering this component
+  const organization = currentWorkspace!.organization;
 
   return (
     <div className="min-h-screen bg-base-200">
@@ -171,7 +155,7 @@ const OrganizationSettings: React.FC = () => {
 
           {/* Main Content - Edit Form */}
           <div className="lg:col-span-3">
-            <div className="card bg-base-100 shadow-xl">
+            <div className="card bg-base-100">
               <div className="card-body">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold">Organization settings</h2>

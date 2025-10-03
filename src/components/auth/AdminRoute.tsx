@@ -11,6 +11,8 @@ interface AdminRouteProps {
  * Protected route wrapper that requires admin permissions
  * Checks if user has the required permission in their current workspace
  * Platform admins (ROLE_PLATFORM_ADMIN) have access to all routes
+ *
+ * Note: ProtectedRoute ensures auth and org contexts are loaded before this runs
  */
 const AdminRoute: React.FC<AdminRouteProps> = ({
   children,
@@ -26,7 +28,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({
   const hasAccess = isPlatformAdmin || hasPermissionInCurrentWorkspace(requiredPermission);
 
   if (!hasAccess) {
-    // Redirect to main page if user doesn't have admin access
+    // Show access denied if user doesn't have permission
     return (
       <div className="hero min-h-screen bg-base-200">
         <div className="hero-content text-center">
