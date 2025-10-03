@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional] [default to undefined]
 **name** | **string** |  | [optional] [default to undefined]
-**slug** | **string** |  | [optional] [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
 **avatarUrl** | **string** |  | [optional] [default to undefined]
 **websiteUrl** | **string** |  | [optional] [default to undefined]
@@ -33,7 +32,6 @@ import { Organization } from './api';
 const instance: Organization = {
     id,
     name,
-    slug,
     description,
     avatarUrl,
     websiteUrl,

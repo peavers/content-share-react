@@ -6,7 +6,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** |  | [optional] [default to undefined]
-**slug** | **string** |  | [optional] [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
 **avatarUrl** | **string** |  | [optional] [default to undefined]
 **websiteUrl** | **string** |  | [optional] [default to undefined]
@@ -24,7 +23,6 @@ import { CreateOrganizationRequest } from './api';
 
 const instance: CreateOrganizationRequest = {
     name,
-    slug,
     description,
     avatarUrl,
     websiteUrl,

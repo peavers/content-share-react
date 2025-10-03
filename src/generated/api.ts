@@ -139,12 +139,6 @@ export interface CreateOrganizationRequest {
      * @type {string}
      * @memberof CreateOrganizationRequest
      */
-    'slug': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateOrganizationRequest
-     */
     'description': string;
     /**
      * 
@@ -381,12 +375,6 @@ export interface Organization {
      * @type {string}
      * @memberof Organization
      */
-    'slug': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Organization
-     */
     'description': string;
     /**
      * 
@@ -562,13 +550,13 @@ export interface OrganizationInvitation {
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'expired': boolean;
+    'active': boolean;
     /**
      * 
      * @type {boolean}
      * @memberof OrganizationInvitation
      */
-    'active': boolean;
+    'expired': boolean;
 }
 
 export const OrganizationInvitationRoleEnum = {
@@ -688,12 +676,6 @@ export interface OrganizationResponse {
      * @memberof OrganizationResponse
      */
     'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OrganizationResponse
-     */
-    'slug': string;
     /**
      * 
      * @type {string}
@@ -2193,39 +2175,6 @@ export const OrganizationControllerApiAxiosParamCreator = function (configuratio
         },
         /**
          * 
-         * @param {string} slug 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        checkSlugAvailability: async (slug: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'slug' is not null or undefined
-            assertParamExists('checkSlugAvailability', 'slug', slug)
-            const localVarPath = `/api/organizations/check-slug/{slug}`
-                .replace(`{${"slug"}}`, encodeURIComponent(String(slug)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2719,18 +2668,6 @@ export const OrganizationControllerApiFp = function(configuration?: Configuratio
         },
         /**
          * 
-         * @param {string} slug 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async checkSlugAvailability(slug: string, options: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: boolean; }>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.checkSlugAvailability(slug, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['OrganizationControllerApi.checkSlugAvailability']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2928,15 +2865,6 @@ export const OrganizationControllerApiFactory = function (configuration?: Config
         },
         /**
          * 
-         * @param {string} slug 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        checkSlugAvailability(slug: string, options: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: boolean; }> {
-            return localVarFp.checkSlugAvailability(slug, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {CreateOrganizationRequest} createOrganizationRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3097,17 +3025,6 @@ export class OrganizationControllerApi extends BaseAPI {
      */
     public cancelInvitation(organizationId: string, invitationId: number, options?: RawAxiosRequestConfig) {
         return OrganizationControllerApiFp(this.configuration).cancelInvitation(organizationId, invitationId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} slug 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrganizationControllerApi
-     */
-    public checkSlugAvailability(slug: string, options?: RawAxiosRequestConfig) {
-        return OrganizationControllerApiFp(this.configuration).checkSlugAvailability(slug, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

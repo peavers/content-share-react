@@ -2,3 +2,32 @@
 @plugin "daisyui" {
   themes: all;
 }
+
+/* Tone down input/textarea/select focus borders */
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-color: hsl(var(--bc) / 0.2);
+  box-shadow: none;
+}
+
+.input-bordered:focus,
+.textarea-bordered:focus,
+.select-bordered:focus {
+  border-color: hsl(var(--bc) / 0.3);
+}
+
+/* Keep error/success states more visible */
+.input-error:focus,
+.textarea-error:focus,
+.select-error:focus {
+  border-color: hsl(var(--er) / 0.5);
+}
+
+.input-success:focus,
+.textarea-success:focus,
+.select-success:focus {
+  border-color: hsl(var(--su) / 0.5);
+}

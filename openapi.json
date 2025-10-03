@@ -1586,39 +1586,6 @@
         }
       }
     },
-    "/api/organizations/check-slug/{slug}": {
-      "get": {
-        "tags": [
-          "organization-controller"
-        ],
-        "operationId": "checkSlugAvailability",
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "boolean"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/users": {
       "get": {
         "tags": [
@@ -1929,9 +1896,6 @@
           "name": {
             "type": "string"
           },
-          "slug": {
-            "type": "string"
-          },
           "description": {
             "type": "string"
           },
@@ -1989,9 +1953,6 @@
             "type": "string"
           },
           "name": {
-            "type": "string"
-          },
-          "slug": {
             "type": "string"
           },
           "description": {
@@ -2339,9 +2300,6 @@
           "name": {
             "type": "string"
           },
-          "slug": {
-            "type": "string"
-          },
           "description": {
             "type": "string"
           },
@@ -2531,10 +2489,10 @@
           "inviter": {
             "$ref": "#/components/schemas/User"
           },
-          "expired": {
+          "active": {
             "type": "boolean"
           },
-          "active": {
+          "expired": {
             "type": "boolean"
           }
         }

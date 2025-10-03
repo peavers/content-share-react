@@ -7,7 +7,6 @@ All URIs are relative to *http://localhost:8080*
 |[**acceptInvitation**](#acceptinvitation) | **POST** /api/organizations/invitations/{token}/accept | |
 |[**acceptInvitationPublic**](#acceptinvitationpublic) | **POST** /api/organizations/public/invitations/{token}/accept | |
 |[**cancelInvitation**](#cancelinvitation) | **DELETE** /api/organizations/{organizationId}/invitations/{invitationId} | |
-|[**checkSlugAvailability**](#checkslugavailability) | **GET** /api/organizations/check-slug/{slug} | |
 |[**createOrganization**](#createorganization) | **POST** /api/organizations | |
 |[**declineInvitation**](#declineinvitation) | **POST** /api/organizations/invitations/{token}/decline | |
 |[**deleteOrganization**](#deleteorganization) | **DELETE** /api/organizations/{organizationId} | |
@@ -170,56 +169,6 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: Not defined
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **checkSlugAvailability**
-> { [key: string]: boolean; } checkSlugAvailability()
-
-
-### Example
-
-```typescript
-import {
-    OrganizationControllerApi,
-    Configuration
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new OrganizationControllerApi(configuration);
-
-let slug: string; // (default to undefined)
-
-const { status, data } = await apiInstance.checkSlugAvailability(
-    slug
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **slug** | [**string**] |  | defaults to undefined|
-
-
-### Return type
-
-**{ [key: string]: boolean; }**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: */*
 
 
 ### HTTP response details

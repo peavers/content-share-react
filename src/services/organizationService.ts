@@ -78,31 +78,6 @@ class OrganizationService {
   }
 
   // Utility methods
-  generateSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  }
-
-  validateSlug(slug: string): boolean {
-    const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-    return slugRegex.test(slug) && slug.length >= 3 && slug.length <= 50;
-  }
-
-  async checkSlugAvailability(slug: string): Promise<boolean> {
-    try {
-      const axios = getAuthenticatedAxios();
-      const response = await axios.get<{ available: boolean }>(
-        `/api/organizations/check-slug/${encodeURIComponent(slug)}`
-      );
-      return response.data.available;
-    } catch (error) {
-      console.error('Failed to check slug availability:', error);
-      return false;
-    }
-  }
-
   getStorageUsagePercentage(organization: Organization): number {
     const maxBytes = organization.maxStorageGb * 1024 * 1024 * 1024;
     return Math.round((organization.usedStorageBytes / maxBytes) * 100);
